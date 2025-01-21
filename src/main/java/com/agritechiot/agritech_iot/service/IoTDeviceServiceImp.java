@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
-public class IoTDeviceServiceImp implements IoTDeviceService{
+public class IoTDeviceServiceImp implements IoTDeviceService {
     private final IoTDeviceRepo ioTDeviceRepo;
 
     @Override

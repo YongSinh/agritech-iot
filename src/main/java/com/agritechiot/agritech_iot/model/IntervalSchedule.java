@@ -17,7 +17,6 @@ public class IntervalSchedule {
     private Boolean readSensor;
     @Field("turnOn_water")
     private Boolean turnOnWater;
-    @Field("turnOn_water")
     private Integer duration;
     @Field("deviceid")
     private String deviceId;

@@ -1,13 +1,10 @@
 package com.agritechiot.agritech_iot.dto;
 
 import com.agritechiot.agritech_iot.constant.GenConstant;
-import com.agritechiot.agritech_iot.model.IoTDevice;
 import lombok.Data;
 import org.slf4j.MDC;
-import reactor.core.publisher.Flux;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class ApiResponse<T> {
