@@ -1,32 +1,33 @@
 package com.agritechiot.agritech_iot.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "sensor_log")
-@Getter
+
 @Setter
+@Getter
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Table(name = "sensor_log")
 public class SensorLog {
     @Id
     private String id;
-    private LocalDateTime dateTime;
-    @Field("deviceid")
-    private String deviceId;
+    private LocalDateTime datetime;
+    @JsonProperty("device_id")
+    private String deviceid;
     private Double temperature;
     private Double humidity;
-    @Field("sensorid")
-    private Double sensorId;
-    @Field("soil_moisture")
-    private Double soilMoisture;
-    @Field("flowRate")
+    @JsonProperty("sensor_id")
+    private Double sensorid;
+    private Double soil_moisture;
     private Double flow_rate;
-    @Field("flow_quantity")
-    private Double flowQuantity;
-    @Field("total_water")
-    private Double totalWater;
+    private Double flow_quantity;
+    private Double total_water;
 }

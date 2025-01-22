@@ -1,24 +1,27 @@
 package com.agritechiot.agritech_iot.model;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "control_log")
-@Getter
+
 @Setter
+@Getter
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Table("control_log")
 public class ControlLog {
     @Id
     private String id;
-    private LocalDateTime dateTime;
-    @Field("deviceid")
-    private String deviceId;
+    private LocalDateTime datetime;
+    @JsonProperty("device_id")
+    private String deviceid;
     private String status;
     private Integer duration;
-    @Field("sentby")
     private String sentBy;
 }

@@ -10,7 +10,6 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class IoTDeviceServiceImp implements IoTDeviceService {
     private final IoTDeviceRepo ioTDeviceRepo;
-
     @Override
     public Flux<IoTDevice> getListDevice() {
         return ioTDeviceRepo.findAll();
