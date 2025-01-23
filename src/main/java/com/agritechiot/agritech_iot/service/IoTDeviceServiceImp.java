@@ -5,13 +5,20 @@ import com.agritechiot.agritech_iot.repository.IoTDeviceRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class IoTDeviceServiceImp implements IoTDeviceService {
     private final IoTDeviceRepo ioTDeviceRepo;
+
     @Override
     public Flux<IoTDevice> getListDevice() {
         return ioTDeviceRepo.findAll();
+    }
+
+    @Override
+    public Mono<IoTDevice> getDeviceById(Integer id) {
+        return ioTDeviceRepo.findById(id);
     }
 }
