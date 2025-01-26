@@ -28,7 +28,8 @@ public class IoTDeviceController {
                 .collectList()  // Collect the Flux into a List
                 .map(devices -> new ApiResponse<>(devices, correlationId));
     }
-    @PostMapping(value="/v1/iot/getDeviceName")
+
+    @PostMapping(value = "/v1/iot/getDeviceName")
     public Mono<ApiResponse<?>> getIoTDevicesByName(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq ioTDeviceReq

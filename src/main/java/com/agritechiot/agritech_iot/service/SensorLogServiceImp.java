@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class SensorLogServiceImp implements SensorLogService{
+public class SensorLogServiceImp implements SensorLogService {
     private final SensorLogRepo sensorLogRepo;
 }

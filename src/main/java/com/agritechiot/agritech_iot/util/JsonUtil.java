@@ -1,6 +1,7 @@
 package com.agritechiot.agritech_iot.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class JsonUtil {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
