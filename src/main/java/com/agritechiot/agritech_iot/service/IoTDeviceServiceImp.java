@@ -21,4 +21,29 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
     public Mono<IoTDevice> getDeviceById(Integer id) {
         return ioTDeviceRepo.findById(id);
     }
+
+    @Override
+    public Mono<IoTDevice> getDeviceByName(String name) {
+        return ioTDeviceRepo.findByName(name);
+    }
+
+    @Override
+    public Mono<IoTDevice> saveDevice(IoTDevice req) {
+        return ioTDeviceRepo.save(req);
+    }
+
+    @Override
+    public Mono<IoTDevice> updateDevice(Integer id, IoTDevice req) {
+        return ioTDeviceRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("IOT_DEVICE_NOT_FOUND")))
+                .map(d -> {
+                    d.setDeviceid(id);
+                    d.setName(req.getName());
+                    d.setRemark(req.getRemark());
+                    d.setSensors(req.getSensors());
+                    return d;
+                }).flatMap(ioTDeviceRepo::save);
+    }
+
+
 }
