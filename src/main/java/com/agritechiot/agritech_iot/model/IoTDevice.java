@@ -1,19 +1,22 @@
 package com.agritechiot.agritech_iot.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Document(collection = "tbl_iotdevice")
-@Getter
 @Setter
+@Getter
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Table("tbl_iotdevice")
 public class IoTDevice {
     @Id
-    private String id;
-    @Field("deviceid")
-    private String deviceId;
+    @JsonProperty("device_id")
+    private Integer deviceid;
     private String name;
     private String sensors;
     private String remark;
