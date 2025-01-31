@@ -30,7 +30,6 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
-		<!-- https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client -->
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
@@ -41,7 +40,6 @@
 			<artifactId>reactor-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.mariadb/r2dbc-mariadb -->
 		<dependency>
 			<groupId>org.mariadb</groupId>
 			<artifactId>r2dbc-mariadb</artifactId>
@@ -61,7 +59,6 @@
 			<artifactId>aspectjtools</artifactId>
 			<version>1.9.21</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
@@ -80,7 +77,7 @@
 		<dependency>
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-pool</artifactId>
-			<version>1.0.1.RELEASE</version> <!-- Match the version with your setup -->
+			<version>1.0.1.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
