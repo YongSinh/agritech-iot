@@ -9,13 +9,10 @@ import lombok.Setter;
 public class IoTDeviceReq {
     @JsonProperty("device_id")
     private Integer deviceId;
-
     @JsonProperty("name")
     private String name;
-
     @JsonProperty("sensors")
     private String sensors;
-
     @JsonProperty("remark")
     private String remark;
 }
