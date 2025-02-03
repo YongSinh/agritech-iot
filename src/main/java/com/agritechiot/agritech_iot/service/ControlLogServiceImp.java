@@ -24,7 +24,13 @@ public class ControlLogServiceImp implements ControlLogService {
 
     @Override
     public Mono<ControlLog> saveControlLogs(ControlLog req) {
-        return controlLogRepo.save(req);
+        ControlLog controlLog = new ControlLog();
+        controlLog.setDatetime(req.getDatetime());
+        controlLog.setDuration(req.getDuration());
+        controlLog.setStatus(req.getStatus());
+        controlLog.setSentBy(req.getSentBy());
+        controlLog.setDeviceid(req.getDeviceid());
+        return controlLogRepo.save(controlLog);
     }
 
     @Override

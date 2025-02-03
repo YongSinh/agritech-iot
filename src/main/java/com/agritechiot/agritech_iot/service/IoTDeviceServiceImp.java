@@ -1,5 +1,6 @@
 package com.agritechiot.agritech_iot.service;
 
+import com.agritechiot.agritech_iot.dto.request.IoTDeviceReq;
 import com.agritechiot.agritech_iot.model.IoTDevice;
 import com.agritechiot.agritech_iot.repository.IoTDeviceRepo;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,17 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
     }
 
     @Override
-    public Mono<IoTDevice> saveDevice(IoTDevice req) {
-        return ioTDeviceRepo.save(req);
+    public Mono<IoTDevice> saveDevice(IoTDeviceReq req) {
+        IoTDevice device = new IoTDevice();
+        device.setName(req.getName());
+        device.setSensors(req.getSensors());
+        device.setRemark(req.getRemark());
+        device.setController(req.getController());
+        return ioTDeviceRepo.save(device);
     }
 
     @Override
-    public Mono<IoTDevice> updateDevice(Integer id, IoTDevice req) {
+    public Mono<IoTDevice> updateDevice(Integer id, IoTDeviceReq req) {
         return ioTDeviceRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception("IOT_DEVICE_NOT_FOUND")))
                 .map(d -> {
@@ -41,6 +47,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                     d.setName(req.getName());
                     d.setRemark(req.getRemark());
                     d.setSensors(req.getSensors());
+                    d.setController(req.getController());
                     return d;
                 }).flatMap(ioTDeviceRepo::save);
     }
