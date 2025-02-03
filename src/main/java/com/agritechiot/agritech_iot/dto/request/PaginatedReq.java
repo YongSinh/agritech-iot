@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class PaginatedReq {
     private Integer page = 0;
-    private  Integer size = 10;
+    private Integer size = 10;
 }

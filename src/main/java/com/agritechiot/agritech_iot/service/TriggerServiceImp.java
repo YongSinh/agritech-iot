@@ -13,6 +13,6 @@ public class TriggerServiceImp implements TriggerService {
 
     @Override
     public Mono<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId) {
-        return triggerRepo.findByDeviceIdAndSensor(deviceId,sensor);
+        return triggerRepo.findByDeviceIdAndSensor(deviceId, sensor);
     }
 }

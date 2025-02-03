@@ -28,7 +28,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     public Mono<OnetimeSchedule> updateOnetimeSchedule(Integer id, OnetimeSchedule req) {
         return onetimeScheduleRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception("ONE_TIME_SCHEDULE_NOT_FOUND")))
-                .map( onetimeSchedule -> {
+                .map(onetimeSchedule -> {
                     onetimeSchedule.setId(id);
                     onetimeSchedule.setDuration(req.getDuration());
                     onetimeSchedule.setDeviceid(req.getDeviceid());
@@ -47,7 +47,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
 
     @Override
     public Flux<OnetimeSchedule> getListOnetimeScheduleDuration(Integer duration, Integer duration2) {
-        return onetimeScheduleRepo.findAllByDurationBetween(duration,duration2);
+        return onetimeScheduleRepo.findAllByDurationBetween(duration, duration2);
     }
 
     @Override
