@@ -5,4 +5,7 @@ import reactor.core.publisher.Mono;
 
 public interface TriggerService {
     Mono<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId);
+    Mono<Trigger> saveTrigger(Trigger req);
+    Mono<Trigger> updateTrigger(Integer id, Trigger req);
+
 }

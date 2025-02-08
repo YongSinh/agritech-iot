@@ -1,14 +1,16 @@
 package com.agritechiot.agritech_iot.controller;
 
 import com.agritechiot.agritech_iot.config.Mqtt;
-import com.agritechiot.agritech_iot.constant.GenConstant;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
 import com.agritechiot.agritech_iot.model.MqttPublishModel;
 import com.agritechiot.agritech_iot.model.MqttSubscribeModel;
+import com.agritechiot.agritech_iot.service.mqtt.SubscriberImp;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +21,18 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class SampleController {
-
-    @PostMapping("/sample")
-    public ResponseEntity<?> cbsAccountInfo(
-            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+    private final SubscriberImp subscriberImp;
+    private final SimpMessagingTemplate messagingTemplate;
+    @GetMapping("/sample")
+    public ResponseEntity<?> cbsAccountInfo() throws MqttException {
+        subscriberImp.sub();
         return ResponseEntity.ok(new ApiResponse<>());
+    }
+    @PostMapping("/send/genMessage")
+    public void sendGenMessage(@RequestBody Object message) {
+        messagingTemplate.convertAndSend("/topic/public", message);
     }
 
     @PostMapping("publish")
@@ -60,4 +68,6 @@ public class SampleController {
 
         return messages;
     }
+
+
 }

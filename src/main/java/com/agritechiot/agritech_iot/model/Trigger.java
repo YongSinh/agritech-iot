@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Table(name = "tbl_trigger")
 public class Trigger {
     @Id
-    private String id;
+    private Integer id;
     private LocalDateTime datetime;
     private String operator;
     private String sensor;
