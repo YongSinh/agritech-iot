@@ -46,7 +46,7 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     }
 
     @Override
-    public Flux<IntervalSchedule> getListIntervalRecordByDeviceId(Integer id) {
+    public Flux<IntervalSchedule> getListIntervalRecordByDeviceId(String id) {
         return intervalScheduleRepo.findAllByDeviceId(id);
     }
 

@@ -11,7 +11,7 @@ public interface IntervalScheduleService {
 
     Flux<IntervalSchedule> getListIntervalRecord();
 
-    Flux<IntervalSchedule> getListIntervalRecordByDeviceId(Integer id);
+    Flux<IntervalSchedule> getListIntervalRecordByDeviceId(String  id);
 
     Mono<IntervalSchedule> getIntervalRecordById(Integer id);
 
