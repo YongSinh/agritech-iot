@@ -27,7 +27,7 @@ public class IntervalScheduleController {
     ) throws Exception {
         log.info("REQ_INTERVAL_SCHEDULE: {}", JsonUtil.toJson(req));
         return intervalScheduleService.saveIntervalRecord(req)// Collect the Flux into a List
-                .map(intervalSchedule -> new ApiResponse<>(intervalSchedule, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PostMapping(value = "/v1/iot/update-interval-schedule")
@@ -37,22 +37,24 @@ public class IntervalScheduleController {
     ) throws Exception {
         log.info("REQ_INTERVAL_SCHEDULE: {}", JsonUtil.toJson(req));
         return intervalScheduleService.updateIntervalRecord(req.getId(), req)// Collect the Flux into a List
-                .map(intervalSchedule -> new ApiResponse<>(intervalSchedule, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
+
     @GetMapping("/v1/iot/interval-schedule")
     public Mono<ApiResponse<?>> getListIntervalSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return intervalScheduleService.getListIntervalRecord()
                 .collectList()  // Collect the Flux into a List
-                .map(intervalSchedule -> new ApiResponse<>(intervalSchedule, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
+
     @PostMapping("/v1/iot/interval-schedule-by-device")
     public Mono<ApiResponse<?>> getIntervalScheduleByDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalScheduleReq req
-            ) throws Exception {
+    ) throws Exception {
         log.info("REQ_INTERVAL_SCHEDULE: {}", JsonUtil.toJson(req));
         return intervalScheduleService.getListIntervalRecordByDeviceId(req.getDeviceId())
                 .collectList()  // Collect the Flux into a List
-                .map(intervalSchedule -> new ApiResponse<>(intervalSchedule, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 }

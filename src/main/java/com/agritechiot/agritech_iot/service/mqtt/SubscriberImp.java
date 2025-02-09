@@ -1,6 +1,8 @@
 package com.agritechiot.agritech_iot.service.mqtt;
 
 import com.agritechiot.agritech_iot.config.Mqtt;
+import com.agritechiot.agritech_iot.util.JsonUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,9 +61,12 @@ public class SubscriberImp implements Subscriber {
     @Override
     public void humidity() throws MqttException {
         Mqtt.getInstance().subscribe("humidity", (topic, message) -> {
-            String payload = new String(message.getPayload());
-            log.info("📥 Received message on topic {}: {}", topic, payload);
-            processMessage(payload);
+            String res = new String(message.getPayload());
+            JsonNode payload = JsonUtil.parseJson(res);
+            log.info(String.valueOf(payload));
+            log.info("date: {}",payload.path("datetime"));
+            log.info("📥 Received message on topic {}: {}", topic, res);
+            processMessage(res);
         });
     }
 

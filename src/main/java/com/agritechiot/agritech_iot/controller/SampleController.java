@@ -25,11 +25,13 @@ import java.util.concurrent.TimeUnit;
 public class SampleController {
     private final SubscriberImp subscriberImp;
     private final SimpMessagingTemplate messagingTemplate;
+
     @GetMapping("/sample")
     public ResponseEntity<?> cbsAccountInfo() throws MqttException {
         subscriberImp.sub();
         return ResponseEntity.ok(new ApiResponse<>());
     }
+
     @PostMapping("/send/genMessage")
     public void sendGenMessage(@RequestBody Object message) {
         messagingTemplate.convertAndSend("/topic/public", message);

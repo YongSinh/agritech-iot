@@ -4,6 +4,7 @@ import com.agritechiot.agritech_iot.model.Trigger;
 import com.agritechiot.agritech_iot.repository.TriggerRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -38,6 +39,11 @@ public class TriggerServiceImp implements TriggerService {
                     return trigger;
                 }).flatMap(triggerRepo::save);
 
+    }
+
+    @Override
+    public Flux<Trigger> getTriggers() {
+        return triggerRepo.findAll();
     }
 
 }
