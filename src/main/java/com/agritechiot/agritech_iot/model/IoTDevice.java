@@ -18,6 +18,7 @@ public class IoTDevice {
     @JsonProperty("device_id")
     private Integer deviceid;
     private String name;
+    private String controller;
     private String sensors;
     private String remark;
 }

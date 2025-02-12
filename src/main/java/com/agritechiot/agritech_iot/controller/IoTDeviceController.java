@@ -3,7 +3,6 @@ package com.agritechiot.agritech_iot.controller;
 import com.agritechiot.agritech_iot.constant.GenConstant;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
 import com.agritechiot.agritech_iot.dto.request.IoTDeviceReq;
-import com.agritechiot.agritech_iot.model.IoTDevice;
 import com.agritechiot.agritech_iot.service.IoTDeviceService;
 import com.agritechiot.agritech_iot.util.JsonUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +24,7 @@ public class IoTDeviceController {
     public Mono<ApiResponse<?>> getListIoTDevices(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return ioTDeviceService.getListDevice()
                 .collectList()  // Collect the Flux into a List
-                .map(devices -> new ApiResponse<>(devices, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PostMapping(value = "/v1/iot/get-device-by-name")
@@ -35,27 +34,27 @@ public class IoTDeviceController {
     ) throws Exception {
         log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(ioTDeviceReq));
         return ioTDeviceService.getDeviceByName(ioTDeviceReq.getName())// Collect the Flux into a List
-                .map(devices -> new ApiResponse<>(devices, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PostMapping(value = "/v1/iot/add-device")
     public Mono<ApiResponse<?>> addDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody IoTDevice req
+            @RequestBody IoTDeviceReq req
     ) throws Exception {
         log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.saveDevice(req)// Collect the Flux into a List
-                .map(devices -> new ApiResponse<>(devices, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PutMapping(value = "/v1/iot/update-device")
     public Mono<ApiResponse<?>> updateDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody IoTDevice req
+            @RequestBody IoTDeviceReq req
     ) throws Exception {
         log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(req));
-        return ioTDeviceService.saveDevice(req)// Collect the Flux into a List
-                .map(devices -> new ApiResponse<>(devices, correlationId));
+        return ioTDeviceService.updateDevice(req.getDeviceId(), req)// Collect the Flux into a List
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 
 

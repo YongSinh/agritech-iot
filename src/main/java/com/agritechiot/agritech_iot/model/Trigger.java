@@ -17,13 +17,12 @@ import java.time.LocalDateTime;
 @Table(name = "tbl_trigger")
 public class Trigger {
     @Id
-    private String id;
-    private LocalDateTime datetime;
+    private Integer id;
     private String operator;
     private String sensor;
     private Integer value;
     private String action;
     private Integer duration;
     @JsonProperty("device_id")
-    private String deviceId;
+    private String deviceid;
 }

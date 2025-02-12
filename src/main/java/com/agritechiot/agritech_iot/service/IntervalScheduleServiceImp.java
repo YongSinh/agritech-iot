@@ -14,7 +14,13 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
 
     @Override
     public Mono<IntervalSchedule> saveIntervalRecord(IntervalSchedule req) {
-        return intervalScheduleRepo.save(req);
+        IntervalSchedule intervalSchedule = new IntervalSchedule();
+        intervalSchedule.setRun_datetime(req.getRun_datetime());
+        intervalSchedule.setDeviceid(req.getDeviceid());
+        intervalSchedule.setDuration(req.getDuration());
+        intervalSchedule.setRead_sensor(req.getRead_sensor());
+        intervalSchedule.setRead_sensor(req.getRead_sensor());
+        return intervalScheduleRepo.save(intervalSchedule);
     }
 
     @Override
@@ -40,7 +46,7 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     }
 
     @Override
-    public Flux<IntervalSchedule> getListIntervalRecordByDeviceId(Integer id) {
+    public Flux<IntervalSchedule> getListIntervalRecordByDeviceId(String id) {
         return intervalScheduleRepo.findAllByDeviceId(id);
     }
 

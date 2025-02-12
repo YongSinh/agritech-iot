@@ -1,5 +1,6 @@
 package com.agritechiot.agritech_iot.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonUtil {
@@ -8,20 +9,13 @@ public class JsonUtil {
     private JsonUtil() {
         // Private constructor to prevent instantiation
     }
-
-    /**
-     * Converts a JSON string to a Java object of the specified type.
-     *
-     * @param json  the JSON string
-     * @param clazz the target class to map the JSON to
-     * @param <T>   the type of the target class
-     * @return the mapped object
-     * @throws Exception if the JSON parsing fails
-     */
-    public static <T> T fromJson(String json, Class<T> clazz) throws Exception {
-        return objectMapper.readValue(json, clazz);
+    public static String objectToJsonString(Object object) throws Exception {
+        return objectMapper.writeValueAsString(object);
     }
 
+    public static JsonNode parseJson(String jsonString) throws Exception {
+        return objectMapper.readTree(jsonString);
+    }
     /**
      * Converts a Java object to a JSON string.
      *

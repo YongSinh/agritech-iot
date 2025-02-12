@@ -28,14 +28,14 @@ public class ControlLogController {
     ) throws Exception {
         log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(req));
         return controlLogService.saveControlLogs(req)// Collect the Flux into a List
-                .map(devices -> new ApiResponse<>(devices, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @GetMapping("/v1/iot/control-logs")
     public Mono<ApiResponse<?>> getListControlLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return controlLogService.getControlLogs()
                 .collectList()  // Collect the Flux into a List
-                .map(controlLogs -> new ApiResponse<>(controlLogs, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PostMapping("/v1/iot/control-logs-by-page")
@@ -44,7 +44,7 @@ public class ControlLogController {
     ) {
         return controlLogService.getPaginatedControlLogs(req.getPage(), req.getSize())
                 .collectList()  // Collect the Flux into a List
-                .map(controlLogs -> new ApiResponse<>(controlLogs, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId));
     }
 
 }
