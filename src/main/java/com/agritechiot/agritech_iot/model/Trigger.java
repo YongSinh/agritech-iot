@@ -18,12 +18,11 @@ import java.time.LocalDateTime;
 public class Trigger {
     @Id
     private Integer id;
-    private LocalDateTime datetime;
     private String operator;
     private String sensor;
     private Integer value;
     private String action;
     private Integer duration;
     @JsonProperty("device_id")
-    private String deviceId;
+    private String deviceid;
 }

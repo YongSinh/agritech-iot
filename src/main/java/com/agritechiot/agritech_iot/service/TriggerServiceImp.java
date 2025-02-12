@@ -3,12 +3,14 @@ package com.agritechiot.agritech_iot.service;
 import com.agritechiot.agritech_iot.model.Trigger;
 import com.agritechiot.agritech_iot.repository.TriggerRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TriggerServiceImp implements TriggerService {
     private final TriggerRepo triggerRepo;
 
@@ -19,14 +21,14 @@ public class TriggerServiceImp implements TriggerService {
 
     @Override
     public Mono<Trigger> saveTrigger(Trigger req) {
+        log.info("REQ_SAVE_TRIGGER_SERVICE: {}", req);
         Trigger trigger = new Trigger();
         trigger.setAction(req.getAction());
-        trigger.setDatetime(req.getDatetime());
         trigger.setOperator(req.getOperator());
         trigger.setDuration(req.getDuration());
         trigger.setSensor(req.getSensor());
         trigger.setValue(req.getValue());
-        trigger.setDeviceId(req.getDeviceId());
+        trigger.setDeviceid(req.getDeviceid());
         return triggerRepo.save(trigger);
     }
 

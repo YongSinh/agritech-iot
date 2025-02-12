@@ -2,9 +2,12 @@ package com.agritechiot.agritech_iot.controller;
 
 import com.agritechiot.agritech_iot.config.Mqtt;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
+import com.agritechiot.agritech_iot.dto.request.MqttPublishReq;
 import com.agritechiot.agritech_iot.model.MqttPublishModel;
 import com.agritechiot.agritech_iot.model.MqttSubscribeModel;
+import com.agritechiot.agritech_iot.service.mqtt.Publisher;
 import com.agritechiot.agritech_iot.service.mqtt.SubscriberImp;
+import com.agritechiot.agritech_iot.util.JsonUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -25,11 +28,11 @@ import java.util.concurrent.TimeUnit;
 public class SampleController {
     private final SubscriberImp subscriberImp;
     private final SimpMessagingTemplate messagingTemplate;
-
-    @GetMapping("/sample")
-    public ResponseEntity<?> cbsAccountInfo() throws MqttException {
-        subscriberImp.sub();
-        return ResponseEntity.ok(new ApiResponse<>());
+    private final Publisher publisher;
+    @PostMapping("/sample")
+    public ResponseEntity<?> sample(@RequestBody MqttPublishReq req) throws Exception {
+        publisher.publish(req.getTopic(), JsonUtil.objectToJsonString(req.getMessage()), req.getQos(), req.getRetained());
+        return ResponseEntity.ok(new ApiResponse<>(req));
     }
 
     @PostMapping("/send/genMessage")

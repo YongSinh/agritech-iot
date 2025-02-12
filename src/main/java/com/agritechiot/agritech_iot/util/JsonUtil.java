@@ -9,6 +9,9 @@ public class JsonUtil {
     private JsonUtil() {
         // Private constructor to prevent instantiation
     }
+    public static String objectToJsonString(Object object) throws Exception {
+        return objectMapper.writeValueAsString(object);
+    }
 
     public static JsonNode parseJson(String jsonString) throws Exception {
         return objectMapper.readTree(jsonString);
