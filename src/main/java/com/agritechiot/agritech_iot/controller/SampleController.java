@@ -29,6 +29,7 @@ public class SampleController {
     private final SubscriberImp subscriberImp;
     private final SimpMessagingTemplate messagingTemplate;
     private final Publisher publisher;
+
     @PostMapping("/sample")
     public ResponseEntity<?> sample(@RequestBody MqttPublishReq req) throws Exception {
         publisher.publish(req.getTopic(), JsonUtil.objectToJsonString(req.getMessage()), req.getQos(), req.getRetained());

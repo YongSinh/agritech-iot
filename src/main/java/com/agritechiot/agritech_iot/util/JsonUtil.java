@@ -9,6 +9,7 @@ public class JsonUtil {
     private JsonUtil() {
         // Private constructor to prevent instantiation
     }
+
     public static String objectToJsonString(Object object) throws Exception {
         return objectMapper.writeValueAsString(object);
     }
@@ -16,6 +17,7 @@ public class JsonUtil {
     public static JsonNode parseJson(String jsonString) throws Exception {
         return objectMapper.readTree(jsonString);
     }
+
     /**
      * Converts a Java object to a JSON string.
      *

@@ -11,6 +11,6 @@ public interface SensorLogService {
 
     Flux<SensorLog> getListSensorLog();
 
-    Flux<SensorLog> getSensorLogByDeviceId(Integer deviceId);
+    Flux<SensorLog> getSensorLogByDeviceId(String deviceId);
 
 }

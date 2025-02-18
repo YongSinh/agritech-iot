@@ -42,7 +42,7 @@ public class IoTDeviceController {
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
     ) throws Exception {
-        log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(req));
+        log.info("REQ_IOT_ADD_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.saveDevice(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
@@ -52,7 +52,7 @@ public class IoTDeviceController {
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
     ) throws Exception {
-        log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(req));
+        log.info("REQ_IOT_UPDATE_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.updateDevice(req.getDeviceId(), req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }

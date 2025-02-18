@@ -1,24 +1,36 @@
 package com.agritechiot.agritech_iot.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
-
+import org.springframework.data.relational.core.mapping.Column;
 @Setter
 @Getter
-@AllArgsConstructor
-@RequiredArgsConstructor
 @Table("tbl_iotdevice")
-public class IoTDevice {
+@Builder
+public class IoTDevice implements Persistable<String> {
     @Id
-    @JsonProperty("device_id")
-    private Integer deviceid;
+    @Column("deviceId")
+    private String deviceId;
     private String name;
     private String controller;
     private String sensors;
     private String remark;
+
+    @Transient
+    @Builder.Default
+    private boolean isNewEntry = true;
+    @Override
+    public String getId() {
+        return deviceId; // Return the actual deviceId
+    }
+
+    @Override
+    public boolean isNew() {
+        return isNewEntry;
+    }
 }

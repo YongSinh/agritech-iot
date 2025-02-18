@@ -2,7 +2,6 @@ package com.agritechiot.agritech_iot.controller;
 
 import com.agritechiot.agritech_iot.constant.GenConstant;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
-import com.agritechiot.agritech_iot.model.IntervalSchedule;
 import com.agritechiot.agritech_iot.model.Trigger;
 import com.agritechiot.agritech_iot.service.TriggerService;
 import com.agritechiot.agritech_iot.util.JsonUtil;
@@ -19,6 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class TriggerController {
     private final TriggerService triggerService;
+
     @GetMapping("/v1/iot/triggers")
     public Mono<ApiResponse<?>> getListSensorLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return triggerService.getTriggers()

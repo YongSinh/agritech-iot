@@ -8,12 +8,12 @@ import reactor.core.publisher.Mono;
 public interface IoTDeviceService {
     Flux<IoTDevice> getListDevice();
 
-    Mono<IoTDevice> getDeviceById(Integer id);
+    Mono<IoTDevice> getDeviceById(String id);
 
     Mono<IoTDevice> getDeviceByName(String name);
 
     Mono<IoTDevice> saveDevice(IoTDeviceReq req);
 
-    Mono<IoTDevice> updateDevice(Integer id, IoTDeviceReq req);
+    Mono<IoTDevice> updateDevice(String id, IoTDeviceReq req);
 
 }

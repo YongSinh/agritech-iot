@@ -20,7 +20,7 @@ public class IntervalSchedule {
     private Boolean read_sensor;
     private Boolean turnOn_water;
     private Integer duration;
-    @JsonProperty("device_id")
+    //@JsonProperty("device_id")
     private String deviceid;
     private Integer run_datetime;
 }

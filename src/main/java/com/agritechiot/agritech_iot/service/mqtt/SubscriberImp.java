@@ -2,7 +2,6 @@ package com.agritechiot.agritech_iot.service.mqtt;
 
 import com.agritechiot.agritech_iot.config.Mqtt;
 import com.agritechiot.agritech_iot.model.Trigger;
-import com.agritechiot.agritech_iot.repository.TriggerRepo;
 import com.agritechiot.agritech_iot.service.TriggerService;
 import com.agritechiot.agritech_iot.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,14 +12,13 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class SubscriberImp implements Subscriber {
 
     private final TriggerService triggerService;
+
     @PostConstruct
     public void init() {
         try {
@@ -65,6 +63,7 @@ public class SubscriberImp implements Subscriber {
             processMessage(payload);
         });
     }
+
     @Async
     @Override
     public void humidity() throws MqttException {
@@ -72,7 +71,7 @@ public class SubscriberImp implements Subscriber {
             String res = new String(message.getPayload());
             JsonNode payload = JsonUtil.parseJson(res);
             log.info(String.valueOf(payload));
-            log.info("date: {}",payload.path("datetime"));
+            log.info("date: {}", payload.path("datetime"));
             log.info("📥 Received message on topic {}: {}", topic, res);
             processMessage(res);
             Trigger trigger = new Trigger();
