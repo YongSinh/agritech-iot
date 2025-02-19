@@ -3,11 +3,15 @@ package com.agritechiot.agritech_iot.controller;
 import com.agritechiot.agritech_iot.constant.GenConstant;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
 import com.agritechiot.agritech_iot.dto.request.IoTDeviceReq;
+import com.agritechiot.agritech_iot.model.IoTDevice;
 import com.agritechiot.agritech_iot.service.IoTDeviceService;
+import com.agritechiot.agritech_iot.util.ErrorHandlerUtil;
 import com.agritechiot.agritech_iot.util.JsonUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -33,18 +37,20 @@ public class IoTDeviceController {
             @RequestBody IoTDeviceReq ioTDeviceReq
     ) throws Exception {
         log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(ioTDeviceReq));
-        return ioTDeviceService.getDeviceByName(ioTDeviceReq.getName())// Collect the Flux into a List
+        return ioTDeviceService.getDeviceByName(ioTDeviceReq.getName())
+                .collectList()// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PostMapping(value = "/v1/iot/add-device")
-    public Mono<ApiResponse<?>> addDevices(
+    public Mono<ApiResponse<IoTDevice>> addDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
     ) throws Exception {
         log.info("REQ_IOT_ADD_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.saveDevice(req)// Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '"+req.getDeviceId()+"' already exists.", correlationId, "IoTDevice"));
     }
 
     @PutMapping(value = "/v1/iot/update-device")

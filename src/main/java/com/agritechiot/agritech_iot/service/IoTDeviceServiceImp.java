@@ -1,6 +1,7 @@
 package com.agritechiot.agritech_iot.service;
 
 import com.agritechiot.agritech_iot.dto.request.IoTDeviceReq;
+import com.agritechiot.agritech_iot.dto.response.IoTDeviceDto;
 import com.agritechiot.agritech_iot.model.IoTDevice;
 import com.agritechiot.agritech_iot.repository.IoTDeviceRepo;
 import lombok.RequiredArgsConstructor;
@@ -10,14 +11,17 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class IoTDeviceServiceImp implements IoTDeviceService {
     private final IoTDeviceRepo ioTDeviceRepo;
 
     @Override
-    public Flux<IoTDevice> getListDevice() {
-        return ioTDeviceRepo.findAll();
+    public Flux<IoTDeviceDto> getListDevice() {
+        return ioTDeviceRepo.findAll()
+                .map(IoTDevice::toDto); // ✅ Convert each entity to DTO
     }
 
     @Override
@@ -26,8 +30,9 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
     }
 
     @Override
-    public Mono<IoTDevice> getDeviceByName(String name) {
-        return ioTDeviceRepo.findByName(name);
+    public Flux<IoTDeviceDto> getDeviceByName(String name) {
+        return ioTDeviceRepo.findByName(name)
+                .map(IoTDevice::toDto);
     }
 
     @Override
@@ -40,17 +45,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                 .controller(req.getController())
                 .isNewEntry(true) // Mark as a new entry
                 .build();
-        return ioTDeviceRepo.save(device)
-                .onErrorResume(error -> {
-                    // Handle specific exceptions, e.g., duplicate key, validation errors, etc.
-                    if (error instanceof DuplicateKeyException) {
-                        return Mono.error(new RuntimeException("Device with ID '001' already exists."));
-                    } else if (error instanceof DataIntegrityViolationException) {
-                        return Mono.error(new RuntimeException("Invalid data provided for the device."));
-                    } else {
-                        return Mono.error(new RuntimeException("Failed to save the device: " + error.getMessage()));
-                    }
-                });
+        return ioTDeviceRepo.save(device);
     }
 
     @Override

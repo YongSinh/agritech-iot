@@ -1,16 +1,18 @@
 package com.agritechiot.agritech_iot.service;
 
 import com.agritechiot.agritech_iot.dto.request.IoTDeviceReq;
+import com.agritechiot.agritech_iot.dto.response.IoTDeviceDto;
 import com.agritechiot.agritech_iot.model.IoTDevice;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface IoTDeviceService {
-    Flux<IoTDevice> getListDevice();
+import java.util.List;
 
+public interface IoTDeviceService {
+    Flux<IoTDeviceDto> getListDevice();
     Mono<IoTDevice> getDeviceById(String id);
 
-    Mono<IoTDevice> getDeviceByName(String name);
+    Flux<IoTDeviceDto> getDeviceByName(String name);
 
     Mono<IoTDevice> saveDevice(IoTDeviceReq req);
 
