@@ -3,15 +3,15 @@ package com.agritechiot.agritech_iot.controller;
 import com.agritechiot.agritech_iot.constant.GenConstant;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
 import com.agritechiot.agritech_iot.dto.request.IoTDeviceReq;
+import com.agritechiot.agritech_iot.dto.request.MqttPublishReq;
 import com.agritechiot.agritech_iot.model.IoTDevice;
 import com.agritechiot.agritech_iot.service.IoTDeviceService;
+import com.agritechiot.agritech_iot.service.mqtt.Publisher;
 import com.agritechiot.agritech_iot.util.ErrorHandlerUtil;
 import com.agritechiot.agritech_iot.util.JsonUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 public class IoTDeviceController {
 
     private final IoTDeviceService ioTDeviceService;
+    private final Publisher publisher;
 
     @GetMapping("/v1/iot/devices")
     public Mono<ApiResponse<?>> getListIoTDevices(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
@@ -50,7 +51,7 @@ public class IoTDeviceController {
         log.info("REQ_IOT_ADD_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.saveDevice(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
-                .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '"+req.getDeviceId()+"' already exists.", correlationId, "IoTDevice"));
+                .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '" + req.getDeviceId() + "' already exists.", correlationId, "IoTDevice"));
     }
 
     @PutMapping(value = "/v1/iot/update-device")
@@ -61,6 +62,16 @@ public class IoTDeviceController {
         log.info("REQ_IOT_UPDATE_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.updateDevice(req.getDeviceId(), req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
+    @PostMapping(value = "/v1/iot/off-on-device")
+    public Mono<ApiResponse<?>> offOnDevice(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody MqttPublishReq req
+    ) throws Exception {
+        publisher.publish(req.getTopic(), JsonUtil.objectToJsonString(req.getMessage()), req.getQos(), req.getRetained());
+        log.info("REQ_IOT_UPDATE_DEVICE: {}", JsonUtil.toJson(req));
+        return Mono.just(new ApiResponse<>(req.getMessage(), correlationId));
     }
 
 

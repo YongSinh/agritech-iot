@@ -13,7 +13,7 @@ public class ErrorHandlerUtil {
         if (error instanceof DuplicateKeyException) {
             messageRes = message;
         } else if (error instanceof DataIntegrityViolationException) {
-            messageRes = "Invalid data provided for the"+ entity+".";
+            messageRes = "Invalid data provided for the" + entity + ".";
         } else {
             messageRes = "Failed to process the request: " + error.getMessage();
         }

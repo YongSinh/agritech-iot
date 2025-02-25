@@ -29,7 +29,7 @@ public class ControlLogServiceImp implements ControlLogService {
         controlLog.setDuration(req.getDuration());
         controlLog.setStatus(req.getStatus());
         controlLog.setSentBy(req.getSentBy());
-        controlLog.setDeviceid(req.getDeviceid());
+        controlLog.setDeviceId(req.getDeviceId());
         return controlLogRepo.save(controlLog);
     }
 
@@ -42,7 +42,7 @@ public class ControlLogServiceImp implements ControlLogService {
                     controlLog.setId(req.getId());
                     controlLog.setDatetime(req.getDatetime());
                     controlLog.setDuration(req.getDuration());
-                    controlLog.setDeviceid(req.getDeviceid());
+                    controlLog.setDeviceId(req.getDeviceId());
                     controlLog.setStatus(req.getStatus());
                     controlLog.setSentBy(req.getSentBy());
                     return controlLog;

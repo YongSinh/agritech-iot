@@ -5,13 +5,9 @@ import com.agritechiot.agritech_iot.dto.response.IoTDeviceDto;
 import com.agritechiot.agritech_iot.model.IoTDevice;
 import com.agritechiot.agritech_iot.repository.IoTDeviceRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

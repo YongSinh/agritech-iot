@@ -16,7 +16,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     public Mono<OnetimeSchedule> saveOnetimeSchedule(OnetimeSchedule req) {
         OnetimeSchedule onetimeSchedule = new OnetimeSchedule();
         onetimeSchedule.setDuration(req.getDuration());
-        onetimeSchedule.setDeviceid(req.getDeviceid());
+        onetimeSchedule.setDeviceId(req.getDeviceId());
         onetimeSchedule.setTime(req.getTime());
         onetimeSchedule.setRead_sensor(req.getRead_sensor());
         onetimeSchedule.setDate(req.getDate());
@@ -31,7 +31,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
                 .map(onetimeSchedule -> {
                     onetimeSchedule.setId(id);
                     onetimeSchedule.setDuration(req.getDuration());
-                    onetimeSchedule.setDeviceid(req.getDeviceid());
+                    onetimeSchedule.setDeviceId(req.getDeviceId());
                     onetimeSchedule.setTime(req.getTime());
                     onetimeSchedule.setRead_sensor(req.getRead_sensor());
                     onetimeSchedule.setDate(req.getDate());

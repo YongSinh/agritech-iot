@@ -15,7 +15,7 @@ public class SensorLogServiceImp implements SensorLogService {
     @Override
     public Mono<SensorLog> saveSensorLog(SensorLog req) {
         SensorLog sensorLog = new SensorLog();
-        sensorLog.setDeviceid(req.getDeviceid());
+        sensorLog.setDeviceId(req.getDeviceId());
         sensorLog.setDatetime(req.getDatetime());
         sensorLog.setHumidity(req.getHumidity());
         sensorLog.setSensorid(req.getSensorid());
@@ -33,7 +33,7 @@ public class SensorLogServiceImp implements SensorLogService {
                 .switchIfEmpty(Mono.error(new Exception("ONE_TIME_SCHEDULE_NOT_FOUND")))
                 .map(sensorLog -> {
                     sensorLog.setId(id);
-                    sensorLog.setDeviceid(req.getDeviceid());
+                    sensorLog.setDeviceId(req.getDeviceId());
                     sensorLog.setDatetime(req.getDatetime());
                     sensorLog.setHumidity(req.getHumidity());
                     sensorLog.setSensorid(req.getSensorid());

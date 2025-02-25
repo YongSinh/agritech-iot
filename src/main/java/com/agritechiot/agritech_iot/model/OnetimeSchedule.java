@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDate;
@@ -25,5 +26,6 @@ public class OnetimeSchedule {
     private Boolean turnOn_water;
     private Integer duration;
     @JsonProperty("device_id")
-    private String deviceid;
+    @Column("deviceId")
+    private String deviceId;
 }

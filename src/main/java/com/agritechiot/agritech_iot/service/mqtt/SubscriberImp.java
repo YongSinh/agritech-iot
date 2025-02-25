@@ -76,7 +76,7 @@ public class SubscriberImp implements Subscriber {
             processMessage(res);
             Trigger trigger = new Trigger();
             trigger.setSensor(payload.path("datetime").asText());
-            trigger.setDeviceid(payload.path("device_id").asText());
+            trigger.setDeviceId(payload.path("device_id").asText());
             trigger.setOperator(payload.path("operator").asText());
             trigger.setValue(payload.path("value").intValue());
             trigger.setDuration(payload.path("duration").intValue());

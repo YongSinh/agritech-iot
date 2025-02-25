@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Setter
@@ -22,5 +23,6 @@ public class Trigger {
     private String action;
     private Integer duration;
     @JsonProperty("device_id")
-    private String deviceid;
+    @Column("deviceId")
+    private String deviceId;
 }

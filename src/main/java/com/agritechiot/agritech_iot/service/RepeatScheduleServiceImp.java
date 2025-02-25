@@ -16,7 +16,7 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
     public Mono<RepeatSchedule> saveRepeatSchedule(RepeatSchedule req) {
         RepeatSchedule repeatSchedule = new RepeatSchedule();
         repeatSchedule.setTime(req.getTime());
-        repeatSchedule.setDeviceid(req.getDeviceid());
+        repeatSchedule.setDeviceId(req.getDeviceId());
         repeatSchedule.setDuration(req.getDuration());
         repeatSchedule.setDay(req.getDay());
         repeatSchedule.setRead_sensor(req.getRead_sensor());
@@ -31,7 +31,7 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
                 .map(repeatSchedule -> {
                     repeatSchedule.setId(id);
                     repeatSchedule.setTime(req.getTime());
-                    repeatSchedule.setDeviceid(req.getDeviceid());
+                    repeatSchedule.setDeviceId(req.getDeviceId());
                     repeatSchedule.setDuration(req.getDuration());
                     repeatSchedule.setDay(req.getDay());
                     repeatSchedule.setRead_sensor(req.getRead_sensor());

@@ -6,10 +6,9 @@ import com.agritechiot.agritech_iot.model.IoTDevice;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 public interface IoTDeviceService {
     Flux<IoTDeviceDto> getListDevice();
+
     Mono<IoTDevice> getDeviceById(String id);
 
     Flux<IoTDeviceDto> getDeviceByName(String name);

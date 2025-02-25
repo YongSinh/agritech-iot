@@ -45,13 +45,14 @@ public class SensorLogController {
         return sensorLogService.updateSensorLog(req.getId(), req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
+
     @PostMapping(value = "/v1/iot/sensor-log-by-device")
     public Mono<ApiResponse<?>> getSensorLogByDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody SensorLog req
     ) throws Exception {
         log.info("REQ_SENSOR_LOG: {}", JsonUtil.toJson(req));
-        return sensorLogService.getSensorLogByDeviceId(req.getDeviceid())
+        return sensorLogService.getSensorLogByDeviceId(req.getDeviceId())
                 .collectList()// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }

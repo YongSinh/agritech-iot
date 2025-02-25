@@ -28,7 +28,7 @@ public class TriggerServiceImp implements TriggerService {
         trigger.setDuration(req.getDuration());
         trigger.setSensor(req.getSensor());
         trigger.setValue(req.getValue());
-        trigger.setDeviceid(req.getDeviceid());
+        trigger.setDeviceId(req.getDeviceId());
         return triggerRepo.save(trigger);
     }
 

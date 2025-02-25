@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
@@ -21,7 +22,8 @@ public class SensorLog {
     private String id;
     private LocalDateTime datetime;
     @JsonProperty("device_id")
-    private String deviceid;
+    @Column("deviceId")
+    private String deviceId;
     private Double temperature;
     private Double humidity;
     @JsonProperty("sensor_id")
