@@ -30,6 +30,13 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
+    public ApiResponse(String message, String correlationId) {
+        this.code = GenConstant.ERR_CODE;
+        this.timestamp = LocalDateTime.now();
+        this.correlationId = correlationId != null ? correlationId : GenConstant.DEFAULT_CORRELATION_ID;
+        this.message = message;
+        this.data = null;
+    }
 
     public ApiResponse() {
         this.code = GenConstant.SUC_CODE;
