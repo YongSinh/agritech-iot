@@ -1,0 +1,26 @@
+royaltops
+RoyalTops@2025
+
+test@2025
+
+mosquitto_sub -h localhost -t test -u "user_test" -P "test@2025"
+
+mosquitto_pub -h localhost -t test -m "hello world" -u "user_test" -P "test@2025"
+
+mosquitto_sub -h 127.0.0.1 -p 1883 -u "user_test" -P "test@2025" -t test
+
+mosquitto_pub -h 127.0.0.1 -t test -m "hello world" -u "user_test" -P "test@2025"
+
+mosquitto_sub -h 172.18.0.2 -t test -u "user_test" -P "test@2025"
+
+mosquitto_pub -h 172.18.0.2 -t test -m "hello world" -u "user_test" -P "test@2025"
+
+mosquitto_pub -h 127.0.0.1 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "user_test" -P "test@2025"
+
+https://github.com/gulteking/spring-boot-mqtt-sample
+https://roytuts.com/publish-subscribe-message-onto-mqtt-using-spring/	
+
+
+mosquitto_pub -h 127.0.0.1 -t humidity -m "{\"id\":1,\"datetime\":\"2025-02-09T12:21:19.283Z\",\"operator\":\"test\",\"sensor\":\"test\",\"value\":20,\"action\":\"run\",\"duration\":2,\"device_id\":\"RC001\"}" -u "user_test" -P "test@2025"
+
+https://medium.com/@tomer.klein/docker-compose-and-mosquitto-mqtt-simplifying-broker-deployment-7aaf469c07ee
