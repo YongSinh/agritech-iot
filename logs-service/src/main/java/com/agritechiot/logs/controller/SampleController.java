@@ -1,7 +1,7 @@
-package com.agritechiot.agritech_iot.controller;
+package com.agritechiot.logs.controller;
 
-import com.agritechiot.agritech_iot.constant.GenConstant;
-import com.agritechiot.agritech_iot.dto.ApiResponse;
+import com.agritechiot.logs.constant.GenConstant;
+import com.agritechiot.logs.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

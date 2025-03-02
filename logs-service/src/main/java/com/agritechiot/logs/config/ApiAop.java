@@ -1,6 +1,6 @@
-package com.agritechiot.agritech_iot.config;
+package com.agritechiot.logs.config;
 
-import com.agritechiot.agritech_iot.constant.GenConstant;
+import com.agritechiot.logs.constant.GenConstant;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ApiAop {
 
-    @Around("execution(* com.agritechiot.agritech_iot.controller.*.*(..))")
+    @Around("execution(* com.agritechiot.logs.controller.*.*(..))")
     public Object flow(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             Object[] args = joinPoint.getArgs();

@@ -8,11 +8,11 @@
 		<version>3.4.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.agritechiot</groupId>
-	<artifactId>agritech-iot</artifactId>
+	<groupId>com.logs</groupId>
+	<artifactId>logs</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>agritech-iot</name>
-	<description>A Spring Boot project for IoT-based agriculture solutions</description>
+	<description>A Spring Boot project for logs store</description>
 	<url/>
 	<licenses>
 		<license/>

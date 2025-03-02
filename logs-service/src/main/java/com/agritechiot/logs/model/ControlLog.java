@@ -1,4 +1,4 @@
-package com.agritechiot.agritech_iot.model;
+package com.agritechiot.logs.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,10 +15,10 @@ public class ControlLog {
     @Id
     private String id;
     private LocalDateTime dateTime;
-    @Field("deviceid")
+    @Field("deviceId")
     private String deviceId;
     private String status;
     private Integer duration;
-    @Field("sentby")
+    @Field("sentBy")
     private String sentBy;
 }

@@ -1,4 +1,4 @@
-package com.agritechiot.agritech_iot.constant;
+package com.agritechiot.logs.constant;
 
 import java.util.UUID;
 

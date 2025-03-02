@@ -1,13 +1,13 @@
-package com.agritechiot.agritech_iot;
+package com.agritechiot.logs;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AgritechIotApplication {
+public class LogsApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AgritechIotApplication.class, args);
+        SpringApplication.run(LogsApplication.class, args);
     }
 
 }

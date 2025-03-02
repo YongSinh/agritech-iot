@@ -1,4 +1,4 @@
-package com.agritechiot.agritech_iot.model;
+package com.agritechiot.logs.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,11 +15,11 @@ public class SensorLog {
     @Id
     private String id;
     private LocalDateTime dateTime;
-    @Field("deviceid")
+    @Field("deviceId")
     private String deviceId;
     private Double temperature;
     private Double humidity;
-    @Field("sensorid")
+    @Field("sensorId")
     private Double sensorId;
     @Field("soil_moisture")
     private Double soilMoisture;

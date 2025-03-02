@@ -1,10 +1,10 @@
-package com.agritechiot.agritech_iot;
+package com.agritechiot.logs;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AgritechIotApplicationTests {
+class LogsApplicationTests {
 
 	@Test
 	void contextLoads() {

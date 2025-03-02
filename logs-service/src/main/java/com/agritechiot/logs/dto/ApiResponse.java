@@ -1,6 +1,6 @@
-package com.agritechiot.agritech_iot.dto;
+package com.agritechiot.logs.dto;
 
-import com.agritechiot.agritech_iot.constant.GenConstant;
+import com.agritechiot.logs.constant.GenConstant;
 import lombok.Data;
 import org.slf4j.MDC;
 

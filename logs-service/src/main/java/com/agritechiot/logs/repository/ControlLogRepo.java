@@ -1,6 +1,6 @@
-package com.agritechiot.agritech_iot.repository;
+package com.agritechiot.logs.repository;
 
-import com.agritechiot.agritech_iot.model.ControlLog;
+import com.agritechiot.logs.model.ControlLog;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
