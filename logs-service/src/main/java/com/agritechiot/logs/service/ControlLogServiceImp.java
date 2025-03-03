@@ -51,9 +51,8 @@ public class ControlLogServiceImp implements ControlLogService {
     }
 
     @Override
-    public Flux<ControlLog> getControlLogsByDeviceId(int id) {
-        return null;
-       // return controlLogRepo.findAllByDeviceId(id);
+    public Flux<ControlLog> getControlLogsByDeviceId(String id) {
+       return controlLogRepo.findByDeviceId(id);
     }
 
     @Override

@@ -1,0 +1,42 @@
+server:
+  servlet:
+    context-path: /
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - name: api-gateway
+        url: /v3/api-docs
+        display-name: api-gateway
+      - name: api-log
+        url: /log/v3/api-docs
+        display-name: api-log
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    gateway:
+      httpclient:
+        connect-timeout: 20000
+        response-timeout: 7s
+      routes:
+        - id: category-service
+          uri: lb://category-service
+          predicates:
+            - Path=/category/** , /category-service/v3/api-docs
+          filters:
+            - StripPrefix=1
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/product/** , /product-service/v3/api-docs
+          filters:
+            - StripPrefix=1

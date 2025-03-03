@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 public class Mqtt {
     private static final Logger LOGGER = LoggerFactory.getLogger(Mqtt.class);
 
-    private static final String MQTT_PUBLISHER_ID = "spring-server";
+    private static final String MQTT_PUBLISHER_ID = "spring-server-log";
     private static final String MQTT_SERVER_ADDRESS = "tcp://127.0.0.1:1883";
 
     private static final String MQTT_USERNAME = "user_test"; // 🔹 Change this to your username

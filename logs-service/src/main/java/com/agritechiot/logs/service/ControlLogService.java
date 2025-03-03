@@ -14,7 +14,7 @@ public interface ControlLogService {
 
     Mono<ControlLog> updateControlLogs(Integer id, ControlLog req);
 
-    Flux<ControlLog> getControlLogsByDeviceId(int id);
+    Flux<ControlLog> getControlLogsByDeviceId(String id);
 
     Mono<ControlLog> getControlLog(Integer id);
 

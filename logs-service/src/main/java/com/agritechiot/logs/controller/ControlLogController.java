@@ -31,6 +31,17 @@ public class ControlLogController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
+    @PostMapping(value = "/v1/iot/log-by-device-id")
+    public Mono<ApiResponse<?>> getListControlLogByDeviceId(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody ControlLog req
+    ) throws Exception {
+        log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(req));
+        return controlLogService.getControlLogsByDeviceId(req.getDeviceId())// Collect the Flux into a List
+                .collectList()
+                .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
     @GetMapping("/v1/iot/control-logs")
     public Mono<ApiResponse<?>> getListControlLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return controlLogService.getControlLogs()
