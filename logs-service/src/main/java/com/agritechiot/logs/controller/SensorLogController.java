@@ -13,21 +13,21 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/log")
 @RequiredArgsConstructor
 @Tag(name = "Sensor-Log")
 @Slf4j
 public class SensorLogController {
     private final SensorLogService sensorLogService;
 
-    @GetMapping("/v1/iot/sensor-logs")
+    @GetMapping("/v1/sensor-logs")
     public Mono<ApiResponse<?>> getListSensorLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return sensorLogService.getListSensorLog()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/iot/add-sensor-log")
+    @PostMapping(value = "/v1/add-sensor-log")
     public Mono<ApiResponse<?>> addSensorLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody SensorLog req
@@ -37,7 +37,7 @@ public class SensorLogController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/iot/update-sensor-log")
+    @PostMapping(value = "/v1/update-sensor-log")
     public Mono<ApiResponse<?>> updateSensorLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody SensorLog req

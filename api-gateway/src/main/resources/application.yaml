@@ -2,21 +2,6 @@ server:
   servlet:
     context-path: /
 
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-    config-url: /v3/api-docs/swagger-config
-    urls:
-      - name: api-gateway
-        url: /v3/api-docs
-        display-name: api-gateway
-      - name: api-log
-        url: /log/v3/api-docs
-        display-name: api-log
-
 spring:
   application:
     name: api-gateway
@@ -28,15 +13,36 @@ spring:
         connect-timeout: 20000
         response-timeout: 7s
       routes:
-        - id: category-service
-          uri: lb://category-service
+        - id: logs-service
+          uri: http://localhost:8082
           predicates:
-            - Path=/category/** , /category-service/v3/api-docs
-          filters:
-            - StripPrefix=1
-        - id: product-service
-          uri: lb://product-service
-          predicates:
-            - Path=/product/** , /product-service/v3/api-docs
-          filters:
-            - StripPrefix=1
+            - Path=/api/log/**, /logs-service/v3/api-docs
+      default-filters:
+        - name: Retry
+          args:
+            retries: 3
+            statuses: BAD_GATEWAY,SERVICE_UNAVAILABLE,INTERNAL_SERVER_ERROR
+            methods: GET,POST,PUT
+        - name: CircuitBreaker
+          args:
+            name: globalCircuitBreaker
+            fallbackUri: forward:/fallback
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - name: api-gateway
+        url: /v3/api-docs
+        display-name: api-gateway
+      - name: logs-service
+        url: /logs-service/v3/api-docs
+        display-name: logs-service
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
