@@ -3,12 +3,20 @@ package com.agritechiot.agritech_iot.service;
 import com.agritechiot.agritech_iot.model.OnetimeSchedule;
 import com.agritechiot.agritech_iot.repository.OnetimeScheduleRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     private final OnetimeScheduleRepo onetimeScheduleRepo;
 
@@ -18,9 +26,9 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
         onetimeSchedule.setDuration(req.getDuration());
         onetimeSchedule.setDeviceId(req.getDeviceId());
         onetimeSchedule.setTime(req.getTime());
-        onetimeSchedule.setRead_sensor(req.getRead_sensor());
+        onetimeSchedule.setReadSensor(req.getReadSensor());
         onetimeSchedule.setDate(req.getDate());
-        onetimeSchedule.setTurnOn_water(req.getTurnOn_water());
+        onetimeSchedule.setTurnOnWater(req.getTurnOnWater());
         return onetimeScheduleRepo.save(onetimeSchedule);
     }
 
@@ -33,9 +41,9 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
                     onetimeSchedule.setDuration(req.getDuration());
                     onetimeSchedule.setDeviceId(req.getDeviceId());
                     onetimeSchedule.setTime(req.getTime());
-                    onetimeSchedule.setRead_sensor(req.getRead_sensor());
+                    onetimeSchedule.setReadSensor(req.getReadSensor());
                     onetimeSchedule.setDate(req.getDate());
-                    onetimeSchedule.setTurnOn_water(req.getTurnOn_water());
+                    onetimeSchedule.setTurnOnWater(req.getTurnOnWater());
                     return onetimeSchedule;
                 }).flatMap(onetimeScheduleRepo::save);
     }
@@ -53,5 +61,37 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     @Override
     public Flux<OnetimeSchedule> getListOnetimeScheduleByDeviceId(Mono<String> deviceId) {
         return onetimeScheduleRepo.findAllByDeviceId(deviceId);
+    }
+
+    @Scheduled(fixedRate = 60000) // 60000 ms = 1 minute
+    public void checkAndExecuteSchedules() {
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now().withSecond(0).withNano(0);
+        Flux<OnetimeSchedule> schedules = onetimeScheduleRepo.findByDate(today);
+        log.info("Schedules start at: {}", LocalDateTime.now());
+        // Process schedules reactively
+        schedules
+                .doOnNext(schedule -> log.info("Schedule found: {}", schedule)) // Log each schedule
+                .doOnComplete(() -> log.info("No more schedules found for today: {}", today)) // Log when the stream completes
+                .filter(schedule -> schedule.getTime().equals(now)) // Filter schedules matching the current time
+                .subscribe(schedule -> {
+                    // Execute tasks based on the schedule
+                    if (Boolean.TRUE.equals(schedule.getReadSensor())) {
+                        readSensor(schedule.getDeviceId());
+                    }
+                    if (Boolean.TRUE.equals(schedule.getTurnOnWater())) {
+                        turnOnWater(schedule.getDeviceId(), schedule.getDuration());
+                    }
+                }, error -> log.error("Error processing schedules: {}", error.getMessage())); // Log
+    }
+
+    private void readSensor(String deviceId) {
+        // Logic to read sensor data
+        log.info("Reading sensor for device: {}", deviceId);
+    }
+
+    private void turnOnWater(String deviceId, Integer duration) {
+        // Logic to turn on water for the specified duration
+        log.info("Turning on water for device: {} for {} minutes", deviceId, duration);
     }
 }

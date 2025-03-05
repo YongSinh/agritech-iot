@@ -21,8 +21,10 @@ public class RepeatSchedule {
     private Integer id;
     private String day;
     private LocalTime time;
-    private Boolean read_sensor;
-    private Boolean turnOn_water;
+    @Column("read_sensor")
+    private Boolean readSensor;
+    @Column("turnOn_water")
+    private Boolean turnOnWater;
     private Integer duration;
     @JsonProperty("device_id")
     @Column("deviceId")
