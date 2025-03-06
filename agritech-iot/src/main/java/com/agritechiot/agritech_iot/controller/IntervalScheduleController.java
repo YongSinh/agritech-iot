@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/iot/api")
 @RequiredArgsConstructor
 @Tag(name = "Interval-Schedule")
 @Slf4j
 public class IntervalScheduleController {
     private final IntervalScheduleService intervalScheduleService;
 
-    @PostMapping(value = "/v1/iot/add-interval-schedule")
+    @PostMapping(value = "/v1/add-interval-schedule")
     public Mono<ApiResponse<?>> addIntervalRecord(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalSchedule req
@@ -30,7 +30,7 @@ public class IntervalScheduleController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/iot/update-interval-schedule")
+    @PostMapping(value = "/v1/update-interval-schedule")
     public Mono<ApiResponse<?>> updateIntervalRecord(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalSchedule req
@@ -40,14 +40,14 @@ public class IntervalScheduleController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @GetMapping("/v1/iot/interval-schedule")
+    @GetMapping("/v1/interval-schedule")
     public Mono<ApiResponse<?>> getListIntervalSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return intervalScheduleService.getListIntervalRecord()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping("/v1/iot/interval-schedule-by-device")
+    @PostMapping("/v1/interval-schedule-by-device")
     public Mono<ApiResponse<?>> getIntervalScheduleByDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalScheduleReq req

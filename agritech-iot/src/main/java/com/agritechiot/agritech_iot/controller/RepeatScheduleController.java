@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/iot/api")
 @RequiredArgsConstructor
 @Tag(name = "Repeat-Schedule")
 @Slf4j
 public class RepeatScheduleController {
     private final RepeatScheduleService repeatScheduleService;
 
-    @GetMapping("/v1/iot/repeat-schedule")
+    @GetMapping("/v1/repeat-schedule")
     public Mono<ApiResponse<?>> getListRepeatSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return repeatScheduleService.getListRepeatSchedule()
                 .collectList()  // Collect the Flux into a List

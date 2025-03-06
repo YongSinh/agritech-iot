@@ -23,6 +23,8 @@ public class IntervalSchedule {
     private Integer runDatetime;
     @Column("turnOn_water")
     private Boolean turnOnWater;
+    @Column("read_sensor")
+    private Boolean readSensor;
     @JsonProperty("device_id")
     @Column("deviceId")
     private String deviceId;

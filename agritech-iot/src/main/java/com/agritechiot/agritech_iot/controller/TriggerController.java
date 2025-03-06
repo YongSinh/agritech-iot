@@ -9,25 +9,28 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/iot/api")
 @RequiredArgsConstructor
 @Tag(name = "Trigger")
 @Slf4j
 public class TriggerController {
     private final TriggerService triggerService;
 
-    @GetMapping("/v1/iot/triggers")
-    public Mono<ApiResponse<?>> getListSensorLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+    @GetMapping("/v1/triggers")
+    public Mono<ApiResponse<List<Trigger>>> getListSensorLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return triggerService.getTriggers()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/iot/add-trigger")
-    public Mono<ApiResponse<?>> addTrigger(
+    @PostMapping(value = "/v1/add-trigger")
+    public Mono<ApiResponse<Trigger>> addTrigger(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody Trigger req
     ) throws Exception {

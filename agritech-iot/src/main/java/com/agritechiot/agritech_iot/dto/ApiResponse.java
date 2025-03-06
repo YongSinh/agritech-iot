@@ -14,35 +14,27 @@ public class ApiResponse<T> {
     private String correlationId;
     private T data;
 
+    public ApiResponse() {
+        this(null, MDC.get(GenConstant.CORRELATION_ID), GenConstant.SUC_MESSAGE, GenConstant.SUC_CODE);
+    }
+
     public ApiResponse(T data) {
-        this.code = GenConstant.SUC_CODE;
-        this.timestamp = LocalDateTime.now();
-        this.correlationId = MDC.get(GenConstant.CORRELATION_ID);
-        this.message = GenConstant.SUC_MESSAGE;
-        this.data = data;
+        this(data, MDC.get(GenConstant.CORRELATION_ID), GenConstant.SUC_MESSAGE, GenConstant.SUC_CODE);
     }
 
     public ApiResponse(T data, String correlationId) {
-        this.code = GenConstant.SUC_CODE;
-        this.timestamp = LocalDateTime.now();
-        this.correlationId = correlationId != null ? correlationId : GenConstant.DEFAULT_CORRELATION_ID;
-        this.message = GenConstant.SUC_MESSAGE;
-        this.data = data;
+        this(data, correlationId, GenConstant.SUC_MESSAGE, GenConstant.SUC_CODE);
     }
 
     public ApiResponse(String message, String correlationId) {
-        this.code = GenConstant.ERR_CODE;
+        this(null, correlationId, message, GenConstant.ERR_CODE);
+    }
+
+    private ApiResponse(T data, String correlationId, String message, String code) {
+        this.code = code;
         this.timestamp = LocalDateTime.now();
         this.correlationId = correlationId != null ? correlationId : GenConstant.DEFAULT_CORRELATION_ID;
         this.message = message;
-        this.data = null;
-    }
-
-    public ApiResponse() {
-        this.code = GenConstant.SUC_CODE;
-        this.timestamp = LocalDateTime.now();
-        this.correlationId = MDC.get(GenConstant.CORRELATION_ID);
-        this.message = GenConstant.SUC_MESSAGE;
-        this.data = null;
+        this.data = data;
     }
 }

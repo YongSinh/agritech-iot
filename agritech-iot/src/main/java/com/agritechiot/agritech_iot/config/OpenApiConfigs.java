@@ -1,4 +1,4 @@
-package com.agritechiot.logs.config;
+package com.agritechiot.agritech_iot.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
@@ -27,7 +27,7 @@ public class OpenApiConfigs {
         return new OpenAPI()
                 .servers(List.of(
                         new Server().url(url).description("Gateway url"),
-                        new Server().url(localUrl).description("Log Service url")
+                        new Server().url(localUrl).description("IOT Service url")
                 ))
                 .components(
                         new Components()

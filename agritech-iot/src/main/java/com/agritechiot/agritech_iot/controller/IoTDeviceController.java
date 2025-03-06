@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/iot/api")
 @RequiredArgsConstructor
 @Tag(name = "IoT-Devices")
 @Slf4j
@@ -25,14 +25,14 @@ public class IoTDeviceController {
     private final IoTDeviceService ioTDeviceService;
     private final Publisher publisher;
 
-    @GetMapping("/v1/iot/devices")
+    @GetMapping("/v1/devices")
     public Mono<ApiResponse<?>> getListIoTDevices(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return ioTDeviceService.getListDevice()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/iot/get-device-by-name")
+    @PostMapping(value = "/v1/get-device-by-name")
     public Mono<ApiResponse<?>> getIoTDevicesByName(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq ioTDeviceReq
@@ -43,7 +43,7 @@ public class IoTDeviceController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/iot/add-device")
+    @PostMapping(value = "/v1/add-device")
     public Mono<ApiResponse<IoTDevice>> addDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
@@ -54,7 +54,7 @@ public class IoTDeviceController {
                 .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '" + req.getDeviceId() + "' already exists.", correlationId, "IoTDevice"));
     }
 
-    @PutMapping(value = "/v1/iot/update-device")
+    @PutMapping(value = "/v1/update-device")
     public Mono<ApiResponse<?>> updateDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
@@ -64,7 +64,7 @@ public class IoTDeviceController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/iot/off-on-device")
+    @PostMapping(value = "/v1/off-on-device")
     public Mono<ApiResponse<?>> offOnDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody MqttPublishReq req

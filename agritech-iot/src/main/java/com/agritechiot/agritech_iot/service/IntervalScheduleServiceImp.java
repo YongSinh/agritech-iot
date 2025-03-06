@@ -15,11 +15,11 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     @Override
     public Mono<IntervalSchedule> saveIntervalRecord(IntervalSchedule req) {
         IntervalSchedule intervalSchedule = new IntervalSchedule();
-        intervalSchedule.setRun_datetime(req.getRun_datetime());
-        intervalSchedule.setDeviceid(req.getDeviceid());
+        intervalSchedule.setRunDatetime(req.getRunDatetime());
+        intervalSchedule.setDeviceId(req.getDeviceId());
         intervalSchedule.setDuration(req.getDuration());
-        intervalSchedule.setRead_sensor(req.getRead_sensor());
-        intervalSchedule.setRead_sensor(req.getRead_sensor());
+        intervalSchedule.setReadSensor(req. getReadSensor());
+        intervalSchedule.setReadSensor(req.getReadSensor());
         return intervalScheduleRepo.save(intervalSchedule);
     }
 
@@ -31,11 +31,11 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
                 .map(intervalSchedule -> {
                     intervalSchedule.setId(req.getId());
                     intervalSchedule.setInterval(req.getInterval());
-                    intervalSchedule.setDeviceid(req.getDeviceid());
+                    intervalSchedule.setDeviceId(req.getDeviceId());
                     intervalSchedule.setDuration(req.getDuration());
-                    intervalSchedule.setRead_sensor(req.getRead_sensor());
-                    intervalSchedule.setTurnOn_water(req.getTurnOn_water());
-                    intervalSchedule.setRun_datetime(req.getRun_datetime());
+                    intervalSchedule.setReadSensor(req.getReadSensor());
+                    intervalSchedule.setTurnOnWater(req.getTurnOnWater());
+                    intervalSchedule.setRunDatetime(req.getRunDatetime());
                     return intervalSchedule;
                 }).flatMap(intervalScheduleRepo::save);
     }

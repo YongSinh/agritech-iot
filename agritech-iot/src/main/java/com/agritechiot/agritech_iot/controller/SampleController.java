@@ -23,7 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/iot/api/v1")
 @RequiredArgsConstructor
 public class SampleController {
     private final SubscriberImp subscriberImp;
