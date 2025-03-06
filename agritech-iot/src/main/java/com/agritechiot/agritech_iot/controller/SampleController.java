@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
 
 @RestController
 @RequestMapping("/iot/api/v1")
@@ -31,7 +31,7 @@ public class SampleController {
     private final Publisher publisher;
 
     @PostMapping("/sample")
-    public ResponseEntity<?> sample(@RequestBody MqttPublishReq req) throws Exception {
+    public ResponseEntity<Object> sample(@RequestBody MqttPublishReq req) throws Exception {
         publisher.publish(req.getTopic(), JsonUtil.objectToJsonString(req.getMessage()), req.getQos(), req.getRetained());
         return ResponseEntity.ok(new ApiResponse<>(req));
     }
@@ -45,7 +45,7 @@ public class SampleController {
     public void publishMessage(@RequestBody @Valid MqttPublishModel messagePublishModel,
                                BindingResult bindingResult) throws org.eclipse.paho.client.mqttv3.MqttException {
         if (bindingResult.hasErrors()) {
-            throw new MqttException(Integer.parseInt("SOME_PARAMETERS_INVALID"));
+            throw new MqttException(500);
         }
 
         MqttMessage mqttMessage = new MqttMessage(messagePublishModel.getMessage().getBytes());
@@ -58,7 +58,7 @@ public class SampleController {
     @GetMapping("subscribe")
     public List<MqttSubscribeModel> subscribeChannel(@RequestParam(value = "topic") String topic,
                                                      @RequestParam(value = "wait_millis") Integer waitMillis)
-            throws InterruptedException, org.eclipse.paho.client.mqttv3.MqttException {
+            throws org.eclipse.paho.client.mqttv3.MqttException {
         List<MqttSubscribeModel> messages = new ArrayList<>();
         CountDownLatch countDownLatch = new CountDownLatch(10);
         Mqtt.getInstance().subscribeWithResponse(topic, (s, mqttMessage) -> {
@@ -70,7 +70,6 @@ public class SampleController {
             countDownLatch.countDown();
         });
 
-        countDownLatch.await(waitMillis, TimeUnit.MILLISECONDS);
 
         return messages;
     }

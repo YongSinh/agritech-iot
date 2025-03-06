@@ -4,6 +4,7 @@ import com.agritechiot.agritech_iot.constant.GenConstant;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
 import com.agritechiot.agritech_iot.dto.request.IoTDeviceReq;
 import com.agritechiot.agritech_iot.dto.request.MqttPublishReq;
+import com.agritechiot.agritech_iot.dto.response.IoTDeviceDto;
 import com.agritechiot.agritech_iot.model.IoTDevice;
 import com.agritechiot.agritech_iot.service.IoTDeviceService;
 import com.agritechiot.agritech_iot.service.mqtt.Publisher;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/iot/api")
@@ -26,14 +29,14 @@ public class IoTDeviceController {
     private final Publisher publisher;
 
     @GetMapping("/v1/devices")
-    public Mono<ApiResponse<?>> getListIoTDevices(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+    public Mono<ApiResponse<List<IoTDeviceDto>>> getListIoTDevices(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return ioTDeviceService.getListDevice()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PostMapping(value = "/v1/get-device-by-name")
-    public Mono<ApiResponse<?>> getIoTDevicesByName(
+    public Mono<ApiResponse<List<IoTDeviceDto>>> getIoTDevicesByName(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq ioTDeviceReq
     ) throws Exception {
@@ -55,7 +58,7 @@ public class IoTDeviceController {
     }
 
     @PutMapping(value = "/v1/update-device")
-    public Mono<ApiResponse<?>> updateDevices(
+    public Mono<ApiResponse<IoTDevice>> updateDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
     ) throws Exception {
@@ -65,12 +68,11 @@ public class IoTDeviceController {
     }
 
     @PostMapping(value = "/v1/off-on-device")
-    public Mono<ApiResponse<?>> offOnDevice(
+    public Mono<ApiResponse<Object>> offOnDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody MqttPublishReq req
     ) throws Exception {
         publisher.publish(req.getTopic(), JsonUtil.objectToJsonString(req.getMessage()), req.getQos(), req.getRetained());
-        log.info("REQ_IOT_UPDATE_DEVICE: {}", JsonUtil.toJson(req));
         return Mono.just(new ApiResponse<>(req.getMessage(), correlationId));
     }
 

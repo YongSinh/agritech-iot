@@ -8,6 +8,11 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class ErrorHandlerUtil {
+
+    private ErrorHandlerUtil() {
+        // Private constructor to prevent instantiation
+    }
+
     public static <T> Mono<ApiResponse<T>> handleDuplicateError(Throwable error, String message, String correlationId, String entity) {
         String messageRes;
         if (error instanceof DuplicateKeyException) {
