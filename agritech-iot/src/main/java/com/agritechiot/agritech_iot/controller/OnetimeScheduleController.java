@@ -2,6 +2,7 @@ package com.agritechiot.agritech_iot.controller;
 
 import com.agritechiot.agritech_iot.constant.GenConstant;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
+import com.agritechiot.agritech_iot.model.OnetimeSchedule;
 import com.agritechiot.agritech_iot.service.OnetimeScheduleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/iot/api")
 @RequiredArgsConstructor
@@ -21,7 +24,7 @@ public class OnetimeScheduleController {
     private final OnetimeScheduleService onetimeScheduleService;
 
     @GetMapping("/v1/one-time-schedules")
-    public Mono<ApiResponse<?>> getListOnetimeSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+    public Mono<ApiResponse<List<OnetimeSchedule>>> getListOnetimeSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return onetimeScheduleService.getListOnetimeSchedule()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
