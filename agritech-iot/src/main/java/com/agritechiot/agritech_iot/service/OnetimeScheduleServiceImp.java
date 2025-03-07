@@ -59,8 +59,8 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     }
 
     @Override
-    public Flux<OnetimeSchedule> getListOnetimeScheduleByDeviceId(Mono<String> deviceId) {
-        return onetimeScheduleRepo.findAllByDeviceId(deviceId);
+    public Flux<OnetimeSchedule> getListOnetimeScheduleByDeviceId(String deviceId) {
+        return onetimeScheduleRepo.findByDeviceId(deviceId);
     }
 
     @Scheduled(fixedRate = 60000) // 60000 ms = 1 minute

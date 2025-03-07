@@ -10,10 +10,10 @@ import lombok.Setter;
 public class IntervalScheduleReq {
     private Integer id;
     private Integer interval;
-    private Boolean read_sensor;
-    private Boolean turnOn_water;
+    private Boolean readSensor;
+    private Boolean turnOnWater;
     private Integer duration;
     //    @JsonProperty("device_id")
     private String deviceId;
-    private Integer run_datetime;
+    private Integer runDatetime;
 }
