@@ -1,19 +1,17 @@
-package com.agritechiot.agritech_iot.controller;
+package com.agritechiot.agritech_iot.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class OnetimeScheduleReq {
+public class RepeatScheduleReq {
     private Integer id;
-    private LocalDate date;
-    private LocalTime time;
+    private String day;
+    private String time;
     private Boolean readSensor;
     private Boolean turnOnWater;
     private Integer duration;

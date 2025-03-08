@@ -2,6 +2,7 @@ package com.agritechiot.agritech_iot.controller;
 
 import com.agritechiot.agritech_iot.constant.GenConstant;
 import com.agritechiot.agritech_iot.dto.ApiResponse;
+import com.agritechiot.agritech_iot.dto.request.OnetimeScheduleReq;
 import com.agritechiot.agritech_iot.model.OnetimeSchedule;
 import com.agritechiot.agritech_iot.service.OnetimeScheduleService;
 import com.agritechiot.agritech_iot.util.ErrorHandlerUtil;
@@ -44,7 +45,7 @@ public class OnetimeScheduleController {
                 .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '" + req.getDeviceId() + "' already exists.", correlationId, "IoTDevice"));
     }
 
-    @PostMapping(value = "/v1/create-onetime-Schedule")
+    @PostMapping(value = "/v1/update-onetime-Schedule")
     public Mono<ApiResponse<OnetimeSchedule>> updateSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody OnetimeSchedule req
