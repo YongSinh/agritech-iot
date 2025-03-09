@@ -8,4 +8,6 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface RepeatScheduleRepo extends ReactiveCrudRepository<RepeatSchedule, Integer> {
     Flux<RepeatSchedule> findByDay(String day);
+
+    Flux<RepeatSchedule> findByDeviceId(String deviceId);
 }

@@ -1,19 +1,20 @@
 package com.agritechiot.agritech_iot.dto.request;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
-@AllArgsConstructor
-public class IntervalScheduleReq {
+@Setter
+@NoArgsConstructor
+public class RepeatScheduleReq {
     private Integer id;
-    private Integer interval;
+    private String day;
+    private String time;
     private Boolean readSensor;
     private Boolean turnOnWater;
     private Integer duration;
-    //    @JsonProperty("device_id")
+    @JsonProperty("device_id")
     private String deviceId;
-    private Integer runDatetime;
 }

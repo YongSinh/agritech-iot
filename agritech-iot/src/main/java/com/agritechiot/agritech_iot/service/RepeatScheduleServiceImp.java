@@ -1,7 +1,9 @@
 package com.agritechiot.agritech_iot.service;
 
+import com.agritechiot.agritech_iot.dto.request.RepeatScheduleReq;
 import com.agritechiot.agritech_iot.model.RepeatSchedule;
 import com.agritechiot.agritech_iot.repository.RepeatScheduleRepo;
+import com.agritechiot.agritech_iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,6 +13,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @RequiredArgsConstructor
 @Service
@@ -19,27 +22,27 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
     private final RepeatScheduleRepo repeatScheduleRepo;
 
     @Override
-    public Mono<RepeatSchedule> saveRepeatSchedule(RepeatSchedule req) {
+    public Mono<RepeatSchedule> saveRepeatSchedule(RepeatScheduleReq req) {
         RepeatSchedule repeatSchedule = new RepeatSchedule();
-        repeatSchedule.setTime(req.getTime());
+        repeatSchedule.setTime(GenUtil.parsedTime(req.getTime()));
         repeatSchedule.setDeviceId(req.getDeviceId());
         repeatSchedule.setDuration(req.getDuration());
-        repeatSchedule.setDay(req.getDay());
+        repeatSchedule.setDay(req.getDay().toUpperCase());
         repeatSchedule.setReadSensor(req.getReadSensor());
         repeatSchedule.setTurnOnWater(req.getTurnOnWater());
         return repeatScheduleRepo.save(repeatSchedule);
     }
 
     @Override
-    public Mono<RepeatSchedule> updateRepeatSchedule(Integer id, RepeatSchedule req) {
+    public Mono<RepeatSchedule> updateRepeatSchedule(Integer id, RepeatScheduleReq req) {
         return repeatScheduleRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception("ONE_TIME_SCHEDULE_NOT_FOUND")))
                 .map(repeatSchedule -> {
                     repeatSchedule.setId(id);
-                    repeatSchedule.setTime(req.getTime());
+                    repeatSchedule.setTime(GenUtil.parsedTime(req.getTime()));
                     repeatSchedule.setDeviceId(req.getDeviceId());
                     repeatSchedule.setDuration(req.getDuration());
-                    repeatSchedule.setDay(req.getDay());
+                    repeatSchedule.setDay(req.getDay().toUpperCase());
                     repeatSchedule.setReadSensor(req.getReadSensor());
                     repeatSchedule.setTurnOnWater(req.getTurnOnWater());
                     return repeatSchedule;
@@ -49,6 +52,11 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
     @Override
     public Flux<RepeatSchedule> getListRepeatSchedule() {
         return repeatScheduleRepo.findAll();
+    }
+
+    @Override
+    public Flux<RepeatSchedule> getListRepeatScheduleByDeviceId(String deviceId) {
+        return repeatScheduleRepo.findByDeviceId(deviceId);
     }
 
     // Run this method every minute

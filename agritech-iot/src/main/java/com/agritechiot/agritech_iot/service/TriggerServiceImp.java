@@ -15,7 +15,7 @@ public class TriggerServiceImp implements TriggerService {
     private final TriggerRepo triggerRepo;
 
     @Override
-    public Mono<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId) {
+    public Flux<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId) {
         return triggerRepo.findByDeviceIdAndSensor(deviceId, sensor);
     }
 
@@ -38,6 +38,12 @@ public class TriggerServiceImp implements TriggerService {
                 .switchIfEmpty(Mono.error(new Exception("TRIGGER_NOT_FOUND")))
                 .map(trigger -> {
                     trigger.setId(id);
+                    trigger.setAction(req.getAction());
+                    trigger.setOperator(req.getOperator());
+                    trigger.setDuration(req.getDuration());
+                    trigger.setSensor(req.getSensor());
+                    trigger.setValue(req.getValue());
+                    trigger.setDeviceId(req.getDeviceId());
                     return trigger;
                 }).flatMap(triggerRepo::save);
 
