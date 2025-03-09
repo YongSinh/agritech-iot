@@ -1,6 +1,10 @@
 package com.agritechiot.agritech_iot.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +12,8 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -17,15 +23,19 @@ import org.springframework.data.relational.core.mapping.Table;
 public class IntervalSchedule {
     @Id
     private Integer id;
+    @Column("interval_minutes")
     private Integer interval;
-    private Integer duration;
-    @Column("run_datetime")
-    private Integer runDatetime;
     @Column("turnOn_water")
     private Boolean turnOnWater;
+    @Column("duration")
+    private Integer duration;
     @Column("read_sensor")
     private Boolean readSensor;
     @JsonProperty("device_id")
     @Column("deviceId")
     private String deviceId;
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @Column("run_datetime")
+    private LocalDateTime runDatetime;
 }

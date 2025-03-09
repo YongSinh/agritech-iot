@@ -22,7 +22,7 @@ import java.util.List;
 public class IntervalScheduleController {
     private final IntervalScheduleService intervalScheduleService;
 
-    @PostMapping(value = "/v1/add-interval-schedule")
+    @PostMapping(value = "/v1/create-interval-schedule")
     public Mono<ApiResponse<IntervalSchedule>> addIntervalRecord(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalSchedule req
@@ -44,6 +44,7 @@ public class IntervalScheduleController {
 
     @GetMapping("/v1/interval-schedule")
     public Mono<ApiResponse<List<IntervalSchedule>>> getListIntervalSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        log.info("fetching interval schedule list");
         return intervalScheduleService.getListIntervalRecord()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));

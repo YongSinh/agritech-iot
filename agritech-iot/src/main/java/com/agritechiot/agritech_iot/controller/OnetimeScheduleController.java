@@ -37,7 +37,7 @@ public class OnetimeScheduleController {
     @PostMapping(value = "/v1/create-onetime-Schedule")
     public Mono<ApiResponse<OnetimeSchedule>> createSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody OnetimeSchedule req
+            @RequestBody OnetimeScheduleReq req
     ) throws Exception {
         log.info("REQ_IOT_ADD_ONE_TIME_SCHEDULE: {}", JsonUtil.toJson(req));
         return onetimeScheduleService.saveOnetimeSchedule(req)// Collect the Flux into a List
@@ -48,7 +48,7 @@ public class OnetimeScheduleController {
     @PostMapping(value = "/v1/update-onetime-Schedule")
     public Mono<ApiResponse<OnetimeSchedule>> updateSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody OnetimeSchedule req
+            @RequestBody OnetimeScheduleReq req
     ) throws Exception {
         log.info("REQ_IOT_UPDATE_ONE_TIME_SCHEDULE: {}", JsonUtil.toJson(req));
         return onetimeScheduleService.updateOnetimeSchedule(req.getId(), req)// Collect the Flux into a List
@@ -56,7 +56,7 @@ public class OnetimeScheduleController {
     }
 
     @PostMapping(value = "/v1/onetime-Schedule-by-device-id")
-    public Mono<ApiResponse<List<OnetimeSchedule>>> updateSchedule(
+    public Mono<ApiResponse<List<OnetimeSchedule>>> getListOnetimeScheduleByDeviceId(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody OnetimeScheduleReq req
     ) throws Exception {

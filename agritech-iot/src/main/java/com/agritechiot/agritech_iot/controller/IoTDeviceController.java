@@ -46,7 +46,7 @@ public class IoTDeviceController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/add-device")
+    @PostMapping(value = "/v1/create-device")
     public Mono<ApiResponse<IoTDevice>> addDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req

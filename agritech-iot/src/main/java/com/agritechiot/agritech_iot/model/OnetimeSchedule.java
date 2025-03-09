@@ -8,8 +8,6 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Setter
@@ -20,7 +18,7 @@ import java.time.LocalTime;
 public class OnetimeSchedule {
     @Id
     private Integer id;
-    private LocalDate date;
+    private String date;
     private LocalTime time;
     @Column("read_sensor")
     private Boolean readSensor;

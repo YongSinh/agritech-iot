@@ -1,10 +1,11 @@
 package com.agritechiot.agritech_iot.service;
 
+import com.agritechiot.agritech_iot.dto.request.OnetimeScheduleReq;
 import com.agritechiot.agritech_iot.model.OnetimeSchedule;
 import com.agritechiot.agritech_iot.repository.OnetimeScheduleRepo;
+import com.agritechiot.agritech_iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -21,11 +22,11 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     private final OnetimeScheduleRepo onetimeScheduleRepo;
 
     @Override
-    public Mono<OnetimeSchedule> saveOnetimeSchedule(OnetimeSchedule req) {
+    public Mono<OnetimeSchedule> saveOnetimeSchedule(OnetimeScheduleReq req) {
         OnetimeSchedule onetimeSchedule = new OnetimeSchedule();
         onetimeSchedule.setDuration(req.getDuration());
         onetimeSchedule.setDeviceId(req.getDeviceId());
-        onetimeSchedule.setTime(req.getTime());
+        onetimeSchedule.setTime(GenUtil.parsedTime(req.getTime()));
         onetimeSchedule.setReadSensor(req.getReadSensor());
         onetimeSchedule.setDate(req.getDate());
         onetimeSchedule.setTurnOnWater(req.getTurnOnWater());
@@ -33,14 +34,14 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     }
 
     @Override
-    public Mono<OnetimeSchedule> updateOnetimeSchedule(Integer id, OnetimeSchedule req) {
+    public Mono<OnetimeSchedule> updateOnetimeSchedule(Integer id, OnetimeScheduleReq req) {
         return onetimeScheduleRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception("ONE_TIME_SCHEDULE_NOT_FOUND")))
                 .map(onetimeSchedule -> {
                     onetimeSchedule.setId(id);
                     onetimeSchedule.setDuration(req.getDuration());
                     onetimeSchedule.setDeviceId(req.getDeviceId());
-                    onetimeSchedule.setTime(req.getTime());
+                    onetimeSchedule.setTime(GenUtil.parsedTime(req.getTime()));
                     onetimeSchedule.setReadSensor(req.getReadSensor());
                     onetimeSchedule.setDate(req.getDate());
                     onetimeSchedule.setTurnOnWater(req.getTurnOnWater());
