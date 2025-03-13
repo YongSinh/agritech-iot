@@ -8,6 +8,6 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface ControlLogRepo extends ReactiveMongoRepository<ControlLog, Integer> {
-    @Query("{ 'deviceId': ?0 }") // Filter by deviceId
+    @Query("{ 'device_id': ?0 }") // Filter by deviceId
     Flux<ControlLog> findByDeviceId(String deviceId);
 }

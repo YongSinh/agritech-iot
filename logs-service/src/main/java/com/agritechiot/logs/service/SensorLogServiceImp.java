@@ -20,7 +20,7 @@ public class SensorLogServiceImp implements SensorLogService {
         sensorLog.setDateTime(req.getDateTime());
         sensorLog.setHumidity(req.getHumidity());
         sensorLog.setSensorId(req.getSensorId());
-        sensorLog.setFlow_rate(req.getFlow_rate());
+        sensorLog.setFlowRate(req.getFlowRate());
         sensorLog.setFlowQuantity(req.getFlowQuantity());
         sensorLog.setTotalWater(req.getTotalWater());
         sensorLog.setTemperature(req.getTemperature());
@@ -38,7 +38,7 @@ public class SensorLogServiceImp implements SensorLogService {
                     sensorLog.setDateTime(req.getDateTime());
                     sensorLog.setHumidity(req.getHumidity());
                     sensorLog.setSensorId(req.getSensorId());
-                    sensorLog.setFlow_rate(req.getFlow_rate());
+                    sensorLog.setFlowRate(req.getFlowRate());
                     sensorLog.setFlowQuantity(req.getFlowQuantity());
                     sensorLog.setTotalWater(req.getTotalWater());
                     sensorLog.setTemperature(req.getTemperature());
