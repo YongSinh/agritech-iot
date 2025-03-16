@@ -17,7 +17,10 @@ import {
   ReceiptOutlined,
   TimelineOutlined,
   WavesOutlined,
-  ConnectedTv
+  ConnectedTv,
+  EventRepeat,
+  LooksOne,
+  CalendarToday
 } from "@mui/icons-material";
 import avatar from "../../../assets/images/avatar.png";
 import logo from "../../../assets/images/logo.png";
@@ -177,6 +180,43 @@ const SideBar = () => {
             path="/device"
             colors={colors}
             icon={<ConnectedTv />}
+          />
+        </Menu>
+        <Typography
+          variant="h6"
+          color={colors.gray[300]}
+          sx={{ m: "15px 0 5px 20px" }}
+        >
+          {!collapsed ? "Schedule" : " "}
+        </Typography>{" "}
+        <Menu
+          menuItemStyles={{
+            button: {
+              ":hover": {
+                color: "#868dfb",
+                background: "transparent",
+                transition: ".4s ease",
+              },
+            },
+          }}
+        > 
+          <Item
+            title="Onetime Schedule"
+            path="/onetime-schedule"
+            colors={colors}
+            icon={<LooksOne />}
+          />
+          <Item
+            title="Interval Schedule"
+            path="/interval-schedule"
+            colors={colors}
+            icon={<CalendarToday />}
+          />
+          <Item
+            title="Repeat Schedule"
+            path="/repeat-schedule"
+            colors={colors}
+            icon={<EventRepeat />}
           />
         </Menu>
         <Typography

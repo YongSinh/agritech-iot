@@ -16,7 +16,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Table("tbl_repeat_schedule")
-public class RepeatSchedule {
+    public class RepeatSchedule {
     @Id
     private Integer id;
     private String day;

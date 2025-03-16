@@ -1,44 +1,15 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
+import { mockDataInvoices } from "../../data/mockData";
 import { tokens } from "../../theme";
-import { useState, useEffect } from "react";
-import { useRequest } from "../../config/api/request"
-import {
-  AdminPanelSettingsOutlined,
-  LockOpenOutlined,
-  SecurityOutlined,
-} from "@mui/icons-material";
 
-const Device = () => {
+const OnetimeSchedule = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { request } = useRequest();
-  const [devices, setDevices] = useState([]);
-
-  useEffect(() => {
-    getListDevice() 
-  }, []);
-
-  const getListDevice = async () => {
-    const result = await request("iot/api/v1/devices", "GET", null);
-    console.log("get Data");
-    if (result) {
-      setDevices(result.data)
-      console.log("Data fetched:", result.data);
-    }
-  };
-
-  const devicesWithIds = devices.map((row, index) => ({
-    id: row.deviceId, // Generate a unique ID
-    ...row,
-  }));
 
   const columns = [
-    {
-      field: "id",
-      headerName: "Device  ID"
-    },
+    { field: "id", headerName: "ID" },
     {
       field: "name",
       headerName: "Name",
@@ -46,28 +17,38 @@ const Device = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "controller",
-      headerName: "Controller",
-      flex: 1
+      field: "phone",
+      headerName: "Phone Number",
+      flex: 1,
     },
     {
-      field: "sensors",
-      headerName: "Sensors",
-      flex: 1
+      field: "email",
+      headerName: "Email",
+      flex: 1,
     },
     {
-      field: "remark",
-      headerName: "Remark",
-      flex: 1
-    }
+      field: "cost",
+      headerName: "Cost",
+      flex: 1,
+      renderCell: (params) => (
+        <Typography color={colors.greenAccent[500]}>
+          ${params.row.cost}
+        </Typography>
+      ),
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+    },
   ];
   return (
     <Box m="20px">
-      <Header title="DEVICE" subtitle="Managing the iot device" />
+      <Header title="ONETIME SCHEDULE" subtitle="List of Onetime Schedule" />
       <Box
         mt="40px"
         height="75vh"
-        flex={1}
+        maxWidth="100%"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
@@ -98,7 +79,7 @@ const Device = () => {
         }}
       >
         <DataGrid
-          rows={devicesWithIds}
+          rows={mockDataInvoices}
           columns={columns}
           initialState={{
             pagination: {
@@ -114,4 +95,4 @@ const Device = () => {
   );
 };
 
-export default Device;
+export default OnetimeSchedule;

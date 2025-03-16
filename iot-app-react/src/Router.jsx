@@ -14,7 +14,10 @@ import {
   Geography,
   Calendar,
   Stream,
-  Device
+  Device,
+  RepeatSchedule,
+  OnetimeSchedule,
+  IntervalSchedule
 } from "./scenes";
 
 const AppRouter = () => {
@@ -35,6 +38,9 @@ const AppRouter = () => {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/geography" element={<Geography />} />
           <Route path="/device" element={<Device />} />
+          <Route path="/repeat-schedule" element={<RepeatSchedule />} />
+          <Route path="/interval-schedule" element={<IntervalSchedule />} />
+          <Route path="/onetime-schedule" element={<OnetimeSchedule />} />
         </Route>
       </Routes>
     </Router>
