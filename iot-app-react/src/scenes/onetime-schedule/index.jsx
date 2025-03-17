@@ -17,30 +17,35 @@ const OnetimeSchedule = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "phone",
-      headerName: "Phone Number",
+      field: "deviceId",
+      headerName: "Device ID",
       flex: 1,
     },
     {
-      field: "email",
-      headerName: "Email",
+      field: "duration",
+      headerName: "Duration",
       flex: 1,
-    },
-    {
-      field: "cost",
-      headerName: "Cost",
-      flex: 1,
-      renderCell: (params) => (
-        <Typography color={colors.greenAccent[500]}>
-          ${params.row.cost}
-        </Typography>
-      ),
     },
     {
       field: "date",
       headerName: "Date",
       flex: 1,
     },
+    {
+      field: "time",
+      headerName: "Time",
+      flex: 1,
+    },
+    {
+      field: "readSensor",
+      headerName: "Read Sensor",
+      flex: 1,
+    },
+    {
+      field: "turnOnWater",
+      headerName: "Turn On Water",
+      flex: 1,
+    }
   ];
   return (
     <Box m="20px">

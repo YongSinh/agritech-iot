@@ -4,27 +4,28 @@ import { DataGrid } from "@mui/x-data-grid";
 import { mockDataInvoices } from "../../data/mockData";
 import { tokens } from "../../theme";
 
-const RepeatSchedule = () => {
+const Trigger = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const columns = [
     { field: "id", headerName: "ID" },
     {
+      field: "interval",
+      headerName: "Interval",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    }, 
+    {
       field: "deviceId",
       headerName: "Device ID",
       flex: 1,
     },
     {
-      field: "day",
-      headerName: "Day",
+      field: "duration",
+      headerName: "Duration",
       flex: 1,
       cellClassName: "name-column--cell",
-    },
-    {
-      field: "time",
-      headerName: "Time",
-      flex: 1,
     },
     {
       field: "readSensor",
@@ -35,11 +36,16 @@ const RepeatSchedule = () => {
       field: "turnOnWater",
       headerName: "Turn On Water",
       flex: 1,
+    },
+    {
+      field: "runDatetime",
+      headerName: "Run Date time",
+      flex: 1,
     }
   ];
   return (
     <Box m="20px">
-      <Header title="REPEAT SCHEDULE" subtitle="List of Repeat Schedule" />
+      <Header title="TRIGGER" subtitle="List of Trigger" />
       <Box
         mt="40px"
         height="75vh"
@@ -90,4 +96,4 @@ const RepeatSchedule = () => {
   );
 };
 
-export default RepeatSchedule;
+export default Trigger;

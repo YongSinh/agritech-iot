@@ -20,7 +20,8 @@ import {
   ConnectedTv,
   EventRepeat,
   LooksOne,
-  CalendarToday
+  CalendarToday,
+  FlashAuto
 } from "@mui/icons-material";
 import avatar from "../../../assets/images/avatar.png";
 import logo from "../../../assets/images/logo.png";
@@ -180,6 +181,12 @@ const SideBar = () => {
             path="/device"
             colors={colors}
             icon={<ConnectedTv />}
+          />
+          <Item
+            title="Trigger"
+            path="/trigger"
+            colors={colors}
+            icon={<FlashAuto />}
           />
         </Menu>
         <Typography
