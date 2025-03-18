@@ -24,6 +24,7 @@ function App() {
                 display: "flex",
                 flexDirection: "column",
                 height: "100%",
+                minWidth: "800px", // Set a minimum width for the main content
                 maxWidth: "100%",
               }}
             >

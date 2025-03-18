@@ -186,7 +186,7 @@ const SideBar = () => {
             title="Trigger"
             path="/trigger"
             colors={colors}
-            icon={<FlashAuto />}
+            icon={<FlashAuto   />}
           />
         </Menu>
         <Typography

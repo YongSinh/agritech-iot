@@ -3,15 +3,33 @@ import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { mockDataInvoices } from "../../data/mockData";
 import { tokens } from "../../theme";
+import { useState, useEffect } from "react";
+import { useRequest } from "../../config/api/request"
 
 const RepeatSchedule = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { request } = useRequest();
+  const [repeatSchedules, setRepeatSchedules] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getListRepeatSchedules() 
+  }, []);
+
+  const getListRepeatSchedules = async () => {
+    const result = await request("/iot/api/v1/repeat-schedule", "GET", null);
+    if (result) {
+      setRepeatSchedules(result.data)
+      setLoading(false)
+      console.log("Data fetched:", result);
+    }
+  };
 
   const columns = [
     { field: "id", headerName: "ID" },
     {
-      field: "deviceId",
+      field: "device_id",
       headerName: "Device ID",
       flex: 1,
     },
@@ -74,8 +92,9 @@ const RepeatSchedule = () => {
         }}
       >
         <DataGrid
-          rows={mockDataInvoices}
+          rows={repeatSchedules}
           columns={columns}
+          loading={loading}
           initialState={{
             pagination: {
               paginationModel: {

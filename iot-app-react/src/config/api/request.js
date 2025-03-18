@@ -20,7 +20,7 @@ export function getLocalAccessToken() {
 }
 
 export const config = {
-  base_server: "http://localhost:8085/",
+  base_server: "http://localhost:8085",
   image_path: "",
   version: 1,
 };
@@ -32,7 +32,8 @@ export const useRequest = () => {
   const request = async (url, method, param) => {
     const headers = {
       "Content-Type": param instanceof FormData ? "multipart/form-data" : "application/json",
-      accept: param instanceof FormData ? "application/json" : "*/*",
+       accept: param instanceof FormData ? "application/json" : "*/*",
+       "correlation_id": self.crypto.randomUUID()
     //   Authorization: `Bearer ${getLocalAccessToken()}`,
     };
 

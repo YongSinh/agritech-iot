@@ -1,23 +1,32 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
-import { mockDataInvoices } from "../../data/mockData";
 import { tokens } from "../../theme";
+import { useState, useEffect } from "react";
+import { useRequest } from "../../config/api/request"
 
 const OnetimeSchedule = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { request } = useRequest();
+  const [onetimeSchedule, setOnetimeSchedule] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    getListOnetimeSchedule() 
+  }, []);
 
+  const getListOnetimeSchedule = async () => {
+    const result = await request("/iot/api/v1/one-time-schedules", "GET", null);
+    if (result) {
+      setOnetimeSchedule(result.data)
+      setLoading(false)
+      console.log("Data fetched:", result);
+    }
+  };
   const columns = [
     { field: "id", headerName: "ID" },
     {
-      field: "name",
-      headerName: "Name",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "deviceId",
+      field: "device_id",
       headerName: "Device ID",
       flex: 1,
     },
@@ -27,13 +36,13 @@ const OnetimeSchedule = () => {
       flex: 1,
     },
     {
-      field: "date",
-      headerName: "Date",
+      field: "time",
+      headerName: "Time",
       flex: 1,
     },
     {
-      field: "time",
-      headerName: "Time",
+      field: "date",
+      headerName: "Date",
       flex: 1,
     },
     {
@@ -84,8 +93,9 @@ const OnetimeSchedule = () => {
         }}
       >
         <DataGrid
-          rows={mockDataInvoices}
+          rows={onetimeSchedule}
           columns={columns}
+          loading={loading}
           initialState={{
             pagination: {
               paginationModel: {

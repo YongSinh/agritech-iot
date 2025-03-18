@@ -15,17 +15,18 @@ const Device = () => {
   const colors = tokens(theme.palette.mode);
   const { request } = useRequest();
   const [devices, setDevices] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getListDevice() 
   }, []);
 
   const getListDevice = async () => {
-    const result = await request("iot/api/v1/devices", "GET", null);
-    console.log("get Data");
+    const result = await request("/iot/api/v1/devices", "GET", null);
     if (result) {
       setDevices(result.data)
-      console.log("Data fetched:", result.data);
+      setLoading(false)
+      console.log("Data fetched:", result);
     }
   };
 
@@ -100,6 +101,7 @@ const Device = () => {
         <DataGrid
           rows={devicesWithIds}
           columns={columns}
+          loading={loading}
           initialState={{
             pagination: {
               paginationModel: {

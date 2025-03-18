@@ -3,11 +3,28 @@ import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { mockDataInvoices } from "../../data/mockData";
 import { tokens } from "../../theme";
+import { useState, useEffect } from "react";
+import { useRequest } from "../../config/api/request"
 
 const IntervalSchedule = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { request } = useRequest();
+  const [intervalSchedule, setIntervalSchedule] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    getListIntervalSchedule() 
+  }, []);
+
+  const getListIntervalSchedule = async () => {
+    const result = await request("/iot/api/v1/interval-schedule", "GET", null);
+    if (result) {
+      setIntervalSchedule(result.data)
+      setLoading(false)
+      console.log("Data fetched:", result);
+    }
+  };
   const columns = [
     { field: "id", headerName: "ID" },
     {
@@ -17,7 +34,7 @@ const IntervalSchedule = () => {
       cellClassName: "name-column--cell",
     }, 
     {
-      field: "deviceId",
+      field: "device_id",
       headerName: "Device ID",
       flex: 1,
     },
@@ -80,8 +97,9 @@ const IntervalSchedule = () => {
         }}
       >
         <DataGrid
-          rows={mockDataInvoices}
+          rows={intervalSchedule}
           columns={columns}
+          loading={loading}
           initialState={{
             pagination: {
               paginationModel: {
