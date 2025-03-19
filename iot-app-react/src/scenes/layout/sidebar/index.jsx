@@ -6,7 +6,6 @@ import { Menu, MenuItem, Sidebar } from "react-pro-sidebar";
 import {
   BarChartOutlined,
   CalendarTodayOutlined,
-  ContactsOutlined,
   DashboardOutlined,
   DonutLargeOutlined,
   HelpOutlineOutlined,
@@ -14,7 +13,6 @@ import {
   MenuOutlined,
   PeopleAltOutlined,
   PersonOutlined,
-  ReceiptOutlined,
   TimelineOutlined,
   WavesOutlined,
   ConnectedTv,
@@ -163,18 +161,6 @@ const SideBar = () => {
             path="/team"
             colors={colors}
             icon={<PeopleAltOutlined />}
-          />
-          <Item
-            title="Contacts Information"
-            path="/contacts"
-            colors={colors}
-            icon={<ContactsOutlined />}
-          />
-          <Item
-            title="Invoices Balances"
-            path="/invoices"
-            colors={colors}
-            icon={<ReceiptOutlined />}
           />
           <Item
             title="Device"
