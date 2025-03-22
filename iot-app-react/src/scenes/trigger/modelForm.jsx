@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,13 +7,18 @@ import {
   DialogActions,
   TextField,
   Grid,
-  Button
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl
 } from "@mui/material";
-import { tokens } from "../../theme";
-import { useTheme } from "@emotion/react";
-const ModelForm = ({ open, handleClose, handleSubmit }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
+  const [deviceId, setDeviceId] = useState('');
+  const handleChange = (event) => {
+    setDeviceId(event.target.value);
+  };
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <form
@@ -25,19 +30,19 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
           handleSubmit(formJson);
         }}
       >
-        <DialogTitle>IoT DEVICE</DialogTitle>
+        <DialogTitle>TRIGGER</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the details below to add a new IoT device to the system.
+            Please enter the details below to add a new trigger to the system.
           </DialogContentText>
           <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
             <Grid item xs={6}>
               <TextField
                 required
                 margin="dense"
-                id="device_id"
-                name="device_id"
-                label="Device ID"
+                id="operator"
+                name="operator"
+                label="Operator"
                 type="text"
                 fullWidth
                 variant="outlined"
@@ -47,9 +52,9 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
               <TextField
                 required
                 margin="dense"
-                id="name"
-                name="name"
-                label="Full Name"
+                id="sensor"
+                name="sensor"
+                label="Sensor"
                 type="text"
                 fullWidth
                 variant="outlined"
@@ -59,9 +64,9 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
               <TextField
                 required
                 margin="dense"
-                id="controller"
-                name="controller"
-                label="Controller"
+                id="value"
+                name="value"
+                label="Value"
                 type="text"
                 fullWidth
                 variant="outlined"
@@ -71,27 +76,42 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
               <TextField
                 required
                 margin="dense"
-                id="sensors"
-                name="sensors"
-                label="Sensors"
+                id="action"
+                name="action"
+                label="Action"
                 type="text"
                 fullWidth
                 variant="outlined"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
               <TextField
+                required
                 margin="dense"
-                id="remark"
-                name="remark"
-                label="Remark"
+                id="duration"
+                name="duration"
+                label="Duration"
                 type="text"
                 fullWidth
                 variant="outlined"
-                multiline
-                minRows={3}
-                maxRows={10}
               />
+            </Grid>
+            <Grid item xs={6}>
+              <FormControl fullWidth variant="outlined" margin="dense">
+                <InputLabel id="device-id-label">Device ID</InputLabel>
+                <Select
+                  labelId="device-id-label"
+                  id="device-id"
+                  value={deviceId}
+                  onChange={handleChange}
+                >
+                  {deviceIds.map((device) => (
+                    <MenuItem key={device.deviceId} value={device.deviceId}>
+                      {device.deviceId}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
         </DialogContent>

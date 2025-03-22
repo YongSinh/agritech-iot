@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/iot/api")
@@ -35,6 +36,16 @@ public class IoTDeviceController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
+
+    @GetMapping("/v1/device-ids")
+    public Mono<ApiResponse<List<Map<String, String>>>> getAllDeviceIds(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        return ioTDeviceService.getAllDeviceIds()
+                .collectList()  // Collect the Flux into a List
+                .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
+    
+    
     @PostMapping(value = "/v1/get-device-by-name")
     public Mono<ApiResponse<List<IoTDeviceDto>>> getIoTDevicesByName(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,

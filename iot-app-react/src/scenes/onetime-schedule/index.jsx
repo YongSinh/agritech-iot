@@ -1,9 +1,11 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
+import ModelForm from "./modelForm";
+import dayjs from "dayjs";
 
 const OnetimeSchedule = () => {
   const theme = useTheme();
@@ -11,9 +13,38 @@ const OnetimeSchedule = () => {
   const { request } = useRequest();
   const [onetimeSchedule, setOnetimeSchedule] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deviceIds, setDeviceIds] = useState([]);
+  const [open, setOpen] = useState(false);
+
+  // Open the form dialog
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  // Close the form dialog
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSubmit = (formData) => {
+    console.log("Form Data Submitted:", formData);
+    // You can now send the formData to your API or perform other actions
+    handleClose(); // Close the dialog after submission
+  };
+
   useEffect(() => {
-    getListOnetimeSchedule() 
+    getListOnetimeSchedule()
+    getAllDeviceIds()
   }, []);
+
+  const getAllDeviceIds = async () => {
+    const result = await request("/iot/api/v1/device-ids", "GET", null);
+    if (result) {
+      setDeviceIds(result.data)
+      setLoading(false)
+      console.log("Data fetched:", result);
+    }
+  };
 
   const getListOnetimeSchedule = async () => {
     const result = await request("/iot/api/v1/one-time-schedules", "GET", null);
@@ -39,6 +70,15 @@ const OnetimeSchedule = () => {
       field: "time",
       headerName: "Time",
       flex: 1,
+      renderCell: ({ row: { time, date } }) => {
+        // Combine date and time into a single string
+        const dateTimeString = `${date} ${time}`;
+
+        // Parse and format using Day.js
+        const formattedDateTime = dayjs(dateTimeString).format('h:mm A');
+
+        return <span>{formattedDateTime}</span>;
+      },
     },
     {
       field: "date",
@@ -59,6 +99,16 @@ const OnetimeSchedule = () => {
   return (
     <Box m="20px">
       <Header title="ONETIME SCHEDULE" subtitle="List of Onetime Schedule" />
+      <Button color="secondary" variant="contained" onClick={handleClickOpen}>
+        Add ONETIME SCHEDULE
+      </Button>
+      <ModelForm
+        open={open}
+        handleClose={handleClose}
+        handleSubmit={handleSubmit} // Pass the submit handler
+        colors={colors}
+        deviceIds={deviceIds}
+      />
       <Box
         mt="40px"
         height="75vh"

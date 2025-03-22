@@ -1,21 +1,47 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
-import { mockDataInvoices } from "../../data/mockData";
 import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
-
+import ModelForm from "./modelForm"
 const RepeatSchedule = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { request } = useRequest();
   const [repeatSchedules, setRepeatSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deviceIds, setDeviceIds] = useState([]);
+  const [open, setOpen] = useState(false);
 
+  // Open the form dialog
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  // Close the form dialog
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSubmit = (formData) => {
+    console.log("Form Data Submitted:", formData);
+    // You can now send the formData to your API or perform other actions
+    handleClose(); // Close the dialog after submission
+  };
   useEffect(() => {
-    getListRepeatSchedules() 
+    getListRepeatSchedules()
+    getAllDeviceIds()
   }, []);
+
+  const getAllDeviceIds = async () => {
+    const result = await request("/iot/api/v1/device-ids", "GET", null);
+    if (result) {
+      setDeviceIds(result.data)
+      setLoading(false)
+      console.log("Data fetched:", result);
+    }
+  };
 
   const getListRepeatSchedules = async () => {
     const result = await request("/iot/api/v1/repeat-schedule", "GET", null);
@@ -58,6 +84,16 @@ const RepeatSchedule = () => {
   return (
     <Box m="20px">
       <Header title="REPEAT SCHEDULE" subtitle="List of Repeat Schedule" />
+      <Button color="secondary" variant="contained" onClick={handleClickOpen}>
+        Add REPEAT SCHEDULE
+      </Button>
+      <ModelForm
+        open={open}
+        handleClose={handleClose}
+        handleSubmit={handleSubmit} // Pass the submit handler
+        colors={colors}
+        deviceIds={deviceIds}
+      />
       <Box
         mt="40px"
         height="75vh"
