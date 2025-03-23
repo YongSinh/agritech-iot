@@ -5,6 +5,7 @@ import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
 import ModelForm from "./modelForm";
+import Swal from "sweetalert2";
 
 const Trigger = () => {
   const theme = useTheme();
@@ -14,21 +15,55 @@ const Trigger = () => {
   const [deviceIds, setDeviceIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-
+  const [initialData, setInitialData] = useState(null);
+  const [edit, setEdit] = useState(false);
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
+    setEdit(false)
   };
 
   // Close the form dialog
   const handleClose = () => {
     setOpen(false);
+    setInitialData(null)
   };
 
-  const handleSubmit = (formData) => {
-    console.log("Form Data Submitted:", formData);
+  const handleUpdate = (value) => {
+    setInitialData(value);
+    setOpen(true);
+    setEdit(true)
+  };
+
+  const handleSubmit = async (formData) => {
     // You can now send the formData to your API or perform other actions
-    handleClose(); // Close the dialog after submission
+    let url = edit ? "/iot/api/v1/update-trigger" : "/iot/api/v1/create-trigger";
+    let method = "post";
+
+    const result = await request(url, method, formData);
+    if (result.code === "SUC-000") {
+      Swal.fire({
+        title: "Success!",
+        text: "Your has been saved",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setLoading(false);
+      getListTriggers()
+      handleClose(); // Close the dialog after submission
+    } else {
+      console.log(result.code)
+      Swal.fire({
+        title: "Error!",
+        text: result.message,
+        icon: "error",
+        showConfirmButton: true,
+        timer: 3000,
+      });
+      handleClose(); // Close the dialog after submission
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -41,7 +76,6 @@ const Trigger = () => {
     if (result) {
       setTriggers(result.data)
       setLoading(false)
-      console.log("Data fetched:", result);
     }
   };
 
@@ -50,7 +84,6 @@ const Trigger = () => {
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
-      console.log("Data fetched:", result);
     }
   };
 
@@ -87,6 +120,21 @@ const Trigger = () => {
       field: "action",
       headerName: "Action",
       flex: 1,
+    },
+    {
+      headerName: "Action",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => handleUpdate(row)}
+          >
+            Edit
+          </Button>
+        );
+      },
     }
   ];
   return (
@@ -101,6 +149,7 @@ const Trigger = () => {
         handleSubmit={handleSubmit} // Pass the submit handler
         colors={colors}
         deviceIds={deviceIds}
+        initialData={initialData}
       />
       <Box
         mt="40px"

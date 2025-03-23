@@ -68,7 +68,7 @@ public class IoTDeviceController {
                 .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '" + req.getDeviceId() + "' already exists.", correlationId, "IoTDevice"));
     }
 
-    @PutMapping(value = "/v1/update-device")
+    @PostMapping(value = "/v1/update-device")
     public Mono<ApiResponse<IoTDevice>> updateDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req

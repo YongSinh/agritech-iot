@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,20 +11,40 @@ import {
 } from "@mui/material";
 import { tokens } from "../../theme";
 import { useTheme } from "@emotion/react";
-const ModelForm = ({ open, handleClose, handleSubmit }) => {
+const ModelForm = ({ open, handleClose, handleSubmit, initialData }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [formData, setFormData] = useState({
+    deviceId: "",
+    name: "",
+    controller: "",
+    sensors: "",
+    remark: "",
+  });
+
+  // Update form data when `initialData` changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+  
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const onSubmit = (event) => {
+    event.preventDefault(); // Prevent page reload
+    handleSubmit(formData); // Pass form data to the parent component
+  };
+
   return (
     <Dialog open={open} onClose={handleClose}>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault(); // Prevent page reload
-          const formData = new FormData(event.currentTarget);
-          const formJson = Object.fromEntries(formData.entries());
-          console.log("Form Data in ModelForm:", formJson);
-          handleSubmit(formJson);
-        }}
-      >
+      <form onSubmit={onSubmit}>
         <DialogTitle>IoT DEVICE</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -35,12 +55,14 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
               <TextField
                 required
                 margin="dense"
-                id="device_id"
-                name="device_id"
+                id="deviceId"
+                name="deviceId"
                 label="Device ID"
                 type="text"
                 fullWidth
                 variant="outlined"
+                value={formData.deviceId}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={6}>
@@ -53,6 +75,8 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
                 type="text"
                 fullWidth
                 variant="outlined"
+                value={formData.name}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={6}>
@@ -65,6 +89,8 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
                 type="text"
                 fullWidth
                 variant="outlined"
+                value={formData.controller}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={6}>
@@ -77,6 +103,8 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
                 type="text"
                 fullWidth
                 variant="outlined"
+                value={formData.sensors}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={12}>
@@ -91,6 +119,8 @@ const ModelForm = ({ open, handleClose, handleSubmit }) => {
                 multiline
                 minRows={3}
                 maxRows={10}
+                value={formData.remark}
+                onChange={handleChange}
               />
             </Grid>
           </Grid>

@@ -57,6 +57,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                     d.setRemark(req.getRemark());
                     d.setSensors(req.getSensors());
                     d.setController(req.getController());
+                    d.setNewEntry(false);
                     return d;
                 }).flatMap(ioTDeviceRepo::save);
     }

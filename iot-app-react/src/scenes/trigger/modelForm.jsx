@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -13,23 +13,45 @@ import {
   InputLabel,
   FormControl
 } from "@mui/material";
-const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
-  const [deviceId, setDeviceId] = useState('');
+const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) => {
+
+  const [formData, setFormData] = useState({
+    id: initialData == null ? "" : initialData.id ,
+    operator: "",
+    sensor: "",
+    value: "",
+    action: "",
+    duration: "",
+    device_id: ""
+  });
+
+  // Update form data when `initialData` changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
+  // Handle form field changes
   const handleChange = (event) => {
-    setDeviceId(event.target.value);
+    console.log(formData)
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handle form submission
+  const onSubmit = (event) => {
+    event.preventDefault(); // Prevent page reload
+    console.log(formData)
+    handleSubmit(formData); // Pass form data to the parent component
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault(); // Prevent page reload
-          const formData = new FormData(event.currentTarget);
-          const formJson = Object.fromEntries(formData.entries());
-          console.log("Form Data in ModelForm:", formJson);
-          handleSubmit(formJson);
-        }}
-      >
+      <form onSubmit={onSubmit}>
         <DialogTitle>TRIGGER</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -45,6 +67,8 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 label="Operator"
                 type="text"
                 fullWidth
+                onChange={handleChange}
+                value={formData.operator}
                 variant="outlined"
               />
             </Grid>
@@ -56,6 +80,8 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 name="sensor"
                 label="Sensor"
                 type="text"
+                onChange={handleChange}
+                value={formData.sensor}
                 fullWidth
                 variant="outlined"
               />
@@ -69,6 +95,8 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 label="Value"
                 type="text"
                 fullWidth
+                onChange={handleChange}
+                value={formData.value}
                 variant="outlined"
               />
             </Grid>
@@ -80,6 +108,8 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 name="action"
                 label="Action"
                 type="text"
+                onChange={handleChange}
+                value={formData.action}
                 fullWidth
                 variant="outlined"
               />
@@ -93,6 +123,8 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 label="Duration"
                 type="text"
                 fullWidth
+                onChange={handleChange}
+                value={formData.duration}
                 variant="outlined"
               />
             </Grid>
@@ -102,11 +134,14 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 <Select
                   labelId="device-id-label"
                   id="device-id"
-                  value={deviceId}
+                  name="device_id"
+                  value={formData.device_id}
+                  label="Device ID"
                   onChange={handleChange}
+                  fullWidth
                 >
-                  {deviceIds.map((device) => (
-                    <MenuItem key={device.deviceId} value={device.deviceId}>
+                  {deviceIds.map((device, index) => (
+                    <MenuItem key={index} value={device.deviceId}>
                       {device.deviceId}
                     </MenuItem>
                   ))}
