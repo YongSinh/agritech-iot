@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -15,25 +15,81 @@ import {
 } from "@mui/material";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import dayjs from "dayjs";
 
-const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
-  const [deviceId, setDeviceId] = useState('');
+const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) => {
   const booleans = [true, false];
+
+  const payload = {
+    id: initialData == null ? "" : initialData.id,
+    turnOnWater: "",
+    duration: "",
+    readSensor: "",
+    time: null,
+    date: null,
+    device_id: ""
+  }
+
+  const [formData, setFormData] = useState(payload);
+
+  // Update form data when `initialData` changes
+  useEffect(() => {
+    if (initialData) {
+      const dateTimeString = `${initialData.date} ${initialData.time}`;
+      setFormData({
+        ...initialData,
+        date: initialData.date ? dayjs(initialData.date) : null,
+        time: initialData.time ? dayjs(dateTimeString) : null,
+      });
+    }
+  }, [initialData]);
+
+  // Handle form field changes
   const handleChange = (event) => {
-    setDeviceId(event.target.value);
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handle date change
+  const handleDateChange = (newValue) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      date: newValue,
+    }));
+  };
+
+  // Handle time change
+  const handleTimeChange = (newValue) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      time: newValue,
+    }));
+  };
+
+  // Handle form submission
+  const onSubmit = (event) => {
+    event.preventDefault();
+
+    // Format date and time for submission
+    const submissionData = {
+      ...formData,
+      date: formData.date ? formData.date.format("YYYY-MM-DD") : null,
+      time: formData.time ? formData.time.format("HH:mm:ss") : null,
+    };
+
+    handleSubmit(submissionData);
+    setFormData(payload);
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
       <form
-        onSubmit={(event) => {
-          event.preventDefault(); // Prevent page reload
-          const formData = new FormData(event.currentTarget);
-          const formJson = Object.fromEntries(formData.entries());
-          console.log("Form Data in ModelForm:", formJson);
-          handleSubmit(formJson);
-        }}
+        onSubmit={onSubmit}
       >
         <DialogTitle>ONETIME SCHEDULE</DialogTitle>
         <DialogContent>
@@ -42,25 +98,13 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
           </DialogContentText>
           <Grid container spacing={2}>
             <Grid item xs={6}>
-              <TextField
-                required
-                margin="dense"
-                id="operator"
-                name="interval"
-                label="Interval"
-                type="text"
-                fullWidth
-                variant="outlined"
-              />
-            </Grid>
-
-            <Grid item xs={6}>
               <FormControl fullWidth variant="outlined" margin="dense">
-                <InputLabel id="demo-simple-select-label">Device ID</InputLabel>
+                <InputLabel id="device-id-label">Device ID</InputLabel>
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={deviceId}
+                  labelId="device-id-label"
+                  id="device-id"
+                  name="device_id"
+                  value={formData.device_id}
                   label="Device ID"
                   onChange={handleChange}
                   fullWidth
@@ -75,11 +119,14 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
             </Grid>
             <Grid item xs={6}>
               <FormControl variant="outlined" fullWidth margin="dense">
-                <InputLabel id="demo-simple-select-label">Turn on water</InputLabel>
+                <InputLabel id="turn-on-water-select-label">Turn on water</InputLabel>
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
+                  labelId="turn-on-water-select-label"
+                  id="turn-on-water"
                   label="Turn on water"
+                  name="turnOnWater"
+                  onChange={handleChange}
+                  value={formData.turnOnWater}
                   fullWidth
                 >
 
@@ -98,7 +145,11 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 <InputLabel id="read-sensor-label">Read Sensor</InputLabel>
                 <Select
                   labelId="read-sensor-label"
+                  id="read-sensor"
                   fullWidth
+                  name="readSensor"
+                  onChange={handleChange}
+                  value={formData.readSensor}
                   label="Read Sensor"
                 >
                   {
@@ -118,18 +169,50 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 id="duration"
                 name="duration"
                 label="Duration"
-                type="text"
+                type="number"
+                onChange={handleChange}
+                value={formData.duration}
                 fullWidth
                 variant="outlined"
               />
             </Grid>
             <Grid item xs={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <FormControl fullWidth variant="outlined" margin="dense">
-                  <DateTimePicker name="datetime" label="Run DateTime" sx={{ width: '100%' }} />
+                <FormControl fullWidth margin="dense">
+                  <DatePicker
+                    label="Date"
+                    value={formData.date}
+                    onChange={handleDateChange}
+                    sx={{ width: '100%' }}
+                    slotProps={{
+                      textField: {
+                        variant: 'outlined',
+                      },
+                    }}
+                  />
                 </FormControl>
               </LocalizationProvider>
             </Grid>
+
+            {/* Time Picker */}
+            <Grid item xs={6}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <FormControl fullWidth margin="dense">
+                  <TimePicker
+                    label="Time"
+                    value={formData.time}
+                    onChange={handleTimeChange}
+                    sx={{ width: '100%' }}
+                    slotProps={{
+                      textField: {
+                        variant: 'outlined',
+                      },
+                    }}
+                  />
+                </FormControl>
+              </LocalizationProvider>
+            </Grid>
+
           </Grid>
         </DialogContent>
         <DialogActions>

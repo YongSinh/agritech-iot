@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
 import ModelForm from "./modelForm";
 import dayjs from "dayjs";
+import Swal from "sweetalert2";
 
 const OnetimeSchedule = () => {
   const theme = useTheme();
@@ -15,21 +16,54 @@ const OnetimeSchedule = () => {
   const [loading, setLoading] = useState(true);
   const [deviceIds, setDeviceIds] = useState([]);
   const [open, setOpen] = useState(false);
-
+  const [initialData, setInitialData] = useState(null);
+  const [edit, setEdit] = useState(false);
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
+    setEdit(false)
   };
 
   // Close the form dialog
   const handleClose = () => {
     setOpen(false);
+    setEdit(false)
   };
 
-  const handleSubmit = (formData) => {
-    console.log("Form Data Submitted:", formData);
+  const handleUpdate = (value) => {
+    setInitialData(value);
+    setOpen(true);
+    setEdit(true)
+  };
+
+  const handleSubmit = async (formData) => {
     // You can now send the formData to your API or perform other actions
-    handleClose(); // Close the dialog after submission
+    let url = edit ? "/iot/api/v1/update-onetime-Schedule" : "/iot/api/v1/create-onetime-Schedule";
+    let method = "post";
+
+    const result = await request(url, method, formData);
+    if (result.code === "SUC-000") {
+      Swal.fire({
+        title: "Success!",
+        text: "Your has been saved",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setLoading(false);
+      getListOnetimeSchedule()
+      handleClose(); // Close the dialog after submission
+    } else {
+      Swal.fire({
+        title: "Error!",
+        text: result.message,
+        icon: "error",
+        showConfirmButton: true,
+        timer: 3000,
+      });
+      handleClose(); // Close the dialog after submission
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -42,7 +76,6 @@ const OnetimeSchedule = () => {
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
-      console.log("Data fetched:", result);
     }
   };
 
@@ -51,9 +84,9 @@ const OnetimeSchedule = () => {
     if (result) {
       setOnetimeSchedule(result.data)
       setLoading(false)
-      console.log("Data fetched:", result);
     }
   };
+
   const columns = [
     { field: "id", headerName: "ID" },
     {
@@ -73,10 +106,8 @@ const OnetimeSchedule = () => {
       renderCell: ({ row: { time, date } }) => {
         // Combine date and time into a single string
         const dateTimeString = `${date} ${time}`;
-
         // Parse and format using Day.js
         const formattedDateTime = dayjs(dateTimeString).format('h:mm A');
-
         return <span>{formattedDateTime}</span>;
       },
     },
@@ -94,8 +125,25 @@ const OnetimeSchedule = () => {
       field: "turnOnWater",
       headerName: "Turn On Water",
       flex: 1,
-    }
+    },
+    {
+          headerName: "Action",
+          flex: 1,
+          renderCell: ({ row }) => {
+            return (
+              <Button
+                color="secondary"
+                variant="contained"
+                onClick={() => handleUpdate(row)}
+              >
+                Edit
+              </Button>
+            );
+          },
+        }
   ];
+
+
   return (
     <Box m="20px">
       <Header title="ONETIME SCHEDULE" subtitle="List of Onetime Schedule" />
@@ -108,6 +156,7 @@ const OnetimeSchedule = () => {
         handleSubmit={handleSubmit} // Pass the submit handler
         colors={colors}
         deviceIds={deviceIds}
+        initialData={initialData}
       />
       <Box
         mt="40px"

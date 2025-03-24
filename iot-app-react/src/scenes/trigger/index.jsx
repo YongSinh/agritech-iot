@@ -26,6 +26,7 @@ const Trigger = () => {
   // Close the form dialog
   const handleClose = () => {
     setOpen(false);
+    setEdit(false)
     setInitialData(null)
   };
 

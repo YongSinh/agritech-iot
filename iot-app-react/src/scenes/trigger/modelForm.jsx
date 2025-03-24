@@ -45,7 +45,6 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) 
   // Handle form submission
   const onSubmit = (event) => {
     event.preventDefault(); // Prevent page reload
-    console.log(formData)
     handleSubmit(formData); // Pass form data to the parent component
   };
 
