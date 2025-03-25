@@ -127,20 +127,20 @@ const OnetimeSchedule = () => {
       flex: 1,
     },
     {
-          headerName: "Action",
-          flex: 1,
-          renderCell: ({ row }) => {
-            return (
-              <Button
-                color="secondary"
-                variant="contained"
-                onClick={() => handleUpdate(row)}
-              >
-                Edit
-              </Button>
-            );
-          },
-        }
+      headerName: "Action",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => handleUpdate(row)}
+          >
+            Edit
+          </Button>
+        );
+      },
+    }
   ];
 
 

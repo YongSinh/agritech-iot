@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,24 +16,64 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs from "dayjs";
 
-const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
-  const [deviceId, setDeviceId] = useState('');
+const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) => {
   const booleans = [true, false];
+
+  const payload = {
+    id: initialData == null ? "" : initialData.id,
+    device_id: "",
+    interval: "",
+    turnOnWater: "",
+    duration: "",
+    readSensor: "",
+    runDatetime: null, // Initialize as null or with a default date
+  }
+
+  // Handle form field changes
   const handleChange = (event) => {
-    setDeviceId(event.target.value);
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
+
+  // Handle date/time change
+  const handleDateTimeChange = (newValue) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      runDatetime: newValue,
+    }));
+  };
+
+  // Handle form submission
+  const onSubmit = (event) => {
+    event.preventDefault();
+    // Convert Dayjs object to ISO string before submission if needed
+    const submissionData = {
+      ...formData,
+      runDatetime: formData.runDatetime ? formData.runDatetime.format('YYYY-MM-DDTHH:mm:ss') : null,
+    };
+    handleSubmit(submissionData);
+  };
+  const [formData, setFormData] = useState(payload)
+  // Update form data when `initialData` changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        ...initialData,
+        // Convert string date to Dayjs object if needed
+        runDatetime: initialData.runDatetime ? dayjs(initialData.runDatetime) : null,
+      });
+    }
+  }, [initialData]);
 
   return (
     <Dialog open={open} onClose={handleClose}>
       <form
-        onSubmit={(event) => {
-          event.preventDefault(); // Prevent page reload
-          const formData = new FormData(event.currentTarget);
-          const formJson = Object.fromEntries(formData.entries());
-          console.log("Form Data in ModelForm:", formJson);
-          handleSubmit(formJson);
-        }}
+        onSubmit={onSubmit}
       >
         <DialogTitle>INTERVAL SCHEDULE</DialogTitle>
         <DialogContent>
@@ -45,21 +85,26 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
               <TextField
                 required
                 margin="dense"
-                id="operator"
+                value={formData.interval}
+                onChange={handleChange}
+                id="interval"
                 name="interval"
                 label="Interval"
-                type="text"
+                type="number"
                 fullWidth
                 variant="outlined"
               />
             </Grid>
             <Grid item xs={6}>
               <FormControl variant="outlined" fullWidth margin="dense">
-                <InputLabel id="demo-simple-select-label">Turn on water</InputLabel>
+                <InputLabel id="turn-on-water-select-label">Turn on water</InputLabel>
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
+                  labelId="turn-on-water-select-label"
+                  id="turn-on-water"
                   label="Turn on water"
+                  name="turnOnWater"
+                  onChange={handleChange}
+                  value={formData.turnOnWater}
                   fullWidth
                 >
 
@@ -78,7 +123,11 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 <InputLabel id="read-sensor-label">Read Sensor</InputLabel>
                 <Select
                   labelId="read-sensor-label"
+                  id="read-sensor"
                   fullWidth
+                  name="readSensor"
+                  onChange={handleChange}
+                  value={formData.readSensor}
                   label="Read Sensor"
                 >
                   {
@@ -94,7 +143,17 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
             <Grid item xs={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <FormControl fullWidth variant="outlined" margin="dense">
-                  <DateTimePicker label="Run DateTime" sx={{ width: '100%' }} />
+                  <DateTimePicker
+                    label="Run DateTime"
+                    value={formData.runDatetime}
+                    onChange={handleDateTimeChange}
+                    sx={{ width: '100%' }}
+                    slotProps={{
+                      textField: {
+                        variant: 'outlined',
+                      },
+                    }}
+                  />
                 </FormControl>
               </LocalizationProvider>
             </Grid>
@@ -105,7 +164,9 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 id="duration"
                 name="duration"
                 label="Duration"
-                type="text"
+                type="number"
+                onChange={handleChange}
+                value={formData.duration}
                 fullWidth
                 variant="outlined"
               />
@@ -116,11 +177,14 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 <Select
                   labelId="device-id-label"
                   id="device-id"
-                  value={deviceId}
+                  name="device_id"
+                  value={formData.device_id}
+                  label="Device ID"
                   onChange={handleChange}
+                  fullWidth
                 >
-                  {deviceIds.map((device) => (
-                    <MenuItem key={device.deviceId} value={device.deviceId}>
+                  {deviceIds.map((device, index) => (
+                    <MenuItem key={index} value={device.deviceId}>
                       {device.deviceId}
                     </MenuItem>
                   ))}
