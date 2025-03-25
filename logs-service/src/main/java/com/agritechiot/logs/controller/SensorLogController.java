@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/log")
 @RequiredArgsConstructor
@@ -21,24 +23,24 @@ public class SensorLogController {
     private final SensorLogService sensorLogService;
 
     @GetMapping("/v1/sensor-logs")
-    public Mono<ApiResponse<?>> getListSensorLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+    public Mono<ApiResponse<List<SensorLog>>> getListSensorLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return sensorLogService.getListSensorLog()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PostMapping(value = "/v1/add-sensor-log")
-    public Mono<ApiResponse<?>> addSensorLog(
+    public Mono<ApiResponse<SensorLog>> addSensorLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody SensorLog req
     ) throws Exception {
-        log.info("REQ_SENSOR_LOG: {}", JsonUtil.toJson(req));
+        log.info("REQ_CREATE_SENSOR_LOG: {}", JsonUtil.toJson(req));
         return sensorLogService.saveSensorLog(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
     @PostMapping(value = "/v1/update-sensor-log")
-    public Mono<ApiResponse<?>> updateSensorLog(
+    public Mono<ApiResponse<SensorLog>> updateSensorLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody SensorLog req
     ) throws Exception {

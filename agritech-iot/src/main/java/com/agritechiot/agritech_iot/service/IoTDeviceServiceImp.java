@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class IoTDeviceServiceImp implements IoTDeviceService {
@@ -54,8 +57,15 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                     d.setRemark(req.getRemark());
                     d.setSensors(req.getSensors());
                     d.setController(req.getController());
+                    d.setNewEntry(false);
                     return d;
                 }).flatMap(ioTDeviceRepo::save);
+    }
+
+    @Override
+    public Flux<Map<String, String>> getAllDeviceIds() {
+        return ioTDeviceRepo.findByALlDeviceId()
+                .map(deviceId -> Collections.singletonMap("deviceId", deviceId));
     }
 
 
