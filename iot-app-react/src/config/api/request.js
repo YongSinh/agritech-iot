@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useNotifications } from '@toolpad/core/useNotifications';
+import { toast, Bounce } from 'react-toastify';
 
 // Constants for status codes and messages
 const STATUS_CODES = {
@@ -25,16 +25,42 @@ export const config = {
   version: 1,
 };
 
+const notifyError = (message) => {
+  toast.error(message, {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    transition: Bounce,
+  });
+};
+
+const notifyWarning = (message) => {
+  toast.warn(message, {
+    position: "top-center",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    transition: Bounce,
+  });
+};
 // Wrap the request function in a hook to use notifications
 export const useRequest = () => {
-  const { notify } = useNotifications();
 
   const request = async (url, method, param) => {
     const headers = {
       "Content-Type": param instanceof FormData ? "multipart/form-data" : "application/json",
-       accept: param instanceof FormData ? "application/json" : "*/*",
-       "correlation_id": self.crypto.randomUUID()
-    //   Authorization: `Bearer ${getLocalAccessToken()}`,
+      accept: param instanceof FormData ? "application/json" : "*/*",
+      "correlation_id": self.crypto.randomUUID()
+      // Authorization: `Bearer ${getLocalAccessToken()}`,
     };
 
     try {
@@ -43,31 +69,36 @@ export const useRequest = () => {
         method,
         data: param,
         headers,
+        timeout: 10000, // Timeout after 10 seconds (10000ms)
       });
 
       if (response.data.code === 400 || response.data.code === 503) {
-        notify({ severity: "warning", message: response.data.message });
+        notifyWarning(response.data.message);
       } else {
         return response.data;
       }
     } catch (err) {
-      const status = err.response?.status;
-      switch (status) {
-        case STATUS_CODES.NOT_FOUND:
-          notify({ severity: "error", message: MESSAGES.NOT_FOUND });
-          break;
-        case STATUS_CODES.INTERNAL_SERVER_ERROR:
-          notify({ severity: "error", message: err.message });
-          break;
-        case STATUS_CODES.UNAUTHORIZED:
-          notify({ severity: "warning", message: MESSAGES.UNAUTHORIZED });
-          break;
-        case STATUS_CODES.FORBIDDEN:
-          notify({ severity: "warning", message: MESSAGES.FORBIDDEN });
-          break;
-        default:
-          notify({ severity: "error", message: err.message });
-          break;
+      if (err.code === 'ECONNABORTED') {
+        notifyError("Request timed out. Please try again.");
+      } else {
+        const status = err.response?.status;
+        switch (status) {
+          case STATUS_CODES.NOT_FOUND:
+            notifyError(MESSAGES.NOT_FOUND);
+            break;
+          case STATUS_CODES.INTERNAL_SERVER_ERROR:
+            notifyError(err.message);
+            break;
+          case STATUS_CODES.UNAUTHORIZED:
+            notifyError(MESSAGES.UNAUTHORIZED);
+            break;
+          case STATUS_CODES.FORBIDDEN:
+            notifyWarning(MESSAGES.FORBIDDEN);
+            break;
+          default:
+            notifyError(err.message);
+            break;
+        }
       }
       return false;
     } finally {
