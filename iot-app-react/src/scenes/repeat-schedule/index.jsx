@@ -5,6 +5,8 @@ import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
 import ModelForm from "./modelForm"
+import Swal from "sweetalert2";
+
 const RepeatSchedule = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -13,22 +15,26 @@ const RepeatSchedule = () => {
   const [loading, setLoading] = useState(true);
   const [deviceIds, setDeviceIds] = useState([]);
   const [open, setOpen] = useState(false);
-
+  const [initialData, setInitialData] = useState(null);
+  const [edit, setEdit] = useState(false);
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
+    setEdit(false)
   };
 
   // Close the form dialog
   const handleClose = () => {
     setOpen(false);
+    setEdit(false)
   };
 
-  const handleSubmit = (formData) => {
-    console.log("Form Data Submitted:", formData);
-    // You can now send the formData to your API or perform other actions
-    handleClose(); // Close the dialog after submission
+  const handleUpdate = (value) => {
+    setInitialData(value);
+    setOpen(true);
+    setEdit(true)
   };
+
   useEffect(() => {
     getListRepeatSchedules()
     getAllDeviceIds()
@@ -39,7 +45,6 @@ const RepeatSchedule = () => {
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
-      console.log("Data fetched:", result);
     }
   };
 
@@ -48,9 +53,41 @@ const RepeatSchedule = () => {
     if (result) {
       setRepeatSchedules(result.data)
       setLoading(false)
-      console.log("Data fetched:", result);
     }
   };
+
+  const handleSubmit = async (formData) => {
+    console.log(formData)
+  
+    // You can now send the formData to your API or perform other actions
+    let url = edit ? "/iot/api/v1/update-repeat-schedule" : "/iot/api/v1/create-repeat-schedule";
+    let method = "post";
+
+    const result = await request(url, method, formData);
+    if (result.code === "SUC-000") {
+      Swal.fire({
+        title: "Success!",
+        text: "Your has been saved",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setLoading(false);
+      getListRepeatSchedules()
+      handleClose(); // Close the dialog after submission
+    } else {
+      Swal.fire({
+        title: "Error!",
+        text: result.message,
+        icon: "error",
+        showConfirmButton: true,
+        timer: 3000,
+      });
+      handleClose(); // Close the dialog after submission
+      setLoading(false);
+    }
+  };
+
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -88,7 +125,7 @@ const RepeatSchedule = () => {
           <Button
             color="secondary"
             variant="contained"
-            //onClick={() => handleUpdate(row)}
+            onClick={() => handleUpdate(row)}
           >
             Edit
           </Button>
@@ -96,6 +133,7 @@ const RepeatSchedule = () => {
       },
     }
   ];
+
   return (
     <Box m="20px">
       <Header title="REPEAT SCHEDULE" subtitle="List of Repeat Schedule" />
@@ -108,6 +146,7 @@ const RepeatSchedule = () => {
         handleSubmit={handleSubmit} // Pass the submit handler
         colors={colors}
         deviceIds={deviceIds}
+        initialData={initialData}
       />
       <Box
         mt="40px"

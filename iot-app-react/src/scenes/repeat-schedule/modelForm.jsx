@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,13 +16,38 @@ import {
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-
-const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
-  const [deviceId, setDeviceId] = useState('');
+import dayjs from "dayjs";
+const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) => {
   const booleans = [true, false];
+  const payload = {
+    id: initialData == null ? "" : initialData.id,
+    turnOnWater: "",
+    duration: "",
+    readSensor: "",
+    time: null,
+    day: "",
+    device_id: ""
+  }
+
+  const [formData, setFormData] = useState(payload);
+
+  // Modified handleChange to handle day case conversion
   const handleChange = (event) => {
-    setDeviceId(event.target.value);
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === 'day' ? value.toUpperCase() : value,
+    }));
   };
+
+  const handleTimeChange = (newValue) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      time: newValue,
+    }));
+  };
+
+
 
   const daysOfWeek = [
     "Monday",
@@ -34,16 +59,42 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
     "Sunday",
   ];
 
+
+  // Handle form submission
+  const onSubmit = (event) => {
+    event.preventDefault();
+
+    // Format date and time for submission
+    const submissionData = {
+      ...formData,
+      time: formData.time ? formData.time.format("HH:mm:ss") : null,
+    };
+
+    handleSubmit(submissionData);
+    setFormData(payload);
+  };
+
+  // Normalize the day value to title case for display
+  const normalizeDay = (day) => {
+    if (!day) return '';
+    return day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+  };
+
+  useEffect(() => {
+    if (initialData) {
+      const today = dayjs().format('YYYY-MM-DD');
+      setFormData({
+        ...initialData,
+        day: initialData.day ? initialData.day.toUpperCase() : '',
+        time: initialData.time ? dayjs(`${today} ${initialData.time}`) : null,
+      });
+    }
+  }, [initialData]);
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <form
-        onSubmit={(event) => {
-          event.preventDefault(); // Prevent page reload
-          const formData = new FormData(event.currentTarget);
-          const formJson = Object.fromEntries(formData.entries());
-          console.log("Form Data in ModelForm:", formJson);
-          handleSubmit(formJson);
-        }}
+        onSubmit={onSubmit}
       >
         <DialogTitle>REPEAT SCHEDULE</DialogTitle>
         <DialogContent>
@@ -53,13 +104,14 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <FormControl fullWidth variant="outlined" margin="dense">
-                <InputLabel id="demo-simple-select-label">Device ID</InputLabel>
+                <InputLabel id="device-id-label">Device ID</InputLabel>
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={deviceId}
-                  label="Device ID"
+                  labelId="device-id-label"
+                  id="device-id"
+                  name="device_id"
+                  value={formData.device_id}
                   onChange={handleChange}
+                  label="Device ID"
                   fullWidth
                 >
                   {deviceIds.map((device, index) => (
@@ -72,31 +124,37 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
             </Grid>
             <Grid item xs={6}>
               <FormControl variant="outlined" fullWidth margin="dense">
-                <InputLabel id="demo-simple-select-label">Days of week</InputLabel>
+                <InputLabel id="day-select-label">Days of week</InputLabel>
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
+                  labelId="day-select-label"
+                  id="day-select"
+                  name="day"
+                  value={formData.day}  // Store as uppercase internally
+                  onChange={handleChange}
                   label="Days of week"
                   fullWidth
                 >
-
-                  {
-                    daysOfWeek.map((value, index) => (
-                      <MenuItem key={index} value={value}>
-                        {value.toString()}
-                      </MenuItem>
-                    ))
-                  }
+                  {daysOfWeek.map((value, index) => (
+                    <MenuItem 
+                      key={index} 
+                      value={value.toUpperCase()}  // Store value as uppercase
+                    >
+                      {value}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
             <Grid item xs={6}>
               <FormControl variant="outlined" fullWidth margin="dense">
-                <InputLabel id="demo-simple-select-label">Turn on water</InputLabel>
+                <InputLabel id="turn-on-water-select-label">Turn on water</InputLabel>
                 <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
+                  labelId="turn-on-water-select-label"
+                  id="turn-on-water"
                   label="Turn on water"
+                  name="turnOnWater"
+                  onChange={handleChange}
+                  value={formData.turnOnWater}
                   fullWidth
                 >
 
@@ -115,7 +173,11 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 <InputLabel id="read-sensor-label">Read Sensor</InputLabel>
                 <Select
                   labelId="read-sensor-label"
+                  id="read-sensor"
                   fullWidth
+                  name="readSensor"
+                  onChange={handleChange}
+                  value={formData.readSensor}
                   label="Read Sensor"
                 >
                   {
@@ -135,15 +197,27 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds }) => {
                 id="duration"
                 name="duration"
                 label="Duration"
-                type="text"
+                type="number"
+                onChange={handleChange}
+                value={formData.duration}
                 fullWidth
                 variant="outlined"
               />
             </Grid>
             <Grid item xs={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <FormControl fullWidth variant="outlined" margin="dense">
-                  <TimePicker name="time" label="Time" sx={{ width: '100%' }} />
+                <FormControl fullWidth margin="dense">
+                  <TimePicker
+                    label="Time"
+                    value={formData.time}
+                    onChange={handleTimeChange}
+                    sx={{ width: '100%' }}
+                    slotProps={{
+                      textField: {
+                        variant: 'outlined',
+                      },
+                    }}
+                  />
                 </FormControl>
               </LocalizationProvider>
             </Grid>
