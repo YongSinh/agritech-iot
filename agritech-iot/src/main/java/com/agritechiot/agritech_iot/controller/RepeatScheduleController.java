@@ -42,6 +42,21 @@ public class RepeatScheduleController {
                     return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
                 });
     }
+
+    @PostMapping("/v1/repeat-schedule-by-day")
+    public Mono<ApiResponse<List<RepeatSchedule>>> getListRepeatScheduleByDay(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody RepeatScheduleReq req
+    ) {
+        return repeatScheduleService.getListRepeatScheduleByDay(req.getDay())
+                .collectList()  // Collect the Flux into a List
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(e -> {
+                    log.error("Error fetching schedules for deviceId: {}", req.getDeviceId(), e);
+                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
+                });
+    }
+
     @PostMapping("/v1/create-repeat-schedule")
     public Mono<ApiResponse<RepeatSchedule>> createRepeatSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,

@@ -12,5 +12,7 @@ public interface RepeatScheduleService {
 
     Flux<RepeatSchedule> getListRepeatSchedule();
 
+    Flux<RepeatSchedule> getListRepeatScheduleByDay(String day);
+
     Flux<RepeatSchedule> getListRepeatScheduleByDeviceId(String deviceId);
 }

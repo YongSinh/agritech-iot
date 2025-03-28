@@ -55,6 +55,11 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
     }
 
     @Override
+    public Flux<RepeatSchedule> getListRepeatScheduleByDay(String day) {
+        return repeatScheduleRepo.findByDay(day);
+    }
+
+    @Override
     public Flux<RepeatSchedule> getListRepeatScheduleByDeviceId(String deviceId) {
         return repeatScheduleRepo.findByDeviceId(deviceId);
     }
@@ -62,26 +67,30 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
     // Run this method every minute
     @Scheduled(fixedRate = 60000) // 60000 ms = 1 minute
     public void checkAndExecuteRepeatSchedules() {
-        String today = LocalDate.now().getDayOfWeek().name().toLowerCase();  // Get current day of the week (e.g., "MONDAY")
-        LocalTime now = LocalTime.now().withSecond(0).withNano(0); // Ignore seconds and nanoseconds
-        log.info("Repeat schedule start at: {}", LocalDateTime.now());
-        // Fetch schedules for today
-        Flux<RepeatSchedule> schedules = repeatScheduleRepo.findByDay(today);
+        String today = LocalDate.now().getDayOfWeek().name().toUpperCase();
+        LocalTime now = LocalTime.now().withSecond(0).withNano(0);
 
-        // Log the schedules found (or if empty)
-        schedules
-                .doOnNext(schedule -> log.info("Repeat schedule found: {}", schedule)) // Log each schedule
-                .doOnComplete(() -> log.info("No more repeat schedules found for today: {}", today)) // Log when the stream completes
-                .filter(schedule -> schedule.getTime().equals(now)) // Filter schedules matching the current time
+        log.info("Checking repeat schedules at: {}", now);
+
+        repeatScheduleRepo.findByDay(today)
+                .doOnNext(schedule -> log.info("Found schedule: {}", schedule))
+                .doOnComplete(() -> log.info("No more schedules for {}", today))
+                // Check if current time is within 1 hour after the scheduled time
+                .filter(schedule -> {
+                    LocalTime scheduleTime = schedule.getTime(); // e.g., 22:00:00
+                    LocalTime oneHourAfterSchedule = scheduleTime.plusHours(1);
+
+                    // Current time is >= scheduleTime AND < oneHourAfterSchedule
+                    return !now.isBefore(scheduleTime) && now.isBefore(oneHourAfterSchedule);
+                })
                 .subscribe(schedule -> {
-                    // Execute tasks based on the schedule
                     if (Boolean.TRUE.equals(schedule.getReadSensor())) {
                         readSensor(schedule.getDeviceId());
                     }
                     if (Boolean.TRUE.equals(schedule.getTurnOnWater())) {
                         turnOnWater(schedule.getDeviceId(), schedule.getDuration());
                     }
-                }, error -> log.error("Error processing repeat schedules: {}", error.getMessage())); // Log errors
+                }, error -> log.error("Error: {}", error.getMessage()));
     }
 
     private void readSensor(String deviceId) {

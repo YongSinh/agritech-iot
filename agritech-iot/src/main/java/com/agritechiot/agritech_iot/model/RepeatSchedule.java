@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Setter
@@ -29,4 +30,6 @@ import java.time.LocalTime;
     @JsonProperty("device_id")
     @Column("deviceId")
     private String deviceId;
+    @Column("lastExecuted")
+    private LocalDate lastExecuted;
 }
