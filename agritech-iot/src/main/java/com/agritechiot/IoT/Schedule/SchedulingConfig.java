@@ -8,17 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 
 
 @Configuration
@@ -29,12 +27,17 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final RepeatScheduleRepo repeatScheduleRepo;
     private final RepeatScheduleService repeatScheduleService;
     private ScheduledTaskRegistrar taskRegistrar;
+    private final RepeatScheduleManager repeatScheduleManager;
+    private final List<ScheduledFuture<?>> scheduledFutures = new ArrayList<>();
+    private final List<ScheduledFuture<?>> oneTimeFutures = new ArrayList<>();
+
+
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
         this.taskRegistrar = taskRegistrar;
         log.info("Initializing ScheduledTaskRegistrar...");
         taskRegistrar.setTaskScheduler(taskScheduler());
-      refreshScheduledTasks();
+        refreshScheduledTasks();
     }
 
     public void refreshScheduledTasks() {
@@ -43,17 +46,21 @@ public class SchedulingConfig implements SchedulingConfigurer {
             return;
         }
 
-        log.info("Starting task refresh...");
+        log.info("🧹 Cancelling existing tasks...");
+        for (ScheduledFuture<?> future : scheduledFutures) {
+            future.cancel(false); // Cancel without interrupting running tasks
+        }
+        scheduledFutures.clear();
 
-        log.info("🧹 Destroying existing tasks...");
-
-        taskRegistrar.addTriggerTask(
-                () -> {
-                    log.info("⏰ Executing scheduled task for device at {}", new Date());
-                },
+        log.info("🔁 Re-registering tasks...");
+        repeatScheduleManager.refreshRepeatTasks(taskScheduler());
+        // Re-schedule default task
+        ScheduledFuture<?> defaultTask = taskScheduler().schedule(
+                () -> log.info("⏰ Executing default scheduled task at {}", new Date()),
                 new CronTrigger("*/5 * * * * ?")
         );
-        log.info("Task registered successfully!");
+        scheduledFutures.add(defaultTask);
+
         List<RepeatSchedule> schedules = repeatScheduleRepo.findAll()
                 .filter(schedule -> Boolean.TRUE.equals(schedule.getReadSensor()) || Boolean.TRUE.equals(schedule.getTurnOnWater()))
                 .collectList()
@@ -67,20 +74,20 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     }
 
-
     private void scheduleRepeatTask(RepeatSchedule schedule) {
         try {
             String cronExpression = GenUtil.toCronExpression(schedule.getDay(), schedule.getTime());
 
             log.info("✅ Scheduled task for device {} at {} {}", schedule.getDeviceId(), schedule.getDay(), schedule.getTime());
-
-            taskRegistrar.addTriggerTask(
+            ScheduledFuture<?> future = taskScheduler().schedule(
                     () -> {
                         log.info("⏰ Executing scheduled task for device {} at {}", schedule.getDeviceId(), new Date());
-                       executeScheduledActions(schedule);
+                        executeScheduledActions(schedule);
                     },
                     new CronTrigger(cronExpression)
             );
+
+            scheduledFutures.add(future);
 
             log.debug("✅ Scheduled task for device {} at {} {}", schedule.getDeviceId(), schedule.getDay(), schedule.getTime());
         } catch (Exception e) {

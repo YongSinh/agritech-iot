@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -66,6 +67,8 @@ public class RepeatScheduleController {
     ) throws Exception {
         log.info("REQ_IOT_CREATE_REPEAT_SCHEDULE: {}", JsonUtil.toJson(req));
         return repeatScheduleService.saveRepeatSchedule(req)
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshScheduledTasks())
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
@@ -75,11 +78,10 @@ public class RepeatScheduleController {
             @RequestBody RepeatScheduleReq req
     ) throws Exception {
         log.info("REQ_IOT_UPDATE_REPEAT_SCHEDULE: {}", JsonUtil.toJson(req));
-        Mono<ApiResponse<RepeatSchedule>> apiResponseMono = repeatScheduleService.updateRepeatSchedule(req.getId(), req)
-                // .doOnSuccess(updateRepeatSchedule -> config.refreshScheduledTasks())
+        return repeatScheduleService.updateRepeatSchedule(req.getId(), req)
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshScheduledTasks())
                 .map(res -> new ApiResponse<>(res, correlationId));
-//        config.refreshScheduledTasks();
-        return apiResponseMono;
     }
 
 }
