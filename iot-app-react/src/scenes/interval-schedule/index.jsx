@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
 import ModelForm from "./modelForm";
 import dayjs from "dayjs";
+import Swal from "sweetalert2";
 
 const IntervalSchedule = () => {
   const theme = useTheme();
@@ -15,21 +16,56 @@ const IntervalSchedule = () => {
   const [loading, setLoading] = useState(true);
   const [deviceIds, setDeviceIds] = useState([]);
   const [open, setOpen] = useState(false);
+  const [initialData, setInitialData] = useState(null);
+  const [edit, setEdit] = useState(false);
 
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
+    setEdit(false)
   };
 
   // Close the form dialog
   const handleClose = () => {
     setOpen(false);
+    setEdit(false)
   };
 
-  const handleSubmit = (formData) => {
-    console.log("Form Data Submitted:", formData);
+  const handleUpdate = (value) => {
+    setInitialData(value);
+    setOpen(true);
+    setEdit(true)
+  };
+
+  const handleSubmit = async (formData) => {
+    // console.log(formData)
     // You can now send the formData to your API or perform other actions
-    handleClose(); // Close the dialog after submission
+    let url = edit ? "/iot/api/v1/update-interval-schedule" : "/iot/api/v1/create-interval-schedule";
+    let method = "post";
+
+    const result = await request(url, method, formData);
+    if (result.code === "SUC-000") {
+      Swal.fire({
+        title: "Success!",
+        text: "Your has been saved",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setLoading(false);
+      getListIntervalSchedule()
+      handleClose(); // Close the dialog after submission
+    } else {
+      Swal.fire({
+        title: "Error!",
+        text: result.message,
+        icon: "error",
+        showConfirmButton: true,
+        timer: 3000,
+      });
+      handleClose(); // Close the dialog after submission
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -43,7 +79,6 @@ const IntervalSchedule = () => {
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
-      console.log("Data fetched:", result);
     }
   };
 
@@ -53,7 +88,6 @@ const IntervalSchedule = () => {
     if (result) {
       setIntervalSchedule(result.data)
       setLoading(false)
-      console.log("Data fetched:", result);
     }
   };
   const columns = [
@@ -91,7 +125,22 @@ const IntervalSchedule = () => {
       flex: 1,
       renderCell: ({ row: { runDatetime } }) => {
         return (
-            <span>{dayjs(runDatetime).format('YYYY-MM-DD h:mm A') }</span>
+          <span>{dayjs(runDatetime).format('YYYY-MM-DD h:mm A')}</span>
+        );
+      },
+    },
+    {
+      headerName: "Action",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={() => handleUpdate(row)}
+          >
+            Edit
+          </Button>
         );
       },
     }
@@ -108,6 +157,7 @@ const IntervalSchedule = () => {
         handleSubmit={handleSubmit} // Pass the submit handler
         colors={colors}
         deviceIds={deviceIds}
+        initialData={initialData}
       />
       <Box
         mt="40px"
