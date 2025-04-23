@@ -1,13 +1,13 @@
-royaltops
+  royaltops
 RoyalTops@2025
 
 test@2025
-
+	
 mosquitto_sub -h localhost -t test -u "user_test" -P "test@2025"
 
 mosquitto_pub -h localhost -t test -m "hello world" -u "user_test" -P "test@2025"
 
-mosquitto_sub -h 127.0.0.1 -p 1883 -u "user_test" -P "test@2025" -t test
+mosquitto_sub -h 127.0.0.1 -p 1883 -u "user_test" -P "test@2025" -t button
 
 mosquitto_pub -h 127.0.0.1 -t test -m "hello world" -u "user_test" -P "test@2025"
 
@@ -24,3 +24,55 @@ https://roytuts.com/publish-subscribe-message-onto-mqtt-using-spring/
 mosquitto_pub -h 127.0.0.1 -t humidity -m "{\"id\":1,\"datetime\":\"2025-02-09T12:21:19.283Z\",\"operator\":\"test\",\"sensor\":\"test\",\"value\":20,\"action\":\"run\",\"duration\":2,\"device_id\":\"RC001\"}" -u "user_test" -P "test@2025"
 
 https://medium.com/@tomer.klein/docker-compose-and-mosquitto-mqtt-simplifying-broker-deployment-7aaf469c07ee
+
+
+
+
+close/open
+battery
+
+
+Y@&gSinh25
+
+Time@2023
+
+
+mosquitto_pub -h localhost -t test -m "hello world" -u "admin" -P "admin@123"
+
+
+mosquitto_sub -h localhost -p 1883 -u "admin" -P "admin@123" -t humidity
+
+
+
+apt-get install mosquitto-clients -y
+
+
+mosquitto_sub -h localhost -p 1883 -u "test" -P "202025" -t "test"
+
+mosquitto_passwd -b /etc/mosquitto/passwd test 202025
+
+mosquitto_pub -h 159.65.131.28 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot" -P "iot@2025" -t "test"
+
+mosquitto_sub -h 159.65.131.28 -p 1883 -u "iot" -P "iot@2025" -t "test"
+
+
+docker exec mosquitto mosquitto_passwd -b /mosquitto/config/passwd iot iot@2025
+
+
+username = iot
+passwd = iot@2025
+ip = 159.65.131.28
+
+mosquitto_pub -h 159.65.131.28 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot" -P "iot@2025" -t "test"
+
+mosquitto_sub -h 159.65.131.28 -p 1883 -u "iot" -P "iot@2025" -t "test"
+
+
+update and add
+docker exec mosquitto mosquitto_passwd -b /mosquitto/config/passwd [username] [newpassword]
+
+
+sudo chown root:root ./mosquitto/passwd
+sudo chmod 644 ./mosquitto/passwd
+
+docker-compose down && docker-compose up -d

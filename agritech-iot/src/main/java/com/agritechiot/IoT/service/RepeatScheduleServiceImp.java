@@ -1,9 +1,13 @@
 package com.agritechiot.IoT.service;
 
 import com.agritechiot.IoT.dto.request.RepeatScheduleReq;
+import com.agritechiot.IoT.model.IoTDevice;
 import com.agritechiot.IoT.model.RepeatSchedule;
+import com.agritechiot.IoT.repository.IoTDeviceRepo;
 import com.agritechiot.IoT.repository.RepeatScheduleRepo;
+import com.agritechiot.IoT.service.mqtt.Publisher;
 import com.agritechiot.IoT.util.GenUtil;
+import com.agritechiot.IoT.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +22,8 @@ import java.time.LocalDateTime;
 @Slf4j
 public class RepeatScheduleServiceImp implements RepeatScheduleService {
     private final RepeatScheduleRepo repeatScheduleRepo;
-
+    private final Publisher publisher;
+    private final IoTDeviceRepo ioTDeviceRepo;
     @Override
     public Mono<RepeatSchedule> saveRepeatSchedule(RepeatScheduleReq req) {
         RepeatSchedule repeatSchedule = new RepeatSchedule();
@@ -53,8 +58,13 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
     }
 
     @Override
-    public void startRepeatSchedule(String deviceId) {
-        log.info("Reading sensors for device {} at {}", deviceId, LocalDateTime.now());
+    public void startRepeatSchedule(RepeatSchedule repeatSchedule) throws Exception {
+        log.info("Reading sensors for device {} at {}", repeatSchedule.getDeviceId(), LocalDateTime.now());
+        log.info(JsonUtil.objectToJsonString(repeatSchedule));
+        IoTDevice ioTDevice = ioTDeviceRepo.findById(repeatSchedule.getDeviceId()).block();
+        assert ioTDevice != null;
+        log.info(ioTDevice.getName());
+        publisher.publish(ioTDevice.getName(), JsonUtil.objectToJsonString(repeatSchedule), 1, true);
     }
 
     @Override

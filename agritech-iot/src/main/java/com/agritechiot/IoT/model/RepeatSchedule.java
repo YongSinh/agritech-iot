@@ -1,5 +1,6 @@
 package com.agritechiot.IoT.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,6 +31,4 @@ public class    RepeatSchedule {
     @JsonProperty("device_id")
     @Column("deviceId")
     private String deviceId;
-    @Column("lastExecuted")
-    private LocalDate lastExecuted;
 }

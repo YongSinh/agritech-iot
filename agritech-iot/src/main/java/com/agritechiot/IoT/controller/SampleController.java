@@ -11,7 +11,6 @@ import com.agritechiot.IoT.service.mqtt.SubscriberImp;
 import com.agritechiot.IoT.util.JsonUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.http.ResponseEntity;

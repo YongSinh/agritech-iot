@@ -55,11 +55,11 @@ public class SchedulingConfig implements SchedulingConfigurer {
         log.info("🔁 Re-registering tasks...");
         repeatScheduleManager.refreshRepeatTasks(taskScheduler());
         // Re-schedule default task
-        ScheduledFuture<?> defaultTask = taskScheduler().schedule(
-                () -> log.info("⏰ Executing default scheduled task at {}", new Date()),
-                new CronTrigger("*/5 * * * * ?")
-        );
-        scheduledFutures.add(defaultTask);
+//        ScheduledFuture<?> defaultTask = taskScheduler().schedule(
+//                () -> log.info("⏰ Executing default scheduled task at {}", new Date()),
+//                new CronTrigger("*/5 * * * * ?")
+//        );
+//        scheduledFutures.add(defaultTask);
 
         List<RepeatSchedule> schedules = repeatScheduleRepo.findAll()
                 .filter(schedule -> Boolean.TRUE.equals(schedule.getReadSensor()) || Boolean.TRUE.equals(schedule.getTurnOnWater()))
@@ -82,7 +82,11 @@ public class SchedulingConfig implements SchedulingConfigurer {
             ScheduledFuture<?> future = taskScheduler().schedule(
                     () -> {
                         log.info("⏰ Executing scheduled task for device {} at {}", schedule.getDeviceId(), new Date());
-                        executeScheduledActions(schedule);
+                        try {
+                            executeScheduledActions(schedule);
+                        } catch (Exception e) {
+                            throw new IllegalStateException("Executing scheduled ", e);
+                        }
                     },
                     new CronTrigger(cronExpression)
             );
@@ -95,11 +99,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
         }
     }
 
-    private void executeScheduledActions(RepeatSchedule schedule) {
+    private void executeScheduledActions(RepeatSchedule schedule) throws Exception {
         log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
-
         if (Boolean.TRUE.equals(schedule.getReadSensor()) && Boolean.TRUE.equals(schedule.getTurnOnWater())) {
-            repeatScheduleService.startRepeatSchedule(schedule.getDeviceId());
+            repeatScheduleService.startRepeatSchedule(schedule);
         } else {
             log.warn("Schedule for device {} does not require any action", schedule.getDeviceId());
         }

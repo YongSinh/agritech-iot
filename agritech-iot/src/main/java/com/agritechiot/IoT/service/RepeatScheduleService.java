@@ -12,7 +12,7 @@ public interface RepeatScheduleService {
 
     Flux<RepeatSchedule> getListRepeatSchedule();
 
-    void startRepeatSchedule(String deviceId);
+    void startRepeatSchedule(RepeatSchedule repeatSchedule) throws Exception;
 
     Flux<RepeatSchedule> getListRepeatScheduleByDay(String day);
 
