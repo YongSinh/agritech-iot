@@ -68,7 +68,7 @@ public class RepeatScheduleController {
         log.info("REQ_IOT_CREATE_REPEAT_SCHEDULE: {}", JsonUtil.toJson(req));
         return repeatScheduleService.saveRepeatSchedule(req)
                 .publishOn(Schedulers.boundedElastic())
-                .doOnSuccess(updateRepeatSchedule -> config.refreshScheduledTasks())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshRepeatScheduledTasksById(req.getId()))
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
@@ -80,7 +80,7 @@ public class RepeatScheduleController {
         log.info("REQ_IOT_UPDATE_REPEAT_SCHEDULE: {}", JsonUtil.toJson(req));
         return repeatScheduleService.updateRepeatSchedule(req.getId(), req)
                 .publishOn(Schedulers.boundedElastic())
-                .doOnSuccess(updateRepeatSchedule -> config.refreshScheduledTasks())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshRepeatScheduledTasksById(req.getId()))
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 

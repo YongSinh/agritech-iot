@@ -40,7 +40,7 @@ public class SampleController {
 
     @GetMapping("/sample2")
     public ResponseEntity<String> sample2()  {
-        schedulingConfig.refreshScheduledTasks();
+        //schedulingConfig.refreshScheduledTasks();
         return ResponseEntity.ok("Starting task refresh...");
     }
 
