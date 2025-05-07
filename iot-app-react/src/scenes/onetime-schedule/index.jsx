@@ -127,6 +127,11 @@ const OnetimeSchedule = () => {
       flex: 1,
     },
     {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+    },
+    {
       headerName: "Action",
       flex: 1,
       renderCell: ({ row }) => {
