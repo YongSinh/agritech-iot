@@ -26,7 +26,6 @@ public class ControlLog {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
-    @JsonProperty("device_id")
     @Column("deviceId")
     private String deviceId;
     private String status;

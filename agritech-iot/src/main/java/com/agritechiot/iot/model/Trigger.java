@@ -22,7 +22,6 @@ public class Trigger {
     private Integer value;
     private String action;
     private Integer duration;
-    @JsonProperty("device_id")
     @Column("deviceId")
     private String deviceId;
 }

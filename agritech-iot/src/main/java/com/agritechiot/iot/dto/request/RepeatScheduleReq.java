@@ -1,6 +1,5 @@
 package com.agritechiot.iot.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +14,5 @@ public class RepeatScheduleReq {
     private Boolean readSensor;
     private Boolean turnOnWater;
     private Integer duration;
-    @JsonProperty("device_id")
     private String deviceId;
 }

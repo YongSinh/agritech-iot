@@ -26,7 +26,7 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) 
     readSensor: "",
     time: null,
     day: "",
-    device_id: ""
+    deviceId: ""
   }
 
   const [formData, setFormData] = useState(payload);
@@ -108,8 +108,8 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) 
                 <Select
                   labelId="device-id-label"
                   id="device-id"
-                  name="device_id"
-                  value={formData.device_id}
+                  name="deviceId"
+                  value={formData.deviceId}
                   onChange={handleChange}
                   label="Device ID"
                   fullWidth

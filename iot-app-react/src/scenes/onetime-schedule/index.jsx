@@ -7,6 +7,7 @@ import { useRequest } from "../../config/api/request"
 import ModelForm from "./modelForm";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import MaterialUISwitch from "../../components/Switch"
 
 const OnetimeSchedule = () => {
   const theme = useTheme();
@@ -18,6 +19,13 @@ const OnetimeSchedule = () => {
   const [open, setOpen] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [edit, setEdit] = useState(false);
+
+  const handleChangeStatus = (id, newStatus) => {
+    setOnetimeSchedule(onetimeSchedule.map(row =>
+      row.id === id ? { ...row, status: newStatus } : row
+    ));
+  };
+
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
@@ -90,7 +98,7 @@ const OnetimeSchedule = () => {
   const columns = [
     { field: "id", headerName: "ID" },
     {
-      field: "device_id",
+      field: "deviceId",
       headerName: "Device ID",
       flex: 1,
     },
@@ -127,9 +135,17 @@ const OnetimeSchedule = () => {
       flex: 1,
     },
     {
-      field: "status",
       headerName: "Status",
+      field: "status",
       flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <MaterialUISwitch
+            status={row.status}
+            onChange={(newStatus) => handleChangeStatus(row.id, newStatus)}
+          />
+        );
+      },
     },
     {
       headerName: "Action",

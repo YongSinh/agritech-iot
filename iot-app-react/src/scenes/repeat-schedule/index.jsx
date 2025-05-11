@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
 import ModelForm from "./modelForm"
 import Swal from "sweetalert2";
+import MaterialUISwitch from "../../components/Switch"
 
 const RepeatSchedule = () => {
   const theme = useTheme();
@@ -23,6 +24,12 @@ const RepeatSchedule = () => {
     setEdit(false)
   };
 
+  const handleChangeStatus = (id, newStatus) => {
+    setRepeatSchedules(repeatSchedules.map(row =>
+      row.id === id ? { ...row, status: newStatus } : row
+    ));
+  };
+  
   // Close the form dialog
   const handleClose = () => {
     setOpen(false);
@@ -57,8 +64,7 @@ const RepeatSchedule = () => {
   };
 
   const handleSubmit = async (formData) => {
-    console.log(formData)
-  
+
     // You can now send the formData to your API or perform other actions
     let url = edit ? "/iot/api/v1/update-repeat-schedule" : "/iot/api/v1/create-repeat-schedule";
     let method = "post";
@@ -92,7 +98,7 @@ const RepeatSchedule = () => {
   const columns = [
     { field: "id", headerName: "ID" },
     {
-      field: "device_id",
+      field: "deviceId",
       headerName: "Device ID",
       flex: 1,
     },
@@ -116,6 +122,19 @@ const RepeatSchedule = () => {
       field: "turnOnWater",
       headerName: "Turn On Water",
       flex: 1,
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <MaterialUISwitch
+            status={row.status}
+            onChange={(newStatus) => handleChangeStatus(row.id, newStatus)}
+          />
+        );
+      },
     },
     {
       headerName: "Action",

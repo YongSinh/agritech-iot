@@ -24,7 +24,6 @@ public class OnetimeSchedule {
     @Column("turnOn_water")
     private Boolean turnOnWater;
     private Integer duration;
-    @JsonProperty("device_id")
     @Column("deviceId")
     private String deviceId;
     private Boolean status;

@@ -31,7 +31,6 @@ public class IntervalSchedule {
     private Integer duration;
     @Column("read_sensor")
     private Boolean readSensor;
-    @JsonProperty("device_id")
     @Column("deviceId")
     private String deviceId;
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

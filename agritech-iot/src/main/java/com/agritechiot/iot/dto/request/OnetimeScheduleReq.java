@@ -17,6 +17,5 @@ public class OnetimeScheduleReq {
     private Boolean readSensor;
     private Boolean turnOnWater;
     private Integer duration;
-    @JsonProperty("device_id")
     private String deviceId;
 }
