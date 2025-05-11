@@ -9,7 +9,10 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
@@ -61,28 +64,43 @@ public class IntervalScheduleManager {
 
     private void scheduleRepeatTask(IntervalSchedule schedule) {
         try {
-            String taskKey = getTaskKey(schedule);
+            String taskKey = getIntervalTaskKey(schedule);
 
-            String cronExpression = "";
-
-            log.info("✅ Interval Scheduled task for device {} at {} {}", schedule.getDeviceId(), schedule.getInterval(), schedule.getRunDatetime());
-
-            ScheduledFuture<?> future = threadPoolTaskSchedulerConfig.taskScheduler().schedule(
-                    () -> {
-                        log.info("⏰ Executing scheduled task for device {} at {}", schedule.getDeviceId(), new Date());
-                        try {
-                            executeIntervalActions(schedule);
-                        } catch (Exception e) {
-                            throw new IllegalStateException("Executing scheduled ", e);
-                        }
-                    },
-                    new CronTrigger(cronExpression)
+            // Generate cron expression for the interval
+            String cronExpression = generateIntervalCron(
+                    schedule.getRunDatetime(),
+                    schedule.getInterval()
             );
-            intervalSchedule.put(taskKey, future);
 
-            log.debug("✅ Interval scheduled task for device {} at {} {}", schedule.getDeviceId(), schedule.getInterval(), schedule.getRunDatetime());
+            ScheduledFuture<?> future = threadPoolTaskSchedulerConfig.taskScheduler()
+                    .schedule(
+                            () -> executeIntervalActions(schedule),
+                            new CronTrigger(cronExpression)
+                    );
+
+            intervalSchedule.put(taskKey, future);
+            log.info("✅ Scheduled interval task for device {} with cron {}",
+                    schedule.getDeviceId(), cronExpression);
         } catch (Exception e) {
-            log.error("❌ Failed to schedule task for device {}", schedule.getDeviceId(), e);
+            log.error("❌ Failed to schedule interval task", e);
+        }
+    }
+
+    private String generateIntervalCron(LocalDateTime startTime, int intervalMinutes) {
+        int minute = startTime.getMinute();
+        int hour = startTime.getHour();
+
+        // For intervals that divide 60 evenly
+        if (60 % intervalMinutes == 0) {
+            return String.format("%d/%d %d * * *", minute, intervalMinutes, hour);
+        }
+        // For irregular intervals
+        else {
+            List<String> minutes = new ArrayList<>();
+            for (int m = minute; m < 60; m += intervalMinutes) {
+                minutes.add(String.valueOf(m));
+            }
+            return String.format("%s %d * * *", String.join(",", minutes), hour);
         }
     }
 
@@ -176,8 +194,8 @@ public class IntervalScheduleManager {
         }
     }
 
-    private String getTaskKey(IntervalSchedule schedule) {
-        return "oneTime_schedule|" + schedule.getId();
+    private String getIntervalTaskKey(IntervalSchedule schedule) {
+        return "interval_schedule|" + schedule.getId();
     }
 
     private void cancelAllScheduledTasks() {

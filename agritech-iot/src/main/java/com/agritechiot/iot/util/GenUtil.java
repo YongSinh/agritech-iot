@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
 @Slf4j
 public class GenUtil {
     private GenUtil() {
@@ -17,27 +18,27 @@ public class GenUtil {
      */
     public static String createOneTimeCronExpression(String date, LocalTime time) {
         LocalDate localDate = LocalDate.parse(date);
-        String cronExpression =String.format("%d %d %d %d %d ?",
+        String cronExpression = String.format("%d %d %d %d %d ?",
                 time.getSecond(),
                 time.getMinute(),
                 time.getHour(),
                 localDate.getDayOfMonth(),
                 localDate.getMonthValue());
-        log.info("ONE_TIME_CRON_EXPRESSION: {} ",cronExpression);
+        log.info("ONE_TIME_CRON_EXPRESSION: {} ", cronExpression);
         return cronExpression;
     }
 
     public static String buildWeeklyCronExpression(String day, LocalTime time) {
         // Capitalize the day
         int dayOfWeek = convertDayToCronValue(day);
-        log.info("dayOfWeek: {} ",dayOfWeek);
-        String cronExpression =String.format("%d %d %d ? * %d",
+        log.info("dayOfWeek: {} ", dayOfWeek);
+        String cronExpression = String.format("%d %d %d ? * %d",
                 time.getSecond(),
                 time.getMinute(),
                 time.getHour(),
                 dayOfWeek);
 
-        log.info("Cron_Expression: {} ",cronExpression);
+        log.info("Cron_Expression: {} ", cronExpression);
 
         // Build cron expression: second minute hour ? * DAY
         return cronExpression;

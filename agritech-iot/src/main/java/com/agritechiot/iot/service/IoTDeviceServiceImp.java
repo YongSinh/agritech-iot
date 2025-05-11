@@ -1,10 +1,12 @@
 package com.agritechiot.iot.service;
 
 import com.agritechiot.iot.dto.request.IoTDeviceReq;
+import com.agritechiot.iot.dto.response.DeviceJoinDto;
 import com.agritechiot.iot.dto.response.IoTDeviceDto;
 import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,6 +16,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IoTDeviceServiceImp implements IoTDeviceService {
     private final IoTDeviceRepo ioTDeviceRepo;
 
@@ -66,6 +69,11 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
     public Flux<Map<String, String>> getAllDeviceIds() {
         return ioTDeviceRepo.findByALlDeviceId()
                 .map(deviceId -> Collections.singletonMap("deviceId", deviceId));
+    }
+
+    @Override
+    public Flux<DeviceJoinDto> getAllDevices() {
+        return ioTDeviceRepo.findJoinedDevices();
     }
 
 

@@ -76,7 +76,7 @@ public class RepeatScheduleManager {
                     }
                     return Mono.just(schedule);  // Continue with processing
                 })
-              // .doOnNext(this::scheduleRepeatTask)
+                // .doOnNext(this::scheduleRepeatTask)
                 .switchIfEmpty(Mono.defer(() -> {
                     log.warn("⚠️ No schedules found for device {}", id);
                     return Mono.empty();

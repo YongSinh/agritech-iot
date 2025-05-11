@@ -18,7 +18,7 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
         intervalSchedule.setRunDatetime(req.getRunDatetime());
         intervalSchedule.setDeviceId(req.getDeviceId());
         intervalSchedule.setDuration(req.getDuration());
-        intervalSchedule.setReadSensor(req. getReadSensor());
+        intervalSchedule.setReadSensor(req.getReadSensor());
         intervalSchedule.setReadSensor(req.getReadSensor());
         return intervalScheduleRepo.save(intervalSchedule);
     }

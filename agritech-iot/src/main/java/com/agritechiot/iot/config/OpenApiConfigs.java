@@ -22,7 +22,7 @@ public class OpenApiConfigs {
             @Value("${openapi.service.version}") String serviceVersion,
             @Value("${openapi.service.url}") String url,
             @Value("${openapi.service.local-url}") String localUrl
-            ) {
+    ) {
         final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
                 .servers(List.of(

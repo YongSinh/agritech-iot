@@ -12,10 +12,10 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 @RequiredArgsConstructor
 public class SchedulingConfig implements SchedulingConfigurer {
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
-    private ScheduledTaskRegistrar taskRegistrar;
     private final RepeatScheduleManager repeatScheduleManager;
     private final OnetimeScheduleManager onetimeScheduleManager;
     private final IntervalScheduleManager intervalScheduleManager;
+    private ScheduledTaskRegistrar taskRegistrar;
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -32,7 +32,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         }
         repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
         onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
-        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
+        //intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
     }
 
     public void refreshRepeatScheduledTasksById(Integer id) {

@@ -1,6 +1,7 @@
 package com.agritechiot.iot.service;
 
 import com.agritechiot.iot.dto.request.IoTDeviceReq;
+import com.agritechiot.iot.dto.response.DeviceJoinDto;
 import com.agritechiot.iot.dto.response.IoTDeviceDto;
 import com.agritechiot.iot.model.IoTDevice;
 import reactor.core.publisher.Flux;
@@ -20,4 +21,6 @@ public interface IoTDeviceService {
     Mono<IoTDevice> updateDevice(String id, IoTDeviceReq req);
 
     Flux<Map<String, String>> getAllDeviceIds();
+
+    Flux<DeviceJoinDto> getAllDevices();
 }

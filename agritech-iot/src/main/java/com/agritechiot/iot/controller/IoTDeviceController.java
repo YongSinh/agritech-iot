@@ -4,8 +4,10 @@ import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.IoTDeviceReq;
 import com.agritechiot.iot.dto.request.MqttPublishReq;
+import com.agritechiot.iot.dto.response.DeviceJoinDto;
 import com.agritechiot.iot.dto.response.IoTDeviceDto;
 import com.agritechiot.iot.model.IoTDevice;
+import com.agritechiot.iot.repository.IoTDeviceRepo;
 import com.agritechiot.iot.service.IoTDeviceService;
 import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.ErrorHandlerUtil;
@@ -27,11 +29,20 @@ import java.util.Map;
 public class IoTDeviceController {
 
     private final IoTDeviceService ioTDeviceService;
+    private final IoTDeviceRepo repo;
     private final Publisher publisher;
 
     @GetMapping("/v1/devices")
     public Mono<ApiResponse<List<IoTDeviceDto>>> getListIoTDevices(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        log.info("INIT_LIST_IOT_DEVICES");
         return ioTDeviceService.getListDevice()
+                .collectList()  // Collect the Flux into a List
+                .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
+    @GetMapping("/v2/devices")
+    public Mono<ApiResponse<List<DeviceJoinDto>>> getListIoTDevices2(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        return ioTDeviceService.getAllDevices()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
@@ -44,13 +55,12 @@ public class IoTDeviceController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    
-    
     @PostMapping(value = "/v1/get-device-by-name")
     public Mono<ApiResponse<List<IoTDeviceDto>>> getIoTDevicesByName(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq ioTDeviceReq
     ) throws Exception {
+        log.info("INIT_LIST_IOT_DEVICES_BY_NAME");
         log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(ioTDeviceReq));
         return ioTDeviceService.getDeviceByName(ioTDeviceReq.getName())
                 .collectList()// Collect the Flux into a List

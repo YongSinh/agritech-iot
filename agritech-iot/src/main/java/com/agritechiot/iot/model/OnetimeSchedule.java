@@ -1,19 +1,18 @@
 package com.agritechiot.iot.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
+
 import java.time.LocalTime;
 
 @Setter
 @Getter
-@AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Table(name = "tbl_onetime_schedule")
 public class OnetimeSchedule {
     @Id
@@ -29,4 +28,5 @@ public class OnetimeSchedule {
     @Column("deviceId")
     private String deviceId;
     private Boolean status;
+
 }
