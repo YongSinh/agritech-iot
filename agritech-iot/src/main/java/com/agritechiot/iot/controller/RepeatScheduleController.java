@@ -4,7 +4,9 @@ import com.agritechiot.iot.Schedule.SchedulingConfig;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.RepeatScheduleReq;
+import com.agritechiot.iot.dto.request.UpdateScheduleStatusReq;
 import com.agritechiot.iot.model.RepeatSchedule;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.RepeatScheduleService;
 import com.agritechiot.iot.util.JsonUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,9 +26,11 @@ import java.util.List;
 public class RepeatScheduleController {
     private final RepeatScheduleService repeatScheduleService;
     private final SchedulingConfig config;
+    private final LogService logService;
 
     @GetMapping("/v1/repeat-schedule")
     public Mono<ApiResponse<List<RepeatSchedule>>> getListRepeatSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        logService.logInfo("INIT_LIST_REPEAT_SCHEDULE");
         return repeatScheduleService.getListRepeatSchedule()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
@@ -37,6 +41,7 @@ public class RepeatScheduleController {
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody RepeatScheduleReq req
     ) {
+        logService.logInfo("INIT_LIST_REPEAT_SCHEDULE_DEVICE");
         return repeatScheduleService.getListRepeatScheduleByDeviceId(req.getDeviceId())
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
@@ -51,6 +56,7 @@ public class RepeatScheduleController {
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody RepeatScheduleReq req
     ) {
+        logService.logInfo("INIT_LIST_REPEAT_SCHEDULE_DAY");
         return repeatScheduleService.getListRepeatScheduleByDay(req.getDay())
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
@@ -64,8 +70,8 @@ public class RepeatScheduleController {
     public Mono<ApiResponse<RepeatSchedule>> createRepeatSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody RepeatScheduleReq req
-    ) throws Exception {
-        log.info("REQ_IOT_CREATE_REPEAT_SCHEDULE: {}", JsonUtil.toJson(req));
+    ) {
+        logService.logInfo("INIT_IOT_CREATE_REPEAT_SCHEDULE");
         return repeatScheduleService.saveRepeatSchedule(req)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnSuccess(updateRepeatSchedule -> config.refreshRepeatScheduledTasksById(req.getId()))
@@ -76,12 +82,39 @@ public class RepeatScheduleController {
     public Mono<ApiResponse<RepeatSchedule>> updateRepeatSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody RepeatScheduleReq req
-    ) throws Exception {
-        log.info("REQ_IOT_UPDATE_REPEAT_SCHEDULE: {}", JsonUtil.toJson(req));
+    ) {
+        logService.logInfo("INIT_IOT_UPDATE_REPEAT_SCHEDULE");
         return repeatScheduleService.updateRepeatSchedule(req.getId(), req)
                 .publishOn(Schedulers.boundedElastic())
                 .doOnSuccess(updateRepeatSchedule -> config.refreshRepeatScheduledTasksById(req.getId()))
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
+    @PostMapping("/v1/update-all-status")
+    public Mono<ApiResponse<Object>> updateAllStatus(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody UpdateScheduleStatusReq req
+    ) {
+        logService.logInfo("INIT_UPDATE_ALL_STATUS", JsonUtil.toJson(req));
+        return repeatScheduleService.updateAllStatusesSmart(req.getStatus(), req.getBatchSize())
+                .then(Mono.fromCallable(ApiResponse::new))
+                .onErrorResume(e -> {
+                    log.error("Error updating schedules for deviceId : {}", e.getCause().getMessage(), e);
+                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
+                });
+    }
+
+    @PostMapping("/v1/update-single-status")
+    public Mono<ApiResponse<Object>> updateSingleStatus(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody UpdateScheduleStatusReq req
+    ) {
+        logService.logInfo("INIT_UPDATE_SINGLE_STATUS", JsonUtil.toJson(req));
+        return repeatScheduleService.updateSingleStatus(req.getId(), req.getStatus())
+                .then(Mono.fromCallable(ApiResponse::new))
+                .onErrorResume(e -> {
+                    log.error("Error updating schedules: {}", e.getCause().getMessage(), e);
+                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
+                });
+    }
 }

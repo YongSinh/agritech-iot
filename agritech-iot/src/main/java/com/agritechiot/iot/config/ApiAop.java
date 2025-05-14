@@ -1,12 +1,14 @@
 package com.agritechiot.iot.config;
 
 import com.agritechiot.iot.constant.GenConstant;
+import com.agritechiot.iot.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Aspect
 @Component
@@ -17,21 +19,29 @@ public class ApiAop {
     public Object flow(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
             Object[] args = joinPoint.getArgs();
-            if (args.length > 0 && args[0] != null) { // Check if args is not empty and first argument is not null
-                MDC.put(GenConstant.CORRELATION_ID, args[0].toString()); // Convert the argument to a string
-            } else {
-                MDC.put(GenConstant.CORRELATION_ID, GenConstant.DEFAULT_CORRELATION_ID);
+
+            // Handle CORRELATION_ID
+            String correlationId = (args.length > 0 && args[0] != null)
+                    ? args[0].toString()
+                    : GenConstant.DEFAULT_CORRELATION_ID;
+            MDC.put(GenConstant.CORRELATION_ID, correlationId);
+
+
+            Object result = joinPoint.proceed();
+
+            if (result instanceof Mono) {
+                return ((Mono<?>) result)
+                        .doOnNext(value -> log.info("TRACE_ID: [{}] - Returned value: {}", correlationId, JsonUtil.toJson(value)))
+                        .doOnError(error -> log.error("TRACE_ID: [{}] - Error in reactive flow: {}", correlationId, error.getMessage(), error))
+                        .doFinally(signalType -> MDC.clear());
             }
 
-            // Add context to MDC and proceed with method execution
-            return joinPoint.proceed();
+            return result;
         } catch (Exception ex) {
             log.error("Error during API execution: {}", ex.getMessage(), ex);
-            throw ex; // Re-throw the exception to ensure proper handling upstream
-        } finally {
-            // Clear MDC to prevent memory leaks
-            MDC.clear();
+            throw ex;
         }
     }
+
 
 }

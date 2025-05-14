@@ -30,6 +30,10 @@ public class ApiResponse<T> {
         this(null, correlationId, message, GenConstant.ERR_CODE);
     }
 
+    public ApiResponse(String message, String correlationId, String code) {
+        this(null, correlationId, message, code);
+    }
+
     private ApiResponse(T data, String correlationId, String message, String code) {
         this.code = code;
         this.timestamp = LocalDateTime.now();

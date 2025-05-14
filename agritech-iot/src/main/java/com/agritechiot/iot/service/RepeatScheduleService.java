@@ -17,4 +17,8 @@ public interface RepeatScheduleService {
     Flux<RepeatSchedule> getListRepeatScheduleByDay(String day);
 
     Flux<RepeatSchedule> getListRepeatScheduleByDeviceId(String deviceId);
+
+    Mono<Void> updateAllStatusesSmart(boolean newStatus, int batchSize);
+
+    Mono<Void> updateSingleStatus(Integer id, boolean newStatus);
 }
