@@ -24,4 +24,6 @@ public interface IoTDeviceRepo extends ReactiveCrudRepository<IoTDevice, String>
             """)
     Flux<DeviceJoinDto> findJoinedDevices();
 
+    @Query("SELECT i.deviceId FROM tbl_iotdevice i")
+    Flux<String> findAllTopicNames();
 }

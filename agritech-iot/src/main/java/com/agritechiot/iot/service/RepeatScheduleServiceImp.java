@@ -1,6 +1,8 @@
 package com.agritechiot.iot.service;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.RepeatScheduleReq;
+import com.agritechiot.iot.dto.response.ActiveScheduleRes;
 import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.model.RepeatSchedule;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
@@ -15,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -84,17 +87,15 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
         return repeatScheduleRepo.findByDeviceId(deviceId);
     }
 
+
     @Override
-    public Mono<Void> updateAllStatusesSmart(boolean newStatus, int batchSize) {
-        logService.logInfo("REQ_IOT_UPDATE_ALL_STATUS_REPEAT_SCHEDULE");
-        return repeatScheduleRepo.findAll()
+    public Mono<Void> updateListsStatus(List<Integer> ids, boolean newStatus, int batchSize) {
+        if (ids == null || ids.isEmpty()) {
+            throw new IllegalArgumentException("IDs list cannot be null or empty");
+        }
+        return Flux.fromIterable(ids)
                 .buffer(batchSize)
-                .flatMap(batch -> repeatScheduleRepo.updateStatusForIds(
-                        batch.stream()
-                                .map(RepeatSchedule::getId)
-                                .toList(),  // Using Stream.toList() instead
-                        newStatus
-                ))
+                .flatMap(batch -> repeatScheduleRepo.updateStatusForIds(batch, newStatus))
                 .then();
     }
 
@@ -103,6 +104,17 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
         log.info("Updating single status by id {}", id);
         return repeatScheduleRepo.updateStatusById(id, newStatus)
                 .then();
+    }
+
+    @Override
+    public Mono<ActiveScheduleRes> getActiveRepeatSchedule() {
+        return repeatScheduleRepo.countActiveRepeatStatus()
+                .map(count -> {
+                    ActiveScheduleRes res = new ActiveScheduleRes();
+                    res.setActiveSchedule(count);
+                    res.setScheduleType(GenConstant.REPEAT_SCHEDULE_TYPE);
+                    return res;
+                });
     }
 
 }

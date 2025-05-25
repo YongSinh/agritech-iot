@@ -76,3 +76,75 @@ sudo chown root:root ./mosquitto/passwd
 sudo chmod 644 ./mosquitto/passwd
 
 docker-compose down && docker-compose up -d
+
+
+mosquitto_sub -h 127.0.0.1 -p 1883 -u "user_test" -P "test@2025" -t test
+
+username = iot
+passwd = iot@2025
+ip = 159.65.131.28
+
+mosquitto_pub -h 159.65.131.28 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot" -P "iot@2025" -t "test"
+
+mosquitto_sub -h 159.65.131.28 -p 1883 -u "iot" -P "iot@2025" -t "test"
+
+mosquitto_pub -h 159.65.131.28 -t "sensors/mqtt_in/MasterLoRa_1" -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot" -P "iot@2025"
+
+
+- add con interval deivce
+- topic to master
+- add option select open deivce
+
+
+
+
+mosquitto_passwd -b /mosquitto/config/passwd iot2 iot@2025
+
+
+
+mosquitto_pub -h 159.65.131.28 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot2" -P "iot@2025" -t "test"
+
+
+
+root
+IoT@R&D2025
+
+DROP USER 'iot'@'localhost';
+
+CREATE USER 'iot'@'%' IDENTIFIED BY  '	';
+ALTER USER 'iot'@'159.65.131.28' IDENTIFIED BY  'iot@2025';
+
+ALTER USER 'iot'@'159.65.131.28' IDENTIFIED BY 'iot@2025';
+
+FLUSH PRIVILEGES;
+
+
+mysql -u iot -h 159.65.131.28 -p
+
+SHOW GRANTS FOR 'iot'@'%';
+
+
+RENAME USER 'iot'@'159.65.131.28' TO 'iot'@'%';
+
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'iot'@'localhost' WITH GRANT OPTION;
+
+	sudo netstat -tuln | grep 3306
+
+
+telnet 159.65.131.28 3306
+
+telnet 159.65.131.28 1883
+
+
+^@5K#yh#Odk#bJoN
+telnet 159.65.128.1 3306
+
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+
+mysql -h 159.65.131.28 -u iot -p 'iot@2025'
+
+
+
+CREATE USER 'iot'@'%' IDENTIFIED BY 'iot@2025';
+GRANT ALL PRIVILEGES ON iot_db.* TO 'iot'@'%';
+FLUSH PRIVILEGES;

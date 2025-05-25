@@ -22,7 +22,7 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) 
     value: "",
     action: "",
     duration: "",
-    device_id: ""
+    deviceId: ""
   });
 
   // Update form data when `initialData` changes
@@ -133,8 +133,8 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) 
                 <Select
                   labelId="device-id-label"
                   id="device-id"
-                  name="device_id"
-                  value={formData.device_id}
+                  name="deviceId"
+                  value={formData.deviceId}
                   label="Device ID"
                   onChange={handleChange}
                   fullWidth

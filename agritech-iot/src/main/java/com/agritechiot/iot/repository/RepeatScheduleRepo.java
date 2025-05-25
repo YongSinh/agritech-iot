@@ -24,4 +24,7 @@ public interface RepeatScheduleRepo extends ReactiveCrudRepository<RepeatSchedul
     @Modifying
     @Query("UPDATE tbl_repeat_schedule SET status = :status WHERE id = :id")
     Mono<Integer> updateStatusById(Integer id, boolean status);
+
+    @Query("SELECT COUNT(*) FROM tbl_repeat_schedule WHERE status = true")
+    Mono<Long> countActiveRepeatStatus();
 }

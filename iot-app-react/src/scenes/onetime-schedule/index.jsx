@@ -1,4 +1,4 @@
-import { Box, Button, useTheme } from "@mui/material";
+import { Box, Button, useTheme, Stack } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -7,6 +7,10 @@ import { useRequest } from "../../config/api/request"
 import ModelForm from "./modelForm";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import SyncIcon from '@mui/icons-material/Sync';
+import SyncDisabledIcon from '@mui/icons-material/SyncDisabled';
+import { toast } from 'react-toastify';
+import { useSelectedData } from '../../utils/hooks'
 import MaterialUISwitch from "../../components/Switch"
 
 const OnetimeSchedule = () => {
@@ -19,11 +23,108 @@ const OnetimeSchedule = () => {
   const [open, setOpen] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [edit, setEdit] = useState(false);
+  const [status, setStatus] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const selectedRowData = useSelectedData(onetimeSchedule, selectedRows);
 
-  const handleChangeStatus = (id, newStatus) => {
+  const handleChangeStatus = async (id, newStatus) => {
     setOnetimeSchedule(onetimeSchedule.map(row =>
       row.id === id ? { ...row, status: newStatus } : row
     ));
+
+    const message = newStatus ? "The schedule is now ON" : "The schedule is now OFF";
+
+    const body = {
+      "id": id,
+      "status": newStatus,
+      "batchSize": 500
+    }
+
+    // You can now send the formData to your API or perform other actions
+    let url = "/iot/api/v1/onetime-Schedule/update-single-status";
+    let method = "post";
+
+    const result = await request(url, method, body);
+    if (result) {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light"
+      });
+      getListRepeatSchedules()
+    } else {
+      toast.error('Failed to update the schedule status. Please try again ', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light"
+      });
+    }
+  };
+
+
+  const handleChangeAllStatus = async (newStatus) => {
+    setStatus(newStatus)
+    const message = newStatus ? "The all schedule is now ON" : "The all schedule is now OFF";
+    const selectedIds = selectedRowData.map(item => item.id);
+    if (selectedIds.length === 0) {
+      toast.warn("Please select at least one item to update", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light"
+      });
+      return; // Exit early if no IDs are selected
+    }
+    const body = {
+      "id": 10,
+      "ids":selectedIds,
+      "status": newStatus,
+      "batchSize": 500
+    }
+
+    // You can now send the formData to your API or perform other actions
+    let url = "/iot/api/v1/onetime-Schedule/update-multiple-status";
+    let method = "post";
+
+    const result = await request(url, method, body);
+    if (result) {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light"
+      });
+      getListOnetimeSchedule()
+    } else {
+      toast.error('Failed to update the schedule status. Please try again ', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light"
+      });
+    }
   };
 
   // Open the form dialog
@@ -93,6 +194,10 @@ const OnetimeSchedule = () => {
       setOnetimeSchedule(result.data)
       setLoading(false)
     }
+  };
+
+  const handleSelectionChange = (newSelection) => {
+    setSelectedRows(newSelection);
   };
 
   const columns = [
@@ -168,9 +273,19 @@ const OnetimeSchedule = () => {
   return (
     <Box m="20px">
       <Header title="ONETIME SCHEDULE" subtitle="List of Onetime Schedule" />
-      <Button color="secondary" variant="contained" onClick={handleClickOpen}>
-        Add ONETIME SCHEDULE
-      </Button>
+      <Stack direction="row" spacing={2}>
+        <Button color="secondary" variant="contained" onClick={handleClickOpen}>
+          Add ONETIME SCHEDULE
+        </Button>
+        <Button
+          variant="contained"
+          color={status ? "error" : "success"}
+          endIcon={status ? <SyncDisabledIcon /> : <SyncIcon />}
+          onClick={() => handleChangeAllStatus(!status)}
+        >
+          {status ? "Turn Off Schedule" : "Turn On Schedule"}
+        </Button>
+      </Stack>
       <ModelForm
         open={open}
         handleClose={handleClose}
@@ -224,6 +339,8 @@ const OnetimeSchedule = () => {
             },
           }}
           checkboxSelection
+          onRowSelectionModelChange={handleSelectionChange}
+          rowSelectionModel={selectedRows}
         />
       </Box>
     </Box>

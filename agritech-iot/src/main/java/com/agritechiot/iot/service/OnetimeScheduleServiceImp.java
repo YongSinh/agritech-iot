@@ -1,6 +1,8 @@
 package com.agritechiot.iot.service;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.OnetimeScheduleReq;
+import com.agritechiot.iot.dto.response.ActiveScheduleRes;
 import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.model.OnetimeSchedule;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +28,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     private final OnetimeScheduleRepo onetimeScheduleRepo;
     private final Publisher publisher;
     private final IoTDeviceRepo ioTDeviceRepo;
+    private final LogService logService;
 
     @Override
     public Mono<OnetimeSchedule> saveOnetimeSchedule(OnetimeScheduleReq req) {
@@ -77,6 +81,35 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
         assert ioTDevice != null;
         log.info(ioTDevice.getName());
         publisher.publish(ioTDevice.getName(), JsonUtil.objectToJsonString(req), 1, true);
+    }
+
+    @Override
+    public Mono<Void> updateListsStatus(List<Integer> ids, boolean newStatus, int batchSize) {
+        if (ids == null || ids.isEmpty()) {
+            return Mono.error(new IllegalArgumentException("IDs list cannot be null or empty"));
+        }
+        return Flux.fromIterable(ids)
+                .buffer(batchSize)
+                .flatMap(batch -> onetimeScheduleRepo.updateStatusForIds(batch, newStatus))
+                .then();
+    }
+
+    @Override
+    public Mono<Void> updateSingleStatus(Integer id, boolean newStatus) {
+        log.info("Updating single status by id {}", id);
+        return onetimeScheduleRepo.updateStatusById(id, newStatus)
+                .then();
+    }
+
+    @Override
+    public Mono<ActiveScheduleRes> getActiveOnetimeSchedule() {
+        return onetimeScheduleRepo.countActiveOnetimeStatus()
+                .map(count -> {
+                    ActiveScheduleRes res = new ActiveScheduleRes();
+                    res.setActiveSchedule(count);
+                    res.setScheduleType(GenConstant.ONETIME_SCHEDULE_TYPE);
+                    return res;
+                });
     }
 
 

@@ -1,5 +1,6 @@
 package com.agritechiot.iot.exception;
 
+import com.agritechiot.iot.dto.ApiErrResponse;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidDefinitionException.class)
     public Mono<ResponseEntity<ApiResponse<String>>> invalidDefinitionException(InvalidDefinitionException ex) {
         return Mono.just(new ResponseEntity<>(new ApiResponse<>(ex.getMessage()), HttpStatus.CONFLICT));
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public Mono<ResponseEntity<ApiErrResponse<String>>> nullPointerException(NullPointerException ex) {
+        return Mono.just(new ResponseEntity<>(new ApiErrResponse<>(ex.getMessage()), HttpStatus.BAD_REQUEST));
     }
 
 }

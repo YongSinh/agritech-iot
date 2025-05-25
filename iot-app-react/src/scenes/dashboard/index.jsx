@@ -23,7 +23,6 @@ import {
 } from "@mui/icons-material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
-import MaterialUISwitch from "../../components/Switch"
 
 function Dashboard() {
   const theme = useTheme();
@@ -33,7 +32,6 @@ function Dashboard() {
   const isXsDevices = useMediaQuery("(max-width: 436px)");
   return (
     <Box m="20px">
-              <MaterialUISwitch/>
       <Box display="flex" justifyContent="space-between">
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
 

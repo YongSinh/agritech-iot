@@ -4,7 +4,10 @@ import com.agritechiot.iot.Schedule.SchedulingConfig;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.OnetimeScheduleReq;
+import com.agritechiot.iot.dto.request.UpdateScheduleStatusReq;
+import com.agritechiot.iot.dto.response.ActiveScheduleRes;
 import com.agritechiot.iot.model.OnetimeSchedule;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.OnetimeScheduleService;
 import com.agritechiot.iot.util.ErrorHandlerUtil;
 import com.agritechiot.iot.util.JsonUtil;
@@ -25,6 +28,7 @@ import java.util.List;
 public class OnetimeScheduleController {
     private final OnetimeScheduleService onetimeScheduleService;
     private final SchedulingConfig config;
+    private final LogService logService;
 
     @GetMapping("/v1/one-time-schedules")
     public Mono<ApiResponse<List<OnetimeSchedule>>> getListOnetimeSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
@@ -74,6 +78,45 @@ public class OnetimeScheduleController {
                 .onErrorResume(e -> {
                     log.error("Error fetching schedules for deviceId: {}", req.getDeviceId(), e);
                     return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
+                });
+    }
+
+
+    @PostMapping("/v1/onetime-Schedule/update-multiple-status")
+    public Mono<ApiResponse<Object>> updateMultipleStatus(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody UpdateScheduleStatusReq req
+    ) {
+        logService.logInfo("INIT_ONETIME_SCHEDULE_UPDATE_MULTIPLE_STATUS", JsonUtil.toJson(req));
+        return onetimeScheduleService.updateListsStatus(req.getIds(),req.getStatus(), req.getBatchSize())
+                .then(Mono.fromCallable(ApiResponse::new))
+                .onErrorResume(e -> {
+                    log.error("Error updating schedules for deviceId : {}", e.getCause().getMessage(), e);
+                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
+                });
+    }
+
+    @PostMapping("/v1/onetime-Schedule/update-single-status")
+    public Mono<ApiResponse<Object>> updateSingleStatus(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody UpdateScheduleStatusReq req
+    ) {
+        logService.logInfo("INIT_ONETIME_SCHEDULE_UPDATE_SINGLE_STATUS", JsonUtil.toJson(req));
+        return onetimeScheduleService.updateSingleStatus(req.getId(), req.getStatus())
+                .then(Mono.fromCallable(ApiResponse::new))
+                .onErrorResume(e -> {
+                    log.error("Error updating schedules: {}", e.getCause().getMessage(), e);
+                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
+                });
+    }
+
+    @GetMapping("/v1/one-time-schedules/check-status-active")
+    public Mono<ApiResponse<ActiveScheduleRes>> getActiveOnetimeSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        return onetimeScheduleService.getActiveOnetimeSchedule()
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(e -> {
+                    log.error("Error fetching schedules", e);
+                    return Mono.just(new ApiResponse<>()); // Return empty list on error
                 });
     }
 }

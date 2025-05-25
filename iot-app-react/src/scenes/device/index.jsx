@@ -20,6 +20,7 @@ const Device = () => {
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
+    setEdit(false)
   };
 
   // Close the form dialog

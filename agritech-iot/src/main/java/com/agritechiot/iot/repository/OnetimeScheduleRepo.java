@@ -30,4 +30,7 @@ public interface OnetimeScheduleRepo extends ReactiveCrudRepository<OnetimeSched
     @Query("UPDATE tbl_onetime_schedule SET status = :status WHERE id = :id")
     Mono<Integer> updateStatusById(Integer id, boolean status);
 
+    @Query("SELECT COUNT(*) FROM tbl_onetime_schedule WHERE status = true")
+    Mono<Long> countActiveOnetimeStatus();
+
 }

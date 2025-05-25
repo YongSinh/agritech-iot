@@ -11,13 +11,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 public class PublisherImp implements Publisher {
+    private final Mqtt mqtt;
     @Override
     public void publish(String topic, String payload, int qos, boolean retained) throws MqttException {
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setPayload(payload.getBytes());
         mqttMessage.setQos(qos);
         mqttMessage.setRetained(retained);
-        Mqtt.getInstance().publish(topic, mqttMessage);
+        mqtt.getClient().publish(topic, mqttMessage);
         //mqttClient.publish(topic, payload.getBytes(), qos, retained);
         // Mqtt.getInstance().disconnect();
     }

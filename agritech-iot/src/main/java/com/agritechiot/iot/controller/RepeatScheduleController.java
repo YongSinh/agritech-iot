@@ -5,6 +5,7 @@ import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.RepeatScheduleReq;
 import com.agritechiot.iot.dto.request.UpdateScheduleStatusReq;
+import com.agritechiot.iot.dto.response.ActiveScheduleRes;
 import com.agritechiot.iot.model.RepeatSchedule;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.RepeatScheduleService;
@@ -90,13 +91,13 @@ public class RepeatScheduleController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping("/v1/update-all-status")
-    public Mono<ApiResponse<Object>> updateAllStatus(
+    @PostMapping("/v1/repeat-schedule/update-multiple-status")
+    public Mono<ApiResponse<Object>> updateMultipleStatus(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody UpdateScheduleStatusReq req
     ) {
-        logService.logInfo("INIT_UPDATE_ALL_STATUS", JsonUtil.toJson(req));
-        return repeatScheduleService.updateAllStatusesSmart(req.getStatus(), req.getBatchSize())
+        logService.logInfo("INIT_UPDATE_MULTIPLE_STATUS", JsonUtil.toJson(req));
+        return repeatScheduleService.updateListsStatus(req.getIds(), req.getStatus(), req.getBatchSize())
                 .then(Mono.fromCallable(ApiResponse::new))
                 .onErrorResume(e -> {
                     log.error("Error updating schedules for deviceId : {}", e.getCause().getMessage(), e);
@@ -104,7 +105,7 @@ public class RepeatScheduleController {
                 });
     }
 
-    @PostMapping("/v1/update-single-status")
+    @PostMapping("/v1/repeat-schedule/update-single-status")
     public Mono<ApiResponse<Object>> updateSingleStatus(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody UpdateScheduleStatusReq req
@@ -117,4 +118,16 @@ public class RepeatScheduleController {
                     return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
                 });
     }
+
+    @GetMapping("/v1/repeat-schedule/check-status-active")
+    public Mono<ApiResponse<ActiveScheduleRes>> getActiveRepeatSchedule(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        logService.logInfo("INIT_LIST_REPEAT_SCHEDULE");
+        return repeatScheduleService.getActiveRepeatSchedule()// Collect the Flux into a List
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(e -> {
+                    log.error("Error fetching schedules", e);
+                    return Mono.just(new ApiResponse<>()); // Return empty list on error
+                });
+    }
+
 }

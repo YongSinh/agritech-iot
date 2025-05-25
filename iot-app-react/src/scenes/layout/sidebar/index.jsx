@@ -19,7 +19,8 @@ import {
   EventRepeat,
   LooksOne,
   CalendarToday,
-  FlashAuto
+  FlashAuto,
+  Tune
 } from "@mui/icons-material";
 import avatar from "../../../assets/images/avatar.png";
 import logo from "../../../assets/images/logo.png";
@@ -161,6 +162,12 @@ const SideBar = () => {
             path="/team"
             colors={colors}
             icon={<PeopleAltOutlined />}
+          />
+          <Item
+            title="Control Logs"
+            path="/control"
+            colors={colors}
+            icon={<Tune />}
           />
           <Item
             title="Device"

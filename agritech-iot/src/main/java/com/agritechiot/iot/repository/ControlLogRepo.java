@@ -23,7 +23,7 @@ public interface ControlLogRepo extends ReactiveCrudRepository<ControlLog, Integ
     Flux<ControlLog> findWithFilters(
             @Param("deviceId") String deviceId,
             @Param("sentBy") String sentBy,
-            @Param("status") String status,
+            @Param("status") Boolean status,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );

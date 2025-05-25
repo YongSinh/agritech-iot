@@ -1,6 +1,5 @@
 package com.agritechiot.iot.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -23,12 +22,11 @@ import java.time.LocalDateTime;
 public class ControlLog {
     @Id
     private Integer id;
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @Column("datetime")
     private LocalDateTime dateTime;
     @Column("deviceId")
     private String deviceId;
-    private String status;
+    private Boolean status;
     private Integer duration;
     @Column("sentby")
     private String sentBy;

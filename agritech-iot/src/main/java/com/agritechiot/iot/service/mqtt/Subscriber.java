@@ -12,4 +12,6 @@ public interface Subscriber {
     void waterFlow() throws MqttException;
 
     void soilMoisture() throws MqttException;
+
+    void test() throws MqttException;
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class LogServiceImp implements LogService {
 
     @Override
-    public void logInfo( String step, String message) {
+    public void logInfo(String step, String message) {
         log.info("TRACE_ID: [{}] - {}: {}", MDC.get(GenConstant.CORRELATION_ID), step, message);
     }
 

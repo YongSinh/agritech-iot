@@ -1,22 +1,24 @@
-import { Box, Button, useTheme } from "@mui/material";
+import { Box, useTheme, Button } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
-import ModelForm from "./modelForm";
+import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import ModelForm from "./modelForm";
 
-const Trigger = () => {
+const IntervalSchedule = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { request } = useRequest();
-  const [triggers, setTriggers] = useState([]);
-  const [deviceIds, setDeviceIds] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deviceIds, setDeviceIds] = useState([]);
   const [open, setOpen] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [edit, setEdit] = useState(false);
+
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
@@ -27,7 +29,6 @@ const Trigger = () => {
   const handleClose = () => {
     setOpen(false);
     setEdit(false)
-    setInitialData(null)
   };
 
   const handleUpdate = (value) => {
@@ -37,8 +38,9 @@ const Trigger = () => {
   };
 
   const handleSubmit = async (formData) => {
+    // console.log(formData)
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/api/v1/update-trigger" : "/iot/api/v1/create-trigger";
+    let url = edit ?  "/iot/api/v1/update-control-log" : "/iot/api/v1/create-control-log";
     let method = "post";
 
     const result = await request(url, method, formData);
@@ -51,10 +53,9 @@ const Trigger = () => {
         timer: 1500,
       });
       setLoading(false);
-      getListTriggers()
+      getListIntervalSchedule()
       handleClose(); // Close the dialog after submission
     } else {
-      console.log(result.code)
       Swal.fire({
         title: "Error!",
         text: result.message,
@@ -68,17 +69,10 @@ const Trigger = () => {
   };
 
   useEffect(() => {
-    getListTriggers()
+    getListIntervalSchedule()
     getAllDeviceIds()
   }, []);
 
-  const getListTriggers = async () => {
-    const result = await request("/iot/api/v1/triggers", "GET", null);
-    if (result) {
-      setTriggers(result.data)
-      setLoading(false)
-    }
-  };
 
   const getAllDeviceIds = async () => {
     const result = await request("/iot/api/v1/device-ids", "GET", null);
@@ -88,14 +82,16 @@ const Trigger = () => {
     }
   };
 
+
+  const getListIntervalSchedule = async () => {
+    const result = await request("/iot/api/v1/control-logs", "GET", null);
+    if (result) {
+      setData(result.data)
+      setLoading(false)
+    }
+  };
   const columns = [
     { field: "id", headerName: "ID" },
-    {
-      field: "operator",
-      headerName: "Operator",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
     {
       field: "deviceId",
       headerName: "Device ID",
@@ -108,19 +104,24 @@ const Trigger = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "sensor",
-      headerName: "Sensor",
+      field: "status",
+      headerName: "Status",
       flex: 1,
     },
     {
-      field: "value",
-      headerName: "Value",
+      field: "sentBy",
+      headerName: "Sent By",
       flex: 1,
     },
     {
-      field: "action",
-      headerName: "Action",
+      field: "runDatetime",
+      headerName: "Run Date time",
       flex: 1,
+      renderCell: ({ row: { runDatetime } }) => {
+        return (
+          <span>{dayjs(runDatetime).format('YYYY-MM-DD h:mm A')}</span>
+        );
+      },
     },
     {
       headerName: "Action",
@@ -140,9 +141,9 @@ const Trigger = () => {
   ];
   return (
     <Box m="20px">
-      <Header title="TRIGGER" subtitle="List of Trigger" />
+      <Header title="CONTROL LOGS" subtitle="Managing the IOT Deivce" />
       <Button color="secondary" variant="contained" onClick={handleClickOpen}>
-        Add Trigger
+        Add CONTROL LOGS
       </Button>
       <ModelForm
         open={open}
@@ -186,7 +187,7 @@ const Trigger = () => {
         }}
       >
         <DataGrid
-          rows={triggers}
+          rows={data}
           columns={columns}
           loading={loading}
           initialState={{
@@ -196,11 +197,11 @@ const Trigger = () => {
               },
             },
           }}
-          checkboxSelection 
+          checkboxSelection
         />
       </Box>
     </Box>
   );
 };
 
-export default Trigger;
+export default IntervalSchedule;

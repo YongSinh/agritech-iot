@@ -17,6 +17,7 @@ import RepeatSchedule from "./repeat-schedule";
 import IntervalSchedule from "./interval-schedule";
 import OnetimeSchedule from "./onetime-schedule";
 import Trigger from "./trigger";
+import Control from "./control"
 export {
   Navbar,
   SideBar,
@@ -36,5 +37,6 @@ export {
   RepeatSchedule,
   IntervalSchedule,
   OnetimeSchedule,
-  Trigger
+  Trigger,
+  Control
 };
