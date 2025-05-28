@@ -20,6 +20,7 @@ const Device = () => {
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
+    setEdit(false)
   };
 
   // Close the form dialog
@@ -40,7 +41,7 @@ const Device = () => {
   }, []);
 
   const getListDevice = async () => {
-    const result = await request("/iot/api/v1/devices", "GET", null);
+    const result = await request("/iot/v1/devices", "GET", null);
     if (result) {
       setDevices(result.data);
       setLoading(false);
@@ -56,7 +57,7 @@ const Device = () => {
   // Handle form submission
   const handleSubmit = async (formData) => {
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/api/v1/update-device" : "/iot/api/v1/create-device";
+    let url = edit ? "/iot/v1/update-device" : "/iot/v1/create-device";
     let method = "post";
 
     const result = await request(url, method, formData);
@@ -102,7 +103,7 @@ const Device = () => {
             variant="contained"
             onClick={() => handleUpdate(row)}
           >
-            Edit
+            Edit 
           </Button>
         );
       },
@@ -148,7 +149,7 @@ const Device = () => {
             color: colors.primary[100],
           },
         }}
-      >
+      > {import.meta.env.VITE_KEYCLOAK_URL}
         <DataGrid
           rows={devicesWithIds}
           columns={columns}

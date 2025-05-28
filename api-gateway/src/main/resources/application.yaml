@@ -21,7 +21,7 @@ spring:
         - id: logs-service
           uri: http://localhost:8083
           predicates:
-            - Path=/iot/api/**, /iot-service/v3/api-docs
+            - Path=/iot/**, /iot-service/v3/api-docs
       default-filters:
         - name: Retry
           args:
@@ -60,4 +60,31 @@ springdoc:
 
 logging:
   level:
+    root: INFO
+
+    # Gateway core routing and filters
     org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.gateway.route.RouteDefinitionLocator: DEBUG
+    org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
+    org.springframework.cloud.gateway.filter: DEBUG
+
+    # Netty & WebFlux details (if needed)
+    reactor.netty.http.client: DEBUG
+    reactor.netty: INFO
+
+    # Spring Security for OAuth2/JWT
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.server.resource: DEBUG
+
+    # Retry & CircuitBreaker (Resilience4j)
+    org.springframework.cloud.gateway.filter.factory.RetryGatewayFilterFactory: DEBUG
+    org.springframework.cloud.gateway.filter.factory.CircuitBreakerGatewayFilterFactory: DEBUG
+    io.github.resilience4j: DEBUG
+
+    # Token and Authorization (if using Keycloak or JWT introspection)
+    org.springframework.security.oauth2.jwt: DEBUG
+    org.springframework.security.oauth2.server.resource.web.access.server: DEBUG
+
+    # Swagger / Springdoc
+    org.springdoc: INFO

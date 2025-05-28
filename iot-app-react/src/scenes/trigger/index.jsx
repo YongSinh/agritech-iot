@@ -38,7 +38,7 @@ const Trigger = () => {
 
   const handleSubmit = async (formData) => {
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/api/v1/update-trigger" : "/iot/api/v1/create-trigger";
+    let url = edit ? "/iot/v1/update-trigger" : "/iot/v1/create-trigger";
     let method = "post";
 
     const result = await request(url, method, formData);
@@ -73,7 +73,7 @@ const Trigger = () => {
   }, []);
 
   const getListTriggers = async () => {
-    const result = await request("/iot/api/v1/triggers", "GET", null);
+    const result = await request("/iot/v1/triggers", "GET", null);
     if (result) {
       setTriggers(result.data)
       setLoading(false)
@@ -81,7 +81,7 @@ const Trigger = () => {
   };
 
   const getAllDeviceIds = async () => {
-    const result = await request("/iot/api/v1/device-ids", "GET", null);
+    const result = await request("/iot/v1/device-ids", "GET", null);
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
@@ -97,7 +97,7 @@ const Trigger = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "device_id",
+      field: "deviceId",
       headerName: "Device ID",
       flex: 1,
     },
@@ -196,7 +196,7 @@ const Trigger = () => {
               },
             },
           }}
-          checkboxSelection
+          checkboxSelection 
         />
       </Box>
     </Box>

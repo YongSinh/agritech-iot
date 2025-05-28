@@ -1,13 +1,13 @@
-royaltops
+  royaltops
 RoyalTops@2025
 
 test@2025
-
+	
 mosquitto_sub -h localhost -t test -u "user_test" -P "test@2025"
 
 mosquitto_pub -h localhost -t test -m "hello world" -u "user_test" -P "test@2025"
 
-mosquitto_sub -h 127.0.0.1 -p 1883 -u "user_test" -P "test@2025" -t test
+mosquitto_sub -h 127.0.0.1 -p 1883 -u "user_test" -P "test@2025" -t button
 
 mosquitto_pub -h 127.0.0.1 -t test -m "hello world" -u "user_test" -P "test@2025"
 
@@ -24,3 +24,127 @@ https://roytuts.com/publish-subscribe-message-onto-mqtt-using-spring/
 mosquitto_pub -h 127.0.0.1 -t humidity -m "{\"id\":1,\"datetime\":\"2025-02-09T12:21:19.283Z\",\"operator\":\"test\",\"sensor\":\"test\",\"value\":20,\"action\":\"run\",\"duration\":2,\"device_id\":\"RC001\"}" -u "user_test" -P "test@2025"
 
 https://medium.com/@tomer.klein/docker-compose-and-mosquitto-mqtt-simplifying-broker-deployment-7aaf469c07ee
+
+
+
+
+close/open
+battery
+
+
+Y@&gSinh25
+
+Time@2023
+
+
+mosquitto_pub -h localhost -t test -m "hello world" -u "admin" -P "admin@123"
+
+
+mosquitto_sub -h localhost -p 1883 -u "admin" -P "admin@123" -t humidity
+
+
+
+apt-get install mosquitto-clients -y
+
+
+mosquitto_sub -h localhost -p 1883 -u "test" -P "202025" -t "test"
+
+mosquitto_passwd -b /etc/mosquitto/passwd test 202025
+
+mosquitto_pub -h 159.65.131.28 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot" -P "iot@2025" -t "test"
+
+mosquitto_sub -h 159.65.131.28 -p 1883 -u "iot" -P "iot@2025" -t "test"
+
+
+docker exec mosquitto mosquitto_passwd -b /mosquitto/config/passwd iot iot@2025
+
+
+username = iot
+passwd = iot@2025
+ip = 159.65.131.28
+
+mosquitto_pub -h 159.65.131.28 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot" -P "iot@2025" -t "test"
+
+mosquitto_sub -h 159.65.131.28 -p 1883 -u "iot" -P "iot@2025" -t "test"
+
+
+update and add
+docker exec mosquitto mosquitto_passwd -b /mosquitto/config/passwd [username] [newpassword]
+
+
+sudo chown root:root ./mosquitto/passwd
+sudo chmod 644 ./mosquitto/passwd
+
+docker-compose down && docker-compose up -d
+
+
+mosquitto_sub -h 127.0.0.1 -p 1883 -u "user_test" -P "test@2025" -t test
+
+username = iot
+passwd = iot@2025
+ip = 159.65.131.28
+
+mosquitto_pub -h 159.65.131.28 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot" -P "iot@2025" -t "test"
+
+mosquitto_sub -h 159.65.131.28 -p 1883 -u "iot" -P "iot@2025" -t "test"
+
+mosquitto_pub -h 159.65.131.28 -t "sensors/mqtt_in/MasterLoRa_1" -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot" -P "iot@2025"
+
+
+- add con interval deivce
+- topic to master
+- add option select open deivce
+
+
+
+
+mosquitto_passwd -b /mosquitto/config/passwd iot2 iot@2025
+
+
+
+mosquitto_pub -h 159.65.131.28 -t test -m "{\"message\":\"hello world\",\"timestamp\":\"2025-02-06T12:00:00Z\"}" -u "iot2" -P "iot@2025" -t "test"
+
+
+
+root
+IoT@R&D2025
+
+DROP USER 'iot'@'localhost';
+
+CREATE USER 'iot'@'%' IDENTIFIED BY  '	';
+ALTER USER 'iot'@'159.65.131.28' IDENTIFIED BY  'iot@2025';
+
+ALTER USER 'iot'@'159.65.131.28' IDENTIFIED BY 'iot@2025';
+
+FLUSH PRIVILEGES;
+
+
+mysql -u iot -h 159.65.131.28 -p
+
+SHOW GRANTS FOR 'iot'@'%';
+
+
+RENAME USER 'iot'@'159.65.131.28' TO 'iot'@'%';
+
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'iot'@'localhost' WITH GRANT OPTION;
+
+	sudo netstat -tuln | grep 3306
+
+
+telnet 159.65.131.28 3306
+
+telnet 159.65.131.28 1883
+
+
+^@5K#yh#Odk#bJoN
+telnet 159.65.128.1 3306
+
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+
+mysql -h 159.65.131.28 -u iot -p 'iot@2025'
+
+
+
+CREATE USER 'iot'@'%' IDENTIFIED BY 'iot@2025';
+GRANT ALL PRIVILEGES ON iot_db.* TO 'iot'@'%';
+FLUSH PRIVILEGES;
