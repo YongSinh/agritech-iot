@@ -21,7 +21,7 @@ import reactor.core.scheduler.Schedulers;
 import java.util.List;
 
 @RestController
-@RequestMapping("/iot/api")
+@RequestMapping("/iot")
 @RequiredArgsConstructor
 @Tag(name = "Onetime-Schedule")
 @Slf4j
@@ -88,7 +88,7 @@ public class OnetimeScheduleController {
             @RequestBody UpdateScheduleStatusReq req
     ) {
         logService.logInfo("INIT_ONETIME_SCHEDULE_UPDATE_MULTIPLE_STATUS", JsonUtil.toJson(req));
-        return onetimeScheduleService.updateListsStatus(req.getIds(),req.getStatus(), req.getBatchSize())
+        return onetimeScheduleService.updateListsStatus(req.getIds(), req.getStatus(), req.getBatchSize())
                 .then(Mono.fromCallable(ApiResponse::new))
                 .onErrorResume(e -> {
                     log.error("Error updating schedules for deviceId : {}", e.getCause().getMessage(), e);
@@ -118,5 +118,19 @@ public class OnetimeScheduleController {
                     log.error("Error fetching schedules", e);
                     return Mono.just(new ApiResponse<>()); // Return empty list on error
                 });
+    }
+
+    @DeleteMapping("/v1/one-time-schedules/{id}")
+    public Mono<ApiResponse<Object>> deleteRecord(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @PathVariable Integer id
+    ) {
+        logService.logInfo("INIT_ONETIME_SCHEDULE_DELETE_RECORD");
+        return onetimeScheduleService.softDeleteById(id)
+                .then(Mono.just(new ApiResponse<>())
+                        .onErrorResume(e -> {
+                            log.error("Error deleting control log with ID: {}", id, e);
+                            return Mono.just(new ApiResponse<>()); // Return empty list on error
+                        }));
     }
 }

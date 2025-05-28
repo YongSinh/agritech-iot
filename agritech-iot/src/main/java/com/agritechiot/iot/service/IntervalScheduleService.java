@@ -15,4 +15,5 @@ public interface IntervalScheduleService {
 
     Mono<IntervalSchedule> getIntervalRecordById(Integer id);
 
+    Mono<Void> softDeleteById(Integer id);
 }

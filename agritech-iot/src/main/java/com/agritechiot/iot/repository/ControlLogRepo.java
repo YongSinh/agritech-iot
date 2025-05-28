@@ -12,6 +12,9 @@ import java.time.LocalDate;
 @Repository
 public interface ControlLogRepo extends ReactiveCrudRepository<ControlLog, Integer> {
 
+    @Query("SELECT * FROM control_log as cl where cl.isRemoved =false or cl.isRemoved IS NULL")
+    Flux<ControlLog> findByIsNotDeleted();
+
     @Query("""
                 SELECT * FROM control_log
                 WHERE (:deviceId IS NULL OR deviceId = :deviceId)

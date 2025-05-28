@@ -3,6 +3,7 @@ package com.agritechiot.iot.controller;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.model.Trigger;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.TriggerService;
 import com.agritechiot.iot.util.JsonUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,12 +15,13 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
-@RequestMapping("/iot/api")
+@RequestMapping("/iot")
 @RequiredArgsConstructor
 @Tag(name = "Trigger")
 @Slf4j
 public class TriggerController {
     private final TriggerService triggerService;
+    private final LogService logService;
 
     @GetMapping("/v1/triggers")
     public Mono<ApiResponse<List<Trigger>>> getListSensorLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
@@ -66,5 +68,17 @@ public class TriggerController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-
+    @DeleteMapping("/v1/trigger/{id}")
+    public Mono<ApiResponse<Object>> deleteRecord(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @PathVariable Integer id
+    ) {
+        logService.logInfo("INIT_IOT_DEVICE_DELETE_RECORD");
+        return triggerService.softDeleteById(id)
+                .then(Mono.just(new ApiResponse<>())
+                        .onErrorResume(e -> {
+                            log.error("Error deleting control log with ID: {}", id, e);
+                            return Mono.just(new ApiResponse<>()); // Return empty list on error
+                        }));
+    }
 }

@@ -1,7 +1,6 @@
 package com.agritechiot.iot.config;
 
 import jakarta.annotation.PostConstruct;
-
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -15,18 +14,13 @@ import org.springframework.stereotype.Component;
 public class Mqtt {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Mqtt.class);
-
+    private static final String MQTT_PUBLISHER_ID = "spring-server-iot";
     @Value("${mqtt.username}")
     private String mqttUsername;
-
     @Value("${mqtt.password}")
     private String mqttPassword;
-
     @Value("${mqtt.url}")
     private String mqttUrl;
-
-    private static final String MQTT_PUBLISHER_ID = "spring-server-iot";
-
     private IMqttClient instance;
 
     @PostConstruct

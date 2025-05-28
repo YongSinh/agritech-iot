@@ -27,4 +27,6 @@ public interface RepeatScheduleService {
 
     Mono<ActiveScheduleRes> getActiveRepeatSchedule();
 
+    Mono<Void> softDeleteById(Integer id);
+
 }

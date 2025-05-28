@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PublisherImp implements Publisher {
     private final Mqtt mqtt;
+
     @Override
     public void publish(String topic, String payload, int qos, boolean retained) throws MqttException {
         MqttMessage mqttMessage = new MqttMessage();

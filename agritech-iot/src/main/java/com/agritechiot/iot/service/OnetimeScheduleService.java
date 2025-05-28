@@ -28,4 +28,5 @@ public interface OnetimeScheduleService {
 
     Mono<ActiveScheduleRes> getActiveOnetimeSchedule();
 
+    Mono<Void> softDeleteById(Integer id);
 }

@@ -26,4 +26,7 @@ public interface IoTDeviceRepo extends ReactiveCrudRepository<IoTDevice, String>
 
     @Query("SELECT i.deviceId FROM tbl_iotdevice i")
     Flux<String> findAllTopicNames();
+
+    @Query("SELECT * FROM tbl_iotdevice as i where i.isRemoved = false or i.isRemoved IS NULL")
+    Flux<IoTDevice> findByIsNotDeleted();
 }

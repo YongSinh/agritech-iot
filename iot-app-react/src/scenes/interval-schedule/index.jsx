@@ -40,7 +40,7 @@ const IntervalSchedule = () => {
   const handleSubmit = async (formData) => {
     // console.log(formData)
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/api/v1/update-interval-schedule" : "/iot/api/v1/create-interval-schedule";
+    let url = edit ? "/iot/v1/update-interval-schedule" : "/iot/v1/create-interval-schedule";
     let method = "post";
 
     const result = await request(url, method, formData);
@@ -75,7 +75,7 @@ const IntervalSchedule = () => {
 
 
   const getAllDeviceIds = async () => {
-    const result = await request("/iot/api/v1/device-ids", "GET", null);
+    const result = await request("/iot/v1/device-ids", "GET", null);
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
@@ -84,7 +84,7 @@ const IntervalSchedule = () => {
 
 
   const getListIntervalSchedule = async () => {
-    const result = await request("/iot/api/v1/interval-schedule", "GET", null);
+    const result = await request("/iot/v1/interval-schedule", "GET", null);
     if (result) {
       setIntervalSchedule(result.data)
       setLoading(false)

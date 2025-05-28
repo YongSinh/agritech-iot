@@ -5,6 +5,7 @@ import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.IntervalScheduleReq;
 import com.agritechiot.iot.model.IntervalSchedule;
 import com.agritechiot.iot.service.IntervalScheduleService;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.util.JsonUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,13 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
-@RequestMapping("/iot/api")
+@RequestMapping("/iot")
 @RequiredArgsConstructor
 @Tag(name = "Interval-Schedule")
 @Slf4j
 public class IntervalScheduleController {
     private final IntervalScheduleService intervalScheduleService;
-
+    private final LogService logService;
 
     @PostMapping(value = "/v1/create-interval-schedule")
     public Mono<ApiResponse<IntervalSchedule>> addIntervalRecord(
@@ -61,5 +62,20 @@ public class IntervalScheduleController {
         return intervalScheduleService.getListIntervalRecordByDeviceId(req.getDeviceId())
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
+
+    @DeleteMapping("/v1/interval-schedule/{id}")
+    public Mono<ApiResponse<Object>> deleteRecord(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @PathVariable Integer id
+    ) {
+        logService.logInfo("INIT_INTERVAL_SCHEDULE_DELETE_RECORD");
+        return intervalScheduleService.softDeleteById(id)
+                .then(Mono.just(new ApiResponse<>())
+                        .onErrorResume(e -> {
+                            log.error("Error deleting control log with ID: {}", id, e);
+                            return Mono.just(new ApiResponse<>()); // Return empty list on error
+                        }));
     }
 }

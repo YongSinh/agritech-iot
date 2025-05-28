@@ -41,7 +41,7 @@ const OnetimeSchedule = () => {
     }
 
     // You can now send the formData to your API or perform other actions
-    let url = "/iot/api/v1/onetime-Schedule/update-single-status";
+    let url = "/iot/v1/onetime-Schedule/update-single-status";
     let method = "post";
 
     const result = await request(url, method, body);
@@ -97,7 +97,7 @@ const OnetimeSchedule = () => {
     }
 
     // You can now send the formData to your API or perform other actions
-    let url = "/iot/api/v1/onetime-Schedule/update-multiple-status";
+    let url = "/iot/v1/onetime-Schedule/update-multiple-status";
     let method = "post";
 
     const result = await request(url, method, body);
@@ -147,7 +147,7 @@ const OnetimeSchedule = () => {
 
   const handleSubmit = async (formData) => {
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/api/v1/update-onetime-Schedule" : "/iot/api/v1/create-onetime-Schedule";
+    let url = edit ? "/iot/v1/update-onetime-Schedule" : "/iot/v1/create-onetime-Schedule";
     let method = "post";
 
     const result = await request(url, method, formData);
@@ -181,7 +181,7 @@ const OnetimeSchedule = () => {
   }, []);
 
   const getAllDeviceIds = async () => {
-    const result = await request("/iot/api/v1/device-ids", "GET", null);
+    const result = await request("/iot/v1/device-ids", "GET", null);
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
@@ -189,7 +189,7 @@ const OnetimeSchedule = () => {
   };
 
   const getListOnetimeSchedule = async () => {
-    const result = await request("/iot/api/v1/one-time-schedules", "GET", null);
+    const result = await request("/iot/v1/one-time-schedules", "GET", null);
     if (result) {
       setOnetimeSchedule(result.data)
       setLoading(false)

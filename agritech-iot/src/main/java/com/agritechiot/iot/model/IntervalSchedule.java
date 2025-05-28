@@ -37,4 +37,8 @@ public class IntervalSchedule {
     @Column("run_datetime")
     private LocalDateTime runDatetime;
     private Boolean status;
+    @Column("isRemoved")
+    private Boolean isRemoved;
+    @Column("deletedAt")
+    private LocalDateTime deletedAt;
 }

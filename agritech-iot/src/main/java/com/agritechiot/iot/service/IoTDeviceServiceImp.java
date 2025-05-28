@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
 
     @Override
     public Flux<IoTDeviceDto> getListDevice() {
-        return ioTDeviceRepo.findAll()
+        return ioTDeviceRepo.findByIsNotDeleted()
                 .map(IoTDevice::toDto); // ✅ Convert each entity to DTO
     }
 
@@ -45,6 +46,9 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                 .sensors(req.getSensors())
                 .remark(req.getRemark())
                 .controller(req.getController())
+                .isRemoved(false)
+                .isDeviceOnline(true)
+                .deletedAt(null)
                 .isNewEntry(true) // Mark as a new entry
                 .build();
         return ioTDeviceRepo.save(device);
@@ -60,6 +64,8 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                     d.setRemark(req.getRemark());
                     d.setSensors(req.getSensors());
                     d.setController(req.getController());
+                    d.setIsRemoved(false);
+                    d.setDeletedAt(null);
                     d.setNewEntry(false);
                     return d;
                 }).flatMap(ioTDeviceRepo::save);
@@ -74,6 +80,18 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
     @Override
     public Flux<DeviceJoinDto> getAllDevices() {
         return ioTDeviceRepo.findJoinedDevices();
+    }
+
+    @Override
+    public Mono<Void> softDeleteById(String id) {
+        return ioTDeviceRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
+                .flatMap(req -> {
+                    req.setIsRemoved(true);
+                    req.setDeletedAt(LocalDateTime.now());
+                    return ioTDeviceRepo.save(req);
+                })
+                .then();
     }
 
 

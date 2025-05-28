@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Setter
@@ -26,5 +27,8 @@ public class OnetimeSchedule {
     @Column("deviceId")
     private String deviceId;
     private Boolean status;
-
+    @Column("isRemoved")
+    private Boolean isRemoved;
+    @Column("deletedAt")
+    private LocalDateTime deletedAt;
 }

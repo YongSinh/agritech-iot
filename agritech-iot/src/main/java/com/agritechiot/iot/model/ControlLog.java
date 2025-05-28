@@ -1,9 +1,5 @@
 package com.agritechiot.iot.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,4 +26,8 @@ public class ControlLog {
     private Integer duration;
     @Column("sentby")
     private String sentBy;
+    @Column("isRemoved")
+    private Boolean isRemoved;
+    @Column("deletedAt")
+    private LocalDateTime deletedAt;
 }

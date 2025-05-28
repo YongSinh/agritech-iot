@@ -39,6 +39,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
         onetimeSchedule.setReadSensor(req.getReadSensor());
         onetimeSchedule.setDate(req.getDate());
         onetimeSchedule.setTurnOnWater(req.getTurnOnWater());
+        onetimeSchedule.setIsRemoved(false);
         return onetimeScheduleRepo.save(onetimeSchedule);
     }
 
@@ -54,13 +55,14 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
                     onetimeSchedule.setReadSensor(req.getReadSensor());
                     onetimeSchedule.setDate(req.getDate());
                     onetimeSchedule.setTurnOnWater(req.getTurnOnWater());
+                    onetimeSchedule.setIsRemoved(false);
                     return onetimeSchedule;
                 }).flatMap(onetimeScheduleRepo::save);
     }
 
     @Override
     public Flux<OnetimeSchedule> getListOnetimeSchedule() {
-        return onetimeScheduleRepo.findAll();
+        return onetimeScheduleRepo.findByIsNotDeleted();
     }
 
     @Override
@@ -110,6 +112,18 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
                     res.setScheduleType(GenConstant.ONETIME_SCHEDULE_TYPE);
                     return res;
                 });
+    }
+
+    @Override
+    public Mono<Void> softDeleteById(Integer id) {
+        return onetimeScheduleRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
+                .flatMap(req -> {
+                    req.setIsRemoved(true);
+                    req.setDeletedAt(LocalDateTime.now());
+                    return onetimeScheduleRepo.save(req);
+                })
+                .then();
     }
 
 

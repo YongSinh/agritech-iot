@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +31,7 @@ public class TriggerServiceImp implements TriggerService {
         trigger.setSensor(req.getSensor());
         trigger.setValue(req.getValue());
         trigger.setDeviceId(req.getDeviceId());
+        trigger.setIsRemoved(false);
         return triggerRepo.save(trigger);
     }
 
@@ -44,6 +47,7 @@ public class TriggerServiceImp implements TriggerService {
                     trigger.setSensor(req.getSensor());
                     trigger.setValue(req.getValue());
                     trigger.setDeviceId(req.getDeviceId());
+                    trigger.setIsRemoved(false);
                     return trigger;
                 }).flatMap(triggerRepo::save);
 
@@ -51,7 +55,19 @@ public class TriggerServiceImp implements TriggerService {
 
     @Override
     public Flux<Trigger> getTriggers() {
-        return triggerRepo.findAll();
+        return triggerRepo.findByIsNotDeleted();
+    }
+
+    @Override
+    public Mono<Void> softDeleteById(Integer id) {
+        return triggerRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
+                .flatMap(req -> {
+                    req.setIsRemoved(true);
+                    req.setDeletedAt(LocalDateTime.now());
+                    return triggerRepo.save(req);
+                })
+                .then();
     }
 
 }

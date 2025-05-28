@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @Slf4j
 @Service
@@ -19,6 +21,7 @@ public class ControlLogServiceImp implements ControlLogService {
     private final ControlLogRepo repo;
     private final LogService logService;
     private final Publisher publisher;
+    private final ControlLogRepo controlLogRepo;
 
     @Override
     public Mono<ControlLog> saveControlLog(ControlLogReq req) {
@@ -29,6 +32,7 @@ public class ControlLogServiceImp implements ControlLogService {
         controlLog.setDuration(req.getDuration());
         controlLog.setSentBy(req.getSentBy());
         controlLog.setStatus(req.getStatus());
+        controlLog.setIsRemoved(false);
         return repo.save(controlLog)
                 .flatMap(savedLog -> {
                     if (Boolean.TRUE.equals(savedLog.getStatus())) {
@@ -55,6 +59,7 @@ public class ControlLogServiceImp implements ControlLogService {
                     controlLog.setSentBy(req.getSentBy());
                     controlLog.setDuration(req.getDuration());
                     controlLog.setStatus(req.getStatus());
+                    controlLog.setIsRemoved(false);
                     return controlLog;
                 }).flatMap(repo::save)
                 .flatMap(savedControlLog -> {
@@ -78,7 +83,7 @@ public class ControlLogServiceImp implements ControlLogService {
 
     @Override
     public Flux<ControlLog> getControlLogs() {
-        return repo.findAll();
+        return repo.findByIsNotDeleted();
     }
 
     @Override
@@ -100,5 +105,17 @@ public class ControlLogServiceImp implements ControlLogService {
     @Override
     public Flux<ControlLog> getControlLogsWithFilters(ControlLogReq req) {
         return repo.findWithFilters(req.getDeviceId(), req.getSentBy(), req.getStatus(), req.getStartDate(), req.getEndDate());
+    }
+
+    @Override
+    public Mono<Void> softDeleteById(Integer id) {
+        return controlLogRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
+                .flatMap(req -> {
+                    req.setIsRemoved(true);
+                    req.setDeletedAt(LocalDateTime.now());
+                    return controlLogRepo.save(req);
+                })
+                .then();
     }
 }

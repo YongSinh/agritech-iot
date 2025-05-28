@@ -11,6 +11,7 @@ public class GenConstant {
     public static final String DEFAULT_CORRELATION_ID = UUID.randomUUID().toString();
     public static final String ONETIME_SCHEDULE_TYPE = "Onetime Schedule";
     public static final String REPEAT_SCHEDULE_TYPE = "Repeat Schedule";
+
     private GenConstant() {
 
     }

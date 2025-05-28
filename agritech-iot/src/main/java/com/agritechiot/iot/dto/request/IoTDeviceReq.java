@@ -11,4 +11,5 @@ public class IoTDeviceReq {
     private String sensors;
     private String remark;
     private String controller;
+    private Boolean isDeviceOnline;
 }

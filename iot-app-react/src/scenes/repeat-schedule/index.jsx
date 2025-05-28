@@ -58,7 +58,7 @@ const RepeatSchedule = () => {
     }
 
     // You can now send the formData to your API or perform other actions
-    let url = "/iot/api/v1/repeat-schedule/update-multiple-status";
+    let url = "/iot/v1/repeat-schedule/update-multiple-status";
     let method = "post";
 
     const result = await request(url, method, body);
@@ -103,7 +103,7 @@ const RepeatSchedule = () => {
     console.log(body)
 
     // You can now send the formData to your API or perform other actions
-    let url = "/iot/api/v1/repeat-schedule/update-single-status";
+    let url = "/iot/v1/repeat-schedule/update-single-status";
     let method = "post";
 
     const result = await request(url, method, body);
@@ -151,7 +151,7 @@ const RepeatSchedule = () => {
   }, []);
 
   const getAllDeviceIds = async () => {
-    const result = await request("/iot/api/v1/device-ids", "GET", null);
+    const result = await request("/iot/v1/device-ids", "GET", null);
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
@@ -159,7 +159,7 @@ const RepeatSchedule = () => {
   };
 
   const getListRepeatSchedules = async () => {
-    const result = await request("/iot/api/v1/repeat-schedule", "GET", null);
+    const result = await request("/iot/v1/repeat-schedule", "GET", null);
     if (result) {
       setRepeatSchedules(result.data)
       setLoading(false)
@@ -169,7 +169,7 @@ const RepeatSchedule = () => {
   const handleSubmit = async (formData) => {
 
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/api/v1/update-repeat-schedule" : "/iot/api/v1/create-repeat-schedule";
+    let url = edit ? "/iot/v1/update-repeat-schedule" : "/iot/v1/create-repeat-schedule";
     let method = "post";
 
     const result = await request(url, method, formData);

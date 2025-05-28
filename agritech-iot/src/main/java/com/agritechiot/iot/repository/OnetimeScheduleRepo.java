@@ -33,4 +33,6 @@ public interface OnetimeScheduleRepo extends ReactiveCrudRepository<OnetimeSched
     @Query("SELECT COUNT(*) FROM tbl_onetime_schedule WHERE status = true")
     Mono<Long> countActiveOnetimeStatus();
 
+    @Query("SELECT * FROM tbl_onetime_schedule as o where o.isRemoved = false or o.isRemoved IS NULL")
+    Flux<OnetimeSchedule> findByIsNotDeleted();
 }

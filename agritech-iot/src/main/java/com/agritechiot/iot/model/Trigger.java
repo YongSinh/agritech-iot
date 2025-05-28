@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -23,4 +25,8 @@ public class Trigger {
     private Integer duration;
     @Column("deviceId")
     private String deviceId;
+    @Column("isRemoved")
+    private Boolean isRemoved;
+    @Column("deletedAt")
+    private LocalDateTime deletedAt;
 }

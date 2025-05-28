@@ -11,6 +11,8 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
+
 @Data
 @Table("tbl_iotdevice")
 @Builder
@@ -24,9 +26,14 @@ public class IoTDevice implements Persistable<String> {
     private String controller;
     private String sensors;
     private String remark;
+    @Column("isRemoved")
+    private Boolean isRemoved;
+    @Column("deletedAt")
+    private LocalDateTime deletedAt;
+    @Column("isDeviceOnline")
+    private Boolean isDeviceOnline;
 
     @Transient
-//    @Builder.Default
     private boolean isNewEntry = true;
 
     @Override
@@ -40,6 +47,6 @@ public class IoTDevice implements Persistable<String> {
     }
 
     public IoTDeviceDto toDto() {
-        return new IoTDeviceDto(deviceId, name, controller, sensors, remark);
+        return new IoTDeviceDto(deviceId, name, controller, sensors, remark , isDeviceOnline);
     }
 }

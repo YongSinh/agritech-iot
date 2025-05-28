@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
-@RequestMapping("/iot/api")
+@RequestMapping("/iot")
 @RequiredArgsConstructor
 @Tag(name = "Control-logs")
 @Slf4j
@@ -24,6 +24,7 @@ public class ControlLogController {
 
     private final ControlLogService controlLogService;
     private final LogService logService;
+
     @PostMapping(value = "/v1/create-control-log")
     public Mono<ApiResponse<ControlLog>> addControlLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
@@ -62,6 +63,20 @@ public class ControlLogController {
         return controlLogService.getControlLogs()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
+    @DeleteMapping("/v1/control-logs/{id}")
+    public Mono<ApiResponse<Object>> deleteRecord(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @PathVariable Integer id
+    ) {
+        logService.logInfo("INIT_DELETE_RECORD_CONTROL_LOGS");
+        return controlLogService.softDeleteById(id)
+                .then(Mono.just(new ApiResponse<>())
+                        .onErrorResume(e -> {
+                            log.error("Error deleting control log with ID: {}", id, e);
+                            return Mono.just(new ApiResponse<>()); // Return empty list on error
+                        }));
     }
 
 }

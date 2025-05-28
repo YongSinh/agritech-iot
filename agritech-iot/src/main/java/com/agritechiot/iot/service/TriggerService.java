@@ -13,4 +13,6 @@ public interface TriggerService {
 
     Flux<Trigger> getTriggers();
 
+    Mono<Void> softDeleteById(Integer id);
+
 }

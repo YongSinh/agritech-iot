@@ -7,8 +7,8 @@ import com.agritechiot.iot.dto.request.MqttPublishReq;
 import com.agritechiot.iot.dto.response.DeviceJoinDto;
 import com.agritechiot.iot.dto.response.IoTDeviceDto;
 import com.agritechiot.iot.model.IoTDevice;
-import com.agritechiot.iot.repository.IoTDeviceRepo;
 import com.agritechiot.iot.service.IoTDeviceService;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.ErrorHandlerUtil;
 import com.agritechiot.iot.util.JsonUtil;
@@ -22,15 +22,16 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/iot/api")
+@RequestMapping("/iot")
 @RequiredArgsConstructor
 @Tag(name = "IoT-Devices")
 @Slf4j
 public class IoTDeviceController {
 
     private final IoTDeviceService ioTDeviceService;
-    private final IoTDeviceRepo repo;
+
     private final Publisher publisher;
+    private final LogService logService;
 
     @GetMapping("/v1/devices")
     public Mono<ApiResponse<List<IoTDeviceDto>>> getListIoTDevices(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
@@ -60,7 +61,6 @@ public class IoTDeviceController {
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq ioTDeviceReq
     ) throws Exception {
-        log.info("INIT_LIST_IOT_DEVICES_BY_NAME");
         log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(ioTDeviceReq));
         return ioTDeviceService.getDeviceByName(ioTDeviceReq.getName())
                 .collectList()// Collect the Flux into a List
@@ -97,5 +97,17 @@ public class IoTDeviceController {
         return Mono.just(new ApiResponse<>(req.getMessage(), correlationId));
     }
 
-
+    @DeleteMapping("/v1/device/{id}")
+    public Mono<ApiResponse<Object>> deleteRecord(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @PathVariable String id
+    ) {
+        logService.logInfo("INIT_IOT_DEVICE_DELETE_RECORD");
+        return ioTDeviceService.softDeleteById(id)
+                .then(Mono.just(new ApiResponse<>())
+                        .onErrorResume(e -> {
+                            log.error("Error deleting control log with ID: {}", id, e);
+                            return Mono.just(new ApiResponse<>()); // Return empty list on error
+                        }));
+    }
 }

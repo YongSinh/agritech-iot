@@ -23,4 +23,6 @@ public interface IoTDeviceService {
     Flux<Map<String, String>> getAllDeviceIds();
 
     Flux<DeviceJoinDto> getAllDevices();
+
+    Mono<Void> softDeleteById(String id);
 }

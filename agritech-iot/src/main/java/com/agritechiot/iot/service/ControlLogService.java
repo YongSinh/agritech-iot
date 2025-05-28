@@ -19,5 +19,7 @@ public interface ControlLogService {
     Flux<ControlLog> getControlLogsByDeviceId(String deviceId);
 
     Flux<ControlLog> getControlLogsWithFilters(ControlLogReq req);
+
+    Mono<Void> softDeleteById(Integer id);
 }
 

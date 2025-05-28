@@ -1,6 +1,5 @@
 package com.agritechiot.iot.controller;
 
-import com.agritechiot.iot.Schedule.SchedulingConfig;
 import com.agritechiot.iot.config.Mqtt;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
@@ -9,7 +8,6 @@ import com.agritechiot.iot.model.MqttPublishModel;
 import com.agritechiot.iot.model.MqttSubscribeModel;
 import com.agritechiot.iot.service.integration.LogClient;
 import com.agritechiot.iot.service.mqtt.Publisher;
-import com.agritechiot.iot.service.mqtt.SubscriberImp;
 import com.agritechiot.iot.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.Valid;
@@ -28,7 +26,7 @@ import java.util.concurrent.CountDownLatch;
 
 
 @RestController
-@RequestMapping("/iot/api/v1")
+@RequestMapping("/iot/v1")
 @RequiredArgsConstructor
 @Slf4j
 public class SampleController {

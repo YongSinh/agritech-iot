@@ -20,7 +20,7 @@ import reactor.core.scheduler.Schedulers;
 import java.util.List;
 
 @RestController
-@RequestMapping("/iot/api")
+@RequestMapping("/iot")
 @RequiredArgsConstructor
 @Tag(name = "Repeat-Schedule")
 @Slf4j
@@ -128,6 +128,20 @@ public class RepeatScheduleController {
                     log.error("Error fetching schedules", e);
                     return Mono.just(new ApiResponse<>()); // Return empty list on error
                 });
+    }
+
+    @DeleteMapping("/v1/repeat-schedule/{id}")
+    public Mono<ApiResponse<Object>> deleteRecord(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @PathVariable Integer id
+    ) {
+        logService.logInfo("INIT_REPEAT_SCHEDULE_DELETE_RECORD");
+        return repeatScheduleService.softDeleteById(id)
+                .then(Mono.just(new ApiResponse<>())
+                        .onErrorResume(e -> {
+                            log.error("Error deleting control log with ID: {}", id, e);
+                            return Mono.just(new ApiResponse<>()); // Return empty list on error
+                        }));
     }
 
 }

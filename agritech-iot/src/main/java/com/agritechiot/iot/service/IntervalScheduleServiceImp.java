@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @Service
 public class IntervalScheduleServiceImp implements IntervalScheduleService {
@@ -20,12 +22,12 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
         intervalSchedule.setDuration(req.getDuration());
         intervalSchedule.setReadSensor(req.getReadSensor());
         intervalSchedule.setReadSensor(req.getReadSensor());
+        intervalSchedule.setIsRemoved(false);
         return intervalScheduleRepo.save(intervalSchedule);
     }
 
     @Override
     public Mono<IntervalSchedule> updateIntervalRecord(Integer id, IntervalSchedule req) {
-
         return intervalScheduleRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception("INTERVAL_SCHEDULE_LOG_NOT_FOUND")))
                 .map(intervalSchedule -> {
@@ -36,13 +38,14 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
                     intervalSchedule.setReadSensor(req.getReadSensor());
                     intervalSchedule.setTurnOnWater(req.getTurnOnWater());
                     intervalSchedule.setRunDatetime(req.getRunDatetime());
+                    intervalSchedule.setIsRemoved(false);
                     return intervalSchedule;
                 }).flatMap(intervalScheduleRepo::save);
     }
 
     @Override
     public Flux<IntervalSchedule> getListIntervalRecord() {
-        return intervalScheduleRepo.findAll();
+        return intervalScheduleRepo.findByIsNotDeleted();
     }
 
     @Override
@@ -54,5 +57,17 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     public Mono<IntervalSchedule> getIntervalRecordById(Integer id) {
         return intervalScheduleRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception("INTERVAL_SCHEDULE_LOG_NOT_FOUND")));
+    }
+
+    @Override
+    public Mono<Void> softDeleteById(Integer id) {
+        return intervalScheduleRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("INTERVAL_SCHEDULE_LOG_NOT_FOUND")))
+                .map(intervalSchedule -> {
+                    intervalSchedule.setId(id);
+                    intervalSchedule.setIsRemoved(true);
+                    intervalSchedule.setDeletedAt(LocalDateTime.now());
+                    return intervalScheduleRepo.save(intervalSchedule);
+                }).then();
     }
 }

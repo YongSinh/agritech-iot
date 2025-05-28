@@ -39,6 +39,7 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
         repeatSchedule.setDay(req.getDay().toUpperCase());
         repeatSchedule.setReadSensor(req.getReadSensor());
         repeatSchedule.setTurnOnWater(req.getTurnOnWater());
+        repeatSchedule.setIsRemoved(false);
         return repeatScheduleRepo.save(repeatSchedule);
     }
 
@@ -55,6 +56,7 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
                     repeatSchedule.setDay(req.getDay().toUpperCase());
                     repeatSchedule.setReadSensor(req.getReadSensor());
                     repeatSchedule.setTurnOnWater(req.getTurnOnWater());
+                    repeatSchedule.setIsRemoved(false);
                     return repeatSchedule;
                 }).flatMap(repeatScheduleRepo::save);
     }
@@ -62,7 +64,7 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
     @Override
     public Flux<RepeatSchedule> getListRepeatSchedule() {
         logService.logInfo("REQ_IOT_REPEAT_SCHEDULES");
-        return repeatScheduleRepo.findAll();
+        return repeatScheduleRepo.findByIsNotDeleted();
     }
 
     @Override
@@ -115,6 +117,18 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
                     res.setScheduleType(GenConstant.REPEAT_SCHEDULE_TYPE);
                     return res;
                 });
+    }
+
+    @Override
+    public Mono<Void> softDeleteById(Integer id) {
+        return repeatScheduleRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
+                .flatMap(req -> {
+                    req.setIsRemoved(true);
+                    req.setDeletedAt(LocalDateTime.now());
+                    return repeatScheduleRepo.save(req);
+                })
+                .then();
     }
 
 }

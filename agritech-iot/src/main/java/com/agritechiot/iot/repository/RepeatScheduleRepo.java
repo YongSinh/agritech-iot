@@ -27,4 +27,7 @@ public interface RepeatScheduleRepo extends ReactiveCrudRepository<RepeatSchedul
 
     @Query("SELECT COUNT(*) FROM tbl_repeat_schedule WHERE status = true")
     Mono<Long> countActiveRepeatStatus();
+
+    @Query("SELECT * FROM tbl_repeat_schedule as r where r.isRemoved = false or r.isRemoved IS NULL")
+    Flux<RepeatSchedule> findByIsNotDeleted();
 }
