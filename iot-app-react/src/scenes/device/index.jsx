@@ -1,11 +1,12 @@
-import { Box, Button } from "@mui/material";
+import { Box, useTheme, Button, Stack, IconButton } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { EditRounded } from "@mui/icons-material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request";
 import ModelForm from "./modelForm";
-import { useTheme } from "@emotion/react";
 import Swal from "sweetalert2";
 
 const Device = () => {
@@ -87,27 +88,74 @@ const Device = () => {
     }
   };
 
+  const handleOnDelete = async (value) => {
+    console.log(value)
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await request(`/iot/v1/device/${value.deviceId}`, "DELETE", null);
+      await getListDevice(); // Assuming this is async
+      Swal.fire({
+        title: "Deleted!",
+        text: "Your record has been deleted.",
+        icon: "success"
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete the item.",
+        icon: "error"
+      });
+    }
+  };
+
   const columns = [
     { field: "id", headerName: "Device ID" },
     { field: "name", headerName: "Name", flex: 1, cellClassName: "name-column--cell" },
     { field: "controller", headerName: "Controller", flex: 1 },
     { field: "sensors", headerName: "Sensors", flex: 1 },
     { field: "remark", headerName: "Remark", flex: 1 },
-    {
-      headerName: "Action",
-      flex: 1,
+     {
+      headerName: "Actions",
+      field: "actions",
+      flex: 0.5,
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
       renderCell: ({ row }) => {
         return (
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => handleUpdate(row)}
-          >
-            Edit 
-          </Button>
+          <Stack direction="row" spacing={0.5}>
+            <IconButton aria-label="edit"
+              color="secondary"
+              onClick={() => handleUpdate(row)}
+              size="large"
+            >
+              <EditRounded />
+            </IconButton>
+            <IconButton
+              aria-label="delete"
+              size="large"
+              color="error"
+              onClick={() => handleOnDelete(row)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
         );
       },
-    },
+    }
   ];
 
   return (

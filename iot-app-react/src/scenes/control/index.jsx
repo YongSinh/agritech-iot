@@ -1,6 +1,8 @@
-import { Box, useTheme, Button } from "@mui/material";
+import { Box, useTheme, Button, Stack, IconButton } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { EditRounded } from "@mui/icons-material";
 import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
@@ -40,7 +42,7 @@ const IntervalSchedule = () => {
   const handleSubmit = async (formData) => {
     // console.log(formData)
     // You can now send the formData to your API or perform other actions
-    let url = edit ?  "/iot/v1/update-control-log" : "/iot/v1/create-control-log";
+    let url = edit ? "/iot/v1/update-control-log" : "/iot/v1/create-control-log";
     let method = "post";
 
     const result = await request(url, method, formData);
@@ -53,7 +55,7 @@ const IntervalSchedule = () => {
         timer: 1500,
       });
       setLoading(false);
-      getListIntervalSchedule()
+      getListControlLog()
       handleClose(); // Close the dialog after submission
     } else {
       Swal.fire({
@@ -68,8 +70,39 @@ const IntervalSchedule = () => {
     }
   };
 
+
+  const handleOnDelete = async (value) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await request(`/iot/v1/control-logs/${value.id}`, "DELETE", null);
+      await getListControlLog(); // Assuming this is async
+      Swal.fire({
+        title: "Deleted!",
+        text: "Your record has been deleted.",
+        icon: "success"
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete the item.",
+        icon: "error"
+      });
+    }
+  };
+
   useEffect(() => {
-    getListIntervalSchedule()
+    getListControlLog()
     getAllDeviceIds()
   }, []);
 
@@ -83,7 +116,7 @@ const IntervalSchedule = () => {
   };
 
 
-  const getListIntervalSchedule = async () => {
+  const getListControlLog = async () => {
     const result = await request("/iot/v1/control-logs", "GET", null);
     if (result) {
       setData(result.data)
@@ -124,17 +157,33 @@ const IntervalSchedule = () => {
       },
     },
     {
-      headerName: "Action",
-      flex: 1,
+      headerName: "Actions",
+      field: "actions",
+      flex: 0.5,
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
       renderCell: ({ row }) => {
         return (
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => handleUpdate(row)}
-          >
-            Edit
-          </Button>
+          <Stack direction="row" spacing={0.5}>
+            <IconButton aria-label="edit"
+              color="secondary"
+              onClick={() => handleUpdate(row)}
+              size="large"
+            >
+              <EditRounded />
+            </IconButton>
+            <IconButton
+              aria-label="delete"
+              size="large"
+              color="error"
+              onClick={() => handleOnDelete(row)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
         );
       },
     }

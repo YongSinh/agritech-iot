@@ -89,6 +89,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                 .flatMap(req -> {
                     req.setIsRemoved(true);
                     req.setDeletedAt(LocalDateTime.now());
+                    req.setNewEntry(false);
                     return ioTDeviceRepo.save(req);
                 })
                 .then();
