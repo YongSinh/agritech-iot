@@ -24,7 +24,7 @@ public class IntervalScheduleController {
     private final IntervalScheduleService intervalScheduleService;
     private final LogService logService;
 
-    @PostMapping(value = "/v1/create-interval-schedule")
+    @PostMapping(value = "/v1/interval-schedule/create")
     public Mono<ApiResponse<IntervalSchedule>> addIntervalRecord(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalSchedule req
@@ -34,7 +34,7 @@ public class IntervalScheduleController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/update-interval-schedule")
+    @PostMapping(value = "/v1/interval-schedule/update")
     public Mono<ApiResponse<IntervalSchedule>> updateIntervalRecord(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalSchedule req

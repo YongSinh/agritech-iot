@@ -25,7 +25,7 @@ public class ControlLogController {
     private final ControlLogService controlLogService;
     private final LogService logService;
 
-    @PostMapping(value = "/v1/create-control-log")
+    @PostMapping(value = "/v1/control-log/create")
     public Mono<ApiResponse<ControlLog>> addControlLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody ControlLogReq req
@@ -36,7 +36,7 @@ public class ControlLogController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/update-control-log")
+    @PostMapping(value = "/v1/control-log/update")
     public Mono<ApiResponse<ControlLog>> updateControlLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody ControlLogReq req

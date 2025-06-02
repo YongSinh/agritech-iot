@@ -58,7 +58,7 @@ const Device = () => {
   // Handle form submission
   const handleSubmit = async (formData) => {
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/v1/update-device" : "/iot/v1/create-device";
+    let url = edit ? "/iot/v1/device/update" : "/iot/v1/device/create";
     let method = "post";
 
     const result = await request(url, method, formData);

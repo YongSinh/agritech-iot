@@ -41,7 +41,7 @@ public class OnetimeScheduleController {
                 });
     }
 
-    @PostMapping(value = "/v1/create-onetime-Schedule")
+    @PostMapping(value = "/v1/onetime-Schedule/create")
     public Mono<ApiResponse<OnetimeSchedule>> createSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody OnetimeScheduleReq req
@@ -54,7 +54,7 @@ public class OnetimeScheduleController {
                 .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '" + req.getDeviceId() + "' already exists.", correlationId, "IoTDevice"));
     }
 
-    @PostMapping(value = "/v1/update-onetime-Schedule")
+    @PostMapping(value = "/v1/onetime-Schedule/update")
     public Mono<ApiResponse<OnetimeSchedule>> updateSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody OnetimeScheduleReq req
@@ -66,7 +66,7 @@ public class OnetimeScheduleController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/onetime-Schedule-by-device-id")
+    @PostMapping(value = "/v1/onetime-Schedule/device-id")
     public Mono<ApiResponse<List<OnetimeSchedule>>> getListOnetimeScheduleByDeviceId(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody OnetimeScheduleReq req

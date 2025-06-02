@@ -37,7 +37,7 @@ public class RepeatScheduleController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping("/v1/repeat-schedule-by-device-id")
+    @PostMapping("/v1/repeat-schedule/device-id")
     public Mono<ApiResponse<List<RepeatSchedule>>> getListRepeatScheduleByDeviceId(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody RepeatScheduleReq req
@@ -52,7 +52,7 @@ public class RepeatScheduleController {
                 });
     }
 
-    @PostMapping("/v1/repeat-schedule-by-day")
+    @PostMapping("/v1/repeat-schedule/-day")
     public Mono<ApiResponse<List<RepeatSchedule>>> getListRepeatScheduleByDay(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody RepeatScheduleReq req
@@ -67,7 +67,7 @@ public class RepeatScheduleController {
                 });
     }
 
-    @PostMapping("/v1/create-repeat-schedule")
+    @PostMapping("/v1/repeat-schedule/create")
     public Mono<ApiResponse<RepeatSchedule>> createRepeatSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody RepeatScheduleReq req
@@ -79,7 +79,7 @@ public class RepeatScheduleController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping("/v1/update-repeat-schedule")
+    @PostMapping("/v1/repeat-schedule/update")
     public Mono<ApiResponse<RepeatSchedule>> updateRepeatSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody RepeatScheduleReq req

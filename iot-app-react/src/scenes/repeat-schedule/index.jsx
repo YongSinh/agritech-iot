@@ -1,6 +1,8 @@
-import { Box, Button, useTheme, Stack, Typography } from "@mui/material";
+import { Box, useTheme, Button, Stack, IconButton } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { EditRounded } from "@mui/icons-material";
 import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
@@ -88,6 +90,36 @@ const RepeatSchedule = () => {
     }
   };
 
+  const handleOnDelete = async (value) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await request(`/iot/v1/repeat-schedule/${value.id}`, "DELETE", null);
+      await getListRepeatSchedules(); // Assuming this is async
+      Swal.fire({
+        title: "Deleted!",
+        text: "Your record has been deleted.",
+        icon: "success"
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete the item.",
+        icon: "error"
+      });
+    }
+  };
+
   const handleChangeStatus = async (id, newStatus) => {
     setRepeatSchedules(repeatSchedules.map(row =>
       row.id === id ? { ...row, status: newStatus } : row
@@ -151,7 +183,7 @@ const RepeatSchedule = () => {
   }, []);
 
   const getAllDeviceIds = async () => {
-    const result = await request("/iot/v1/device-ids", "GET", null);
+    const result = await request("/iot/v1/device/ids", "GET", null);
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
@@ -169,7 +201,7 @@ const RepeatSchedule = () => {
   const handleSubmit = async (formData) => {
 
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/v1/update-repeat-schedule" : "/iot/v1/create-repeat-schedule";
+    let url = edit ? "/iot/v1/repeat-schedule/update" : "/iot/v1/repeat-schedule/create";
     let method = "post";
 
     const result = await request(url, method, formData);
@@ -244,17 +276,33 @@ const RepeatSchedule = () => {
       },
     },
     {
-      headerName: "Action",
-      flex: 1,
+      headerName: "Actions",
+      field: "actions",
+      flex: 0.5,
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
       renderCell: ({ row }) => {
         return (
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => handleUpdate(row)}
-          >
-            Edit
-          </Button>
+          <Stack direction="row" spacing={0.5}>
+            <IconButton aria-label="edit"
+              color="secondary"
+              onClick={() => handleUpdate(row)}
+              size="large"
+            >
+              <EditRounded />
+            </IconButton>
+            <IconButton
+              aria-label="delete"
+              size="large"
+              color="error"
+              onClick={() => handleOnDelete(row)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
         );
       },
     }

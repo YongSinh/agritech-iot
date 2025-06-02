@@ -33,19 +33,7 @@ public class ControlLogServiceImp implements ControlLogService {
         controlLog.setSentBy(req.getSentBy());
         controlLog.setStatus(req.getStatus());
         controlLog.setIsRemoved(false);
-        return repo.save(controlLog)
-                .flatMap(savedLog -> {
-                    if (Boolean.TRUE.equals(savedLog.getStatus())) {
-                        try {
-                            logService.logInfo("PUBLISH_MESSAGE_TO_DEVICE", JsonUtil.toJson(savedLog));
-                            publisher.publish("test", JsonUtil.objectToJsonString(savedLog), 1, true);
-                            return Mono.just(savedLog);
-                        } catch (Exception e) {
-                            return Mono.error(new IllegalStateException("Failed to publish event", e));
-                        }
-                    }
-                    return Mono.just(savedLog);
-                });
+        return repo.save(controlLog);
     }
 
     @Override

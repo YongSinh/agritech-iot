@@ -39,7 +39,7 @@ public class OnetimeScheduleManager {
 
         log.info("🔁 Re-registering tasks...");
         // Re-schedule default task
-        onetimeScheduleRepo.findAll()
+        onetimeScheduleRepo.findByIsNotDeleted()
                 .flatMap(schedule -> {
                     if (Boolean.FALSE.equals(schedule.getStatus())) {
                         cancelDeviceTasks(schedule.getId());

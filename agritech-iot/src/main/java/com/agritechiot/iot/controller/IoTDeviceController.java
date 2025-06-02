@@ -49,14 +49,14 @@ public class IoTDeviceController {
     }
 
 
-    @GetMapping("/v1/device-ids")
+    @GetMapping("/v1/device/ids")
     public Mono<ApiResponse<List<Map<String, String>>>> getAllDeviceIds(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return ioTDeviceService.getAllDeviceIds()
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/get-device-by-name")
+    @PostMapping(value = "/v1/device/get-by-name")
     public Mono<ApiResponse<List<IoTDeviceDto>>> getIoTDevicesByName(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq ioTDeviceReq
@@ -67,7 +67,7 @@ public class IoTDeviceController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/create-device")
+    @PostMapping(value = "/v1/device/device")
     public Mono<ApiResponse<IoTDevice>> addDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
@@ -78,7 +78,7 @@ public class IoTDeviceController {
                 .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '" + req.getDeviceId() + "' already exists.", correlationId, "IoTDevice"));
     }
 
-    @PostMapping(value = "/v1/update-device")
+    @PostMapping(value = "/v1/device/update")
     public Mono<ApiResponse<IoTDevice>> updateDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
@@ -88,7 +88,7 @@ public class IoTDeviceController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/off-on-device")
+    @PostMapping(value = "/v1/device/off-on")
     public Mono<ApiResponse<Object>> offOnDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody MqttPublishReq req

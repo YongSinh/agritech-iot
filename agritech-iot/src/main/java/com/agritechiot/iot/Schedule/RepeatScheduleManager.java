@@ -37,7 +37,7 @@ public class RepeatScheduleManager {
         log.info("🔁 Re-registering tasks...");
         // Re-schedule default task
 
-        repeatScheduleRepo.findAll()
+        repeatScheduleRepo.findByIsNotDeleted()
                 .flatMap(schedule -> {
                     if (Boolean.FALSE.equals(schedule.getStatus())) {
                         cancelDeviceTasks(schedule.getId());

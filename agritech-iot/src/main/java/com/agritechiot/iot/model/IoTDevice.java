@@ -47,6 +47,6 @@ public class IoTDevice implements Persistable<String> {
     }
 
     public IoTDeviceDto toDto() {
-        return new IoTDeviceDto(deviceId, name, controller, sensors, remark , isDeviceOnline);
+        return new IoTDeviceDto(deviceId, name, controller, sensors, remark, isDeviceOnline);
     }
 }

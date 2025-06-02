@@ -1,5 +1,7 @@
-import { Box, Button, useTheme } from "@mui/material";
+import { Box, useTheme, Button, Stack, IconButton } from "@mui/material";
 import { Header } from "../../components";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { EditRounded } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
@@ -12,6 +14,7 @@ const Trigger = () => {
   const colors = tokens(theme.palette.mode);
   const { request } = useRequest();
   const [triggers, setTriggers] = useState([]);
+  const [sensors, setSensors] = useState([]);
   const [deviceIds, setDeviceIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -36,9 +39,40 @@ const Trigger = () => {
     setEdit(true)
   };
 
+
+  const handleOnDelete = async (value) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await request(`/iot/v1/trigger/${value.id}`, "DELETE", null);
+      await getListTriggers(); // Assuming this is async
+      Swal.fire({
+        title: "Deleted!",
+        text: "Your record has been deleted.",
+        icon: "success"
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete the item.",
+        icon: "error"
+      });
+    }
+  };
+
   const handleSubmit = async (formData) => {
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/v1/update-trigger" : "/iot/v1/create-trigger";
+    let url = edit ? "/iot/v1/triggers/update" : "/iot/v1/triggers/create";
     let method = "post";
 
     const result = await request(url, method, formData);
@@ -68,9 +102,11 @@ const Trigger = () => {
   };
 
   useEffect(() => {
-    getListTriggers()
-    getAllDeviceIds()
+    getListTriggers();
+    getListSensors();
+    getAllDeviceIds();
   }, []);
+
 
   const getListTriggers = async () => {
     const result = await request("/iot/v1/triggers", "GET", null);
@@ -80,8 +116,16 @@ const Trigger = () => {
     }
   };
 
+  const getListSensors = async () => {
+    const result = await request("/iot/v1/triggers/sensors", "GET", null);
+    if (result) {
+      setSensors(result.data)
+      setLoading(false)
+    }
+  };
+
   const getAllDeviceIds = async () => {
-    const result = await request("/iot/v1/device-ids", "GET", null);
+    const result = await request("/iot/v1/devices", "GET", null);
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
@@ -91,16 +135,11 @@ const Trigger = () => {
   const columns = [
     { field: "id", headerName: "ID" },
     {
-      field: "operator",
-      headerName: "Operator",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
       field: "deviceId",
       headerName: "Device ID",
       flex: 1,
     },
+
     {
       field: "duration",
       headerName: "Duration",
@@ -113,6 +152,12 @@ const Trigger = () => {
       flex: 1,
     },
     {
+      field: "operator",
+      headerName: "Operator",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
       field: "value",
       headerName: "Value",
       flex: 1,
@@ -123,17 +168,33 @@ const Trigger = () => {
       flex: 1,
     },
     {
-      headerName: "Action",
-      flex: 1,
+      headerName: "Actions",
+      field: "actions",
+      flex: 0.5,
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
       renderCell: ({ row }) => {
         return (
-          <Button
-            color="secondary"
-            variant="contained"
-            onClick={() => handleUpdate(row)}
-          >
-            Edit
-          </Button>
+          <Stack direction="row" spacing={0.5}>
+            <IconButton aria-label="edit"
+              color="secondary"
+              onClick={() => handleUpdate(row)}
+              size="large"
+            >
+              <EditRounded />
+            </IconButton>
+            <IconButton
+              aria-label="delete"
+              size="large"
+              color="error"
+              onClick={() => handleOnDelete(row)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
         );
       },
     }
@@ -151,6 +212,8 @@ const Trigger = () => {
         colors={colors}
         deviceIds={deviceIds}
         initialData={initialData}
+        sensors={sensors}
+        isEdit={edit}
       />
       <Box
         mt="40px"
@@ -196,7 +259,7 @@ const Trigger = () => {
               },
             },
           }}
-          checkboxSelection 
+          checkboxSelection
         />
       </Box>
     </Box>

@@ -42,7 +42,7 @@ public class IntervalScheduleManager {
 
         log.info("🔁 Re-registering tasks...");
         // Re-schedule default task
-        intervalScheduleRepo.findAll()
+        intervalScheduleRepo.findByIsNotDeleted()
                 .flatMap(schedule -> {
                     if (Boolean.FALSE.equals(schedule.getStatus())) {
                         cancelDeviceTasks(schedule.getId());
