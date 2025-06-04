@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Repository
 public interface TriggerRepo extends ReactiveCrudRepository<Trigger, Integer> {
     @Query("SELECT * FROM tbl_trigger WHERE tbl_trigger.sensor = :sensensor AND deviceid LIKE CONCAT('%', :deviceId, '%')")
@@ -19,7 +21,7 @@ public interface TriggerRepo extends ReactiveCrudRepository<Trigger, Integer> {
     @Query("SELECT * FROM tbl_trigger as t WHERE t.deviceId = :deviceid")
     Mono<Trigger> findByDeviceId(@Param("deviceId") String deviceId);
 
-    @Query("SELECT * FROM tbl_trigger as t WHERE t.deviceId = :deviceid")
-    Flux<Trigger> findByDeviceIds(@Param("deviceId") String deviceId);
+    @Query("SELECT * FROM tbl_trigger as t WHERE t.deviceId IN (:deviceid) AND (t.isRemoved = false or t.isRemoved IS NULL)")
+    Flux<Trigger> findByDeviceIds(@Param("deviceId") List<String> deviceId);
 
 }

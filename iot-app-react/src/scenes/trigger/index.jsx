@@ -72,8 +72,9 @@ const Trigger = () => {
 
   const handleSubmit = async (formData) => {
     // You can now send the formData to your API or perform other actions
-    let url = edit ? "/iot/v1/triggers/update" : "/iot/v1/triggers/create";
+    let url = edit ? "/iot/v1/triggers/update" : "/iot/v1/triggers/multiple-create";
     let method = "post";
+    console.log(formData);
 
     const result = await request(url, method, formData);
     if (result.code === "SUC-000") {

@@ -29,4 +29,6 @@ public class Trigger {
     private Boolean isRemoved;
     @Column("deletedAt")
     private LocalDateTime deletedAt;
+    @Column("sleepDuration")
+    private Integer sleepDuration;
 }

@@ -1,6 +1,6 @@
-import { Box, useTheme, Button, Stack, IconButton } from "@mui/material";
+import { Box, useTheme, Button, Stack, IconButton, Chip } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { EditRounded } from "@mui/icons-material";
+import { EditRounded, CloudDone, HighlightOffOutlined } from "@mui/icons-material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -124,8 +124,23 @@ const Device = () => {
     { field: "name", headerName: "Name", flex: 1, cellClassName: "name-column--cell" },
     { field: "controller", headerName: "Controller", flex: 1 },
     { field: "sensors", headerName: "Sensors", flex: 1 },
+    {
+      field: "DeviceOnline",
+      headerName: "Device Status",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Chip
+            label={row.isDeviceOnline ? "Online" : "Offline"}
+            color={row.isDeviceOnline ? "success" : "error"}
+            icon={row.isDeviceOnline ? <CloudDone /> : <HighlightOffOutlined />}
+          //variant="outlined"
+          />
+        );
+      },
+    },
     { field: "remark", headerName: "Remark", flex: 1 },
-     {
+    {
       headerName: "Actions",
       field: "actions",
       flex: 0.5,
@@ -197,7 +212,7 @@ const Device = () => {
             color: colors.primary[100],
           },
         }}
-      > {import.meta.env.VITE_KEYCLOAK_URL}
+      >
         <DataGrid
           rows={devicesWithIds}
           columns={columns}

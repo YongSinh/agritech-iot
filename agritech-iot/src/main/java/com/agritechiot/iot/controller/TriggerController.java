@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -58,13 +57,21 @@ public class TriggerController {
     }
 
     @PostMapping(value = "/v1/triggers/multiple-create")
-    public Flux<ApiResponse<Trigger>> createMultipleTrigger(
+    public Mono<ApiResponse<List<Trigger>>> createMultipleTrigger(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody TriggerReq req
     ) {
         logService.logInfo("CREATING_MULTIPLE_TRIGGER");
         return triggerService.saveMultipleTriggers(req)// Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
+                .collectList()
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @PostMapping(value = "/v1/triggers/create")
@@ -84,7 +91,14 @@ public class TriggerController {
     ) throws Exception {
         log.info("REQ_UPDATE_TRIGGER: {}", JsonUtil.toJson(req));
         return triggerService.updateTrigger(req.getId(), req)// Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @DeleteMapping("/v1/trigger/{id}")
@@ -95,9 +109,12 @@ public class TriggerController {
         logService.logInfo("INIT_IOT_DEVICE_DELETE_RECORD");
         return triggerService.softDeleteById(id)
                 .then(Mono.just(new ApiResponse<>())
-                        .onErrorResume(e -> {
-                            log.error("Error deleting control log with ID: {}", id, e);
-                            return Mono.just(new ApiResponse<>()); // Return empty list on error
-                        }));
+                        .onErrorResume(Exception.class, ex ->
+                                Mono.just(new ApiResponse<>(
+                                        ex.getMessage(),
+                                        correlationId,
+                                        GenConstant.ERR_CODE
+                                ))
+                        ));
     }
 }

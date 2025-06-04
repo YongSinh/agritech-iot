@@ -76,7 +76,6 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
         IoTDevice ioTDevice = ioTDeviceRepo.findById(repeatSchedule.getDeviceId()).block();
         Trigger trigger = triggerService.getTriggerByDeviceId(repeatSchedule.getDeviceId()).block();
         assert ioTDevice != null;
-        log.info(ioTDevice.getName());
         publisher.publish(ioTDevice.getName(), JsonUtil.objectToJsonString(trigger), 1, true);
     }
 

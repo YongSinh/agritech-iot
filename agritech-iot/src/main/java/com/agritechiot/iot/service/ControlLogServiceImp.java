@@ -65,11 +65,6 @@ public class ControlLogServiceImp implements ControlLogService {
     }
 
     @Override
-    public Mono<ControlLog> deleteControlLog(Integer id) {
-        return null;
-    }
-
-    @Override
     public Flux<ControlLog> getControlLogs() {
         return repo.findByIsNotDeleted();
     }

@@ -17,4 +17,5 @@ public class TriggerReq {
     private List<String> deviceId;
     private Boolean isRemoved;
     private LocalDateTime deletedAt;
+    private Integer sleepDuration;
 }

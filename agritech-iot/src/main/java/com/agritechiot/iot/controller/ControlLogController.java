@@ -33,7 +33,14 @@ public class ControlLogController {
 
         logService.logInfo("INIT_CREATE_CONTROL_LOG");
         return controlLogService.saveControlLog(req)// Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @PostMapping(value = "/v1/control-log/update")
@@ -43,7 +50,15 @@ public class ControlLogController {
     ) {
         logService.logInfo("INIT_UPDATE_CONTROL_LOG");
         return controlLogService.updateControlLog(req)// Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
+
     }
 
     @GetMapping("/v1/control-logs")
@@ -73,10 +88,13 @@ public class ControlLogController {
         logService.logInfo("INIT_DELETE_RECORD_CONTROL_LOGS");
         return controlLogService.softDeleteById(id)
                 .then(Mono.just(new ApiResponse<>())
-                        .onErrorResume(e -> {
-                            log.error("Error deleting control log with ID: {}", id, e);
-                            return Mono.just(new ApiResponse<>()); // Return empty list on error
-                        }));
+                        .onErrorResume(Exception.class, ex ->
+                                Mono.just(new ApiResponse<>(
+                                        ex.getMessage(),
+                                        correlationId,
+                                        GenConstant.ERR_CODE
+                                ))
+                        ));
     }
 
 }

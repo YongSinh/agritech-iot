@@ -15,7 +15,7 @@ public class ApiErrResponse<T> {
     private T data;
 
     public ApiErrResponse() {
-        this(null, MDC.get(GenConstant.CORRELATION_ID), GenConstant.SUC_MESSAGE, GenConstant.SUC_CODE);
+        this(null, MDC.get(GenConstant.CORRELATION_ID), GenConstant.ERR_CODE, GenConstant.ERR_CODE);
     }
 
     public ApiErrResponse(T data) {
@@ -23,7 +23,7 @@ public class ApiErrResponse<T> {
     }
 
     public ApiErrResponse(T data, String correlationId) {
-        this(data, correlationId, GenConstant.SUC_MESSAGE, GenConstant.SUC_CODE);
+        this(data, correlationId, GenConstant.SUC_MESSAGE, GenConstant.ERR_CODE);
     }
 
     public ApiErrResponse(String message, String correlationId) {

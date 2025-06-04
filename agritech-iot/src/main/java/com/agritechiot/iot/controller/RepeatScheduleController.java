@@ -46,10 +46,13 @@ public class RepeatScheduleController {
         return repeatScheduleService.getListRepeatScheduleByDeviceId(req.getDeviceId())
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
-                .onErrorResume(e -> {
-                    log.error("Error fetching schedules for deviceId: {}", req.getDeviceId(), e);
-                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
-                });
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @PostMapping("/v1/repeat-schedule/-day")
@@ -61,10 +64,13 @@ public class RepeatScheduleController {
         return repeatScheduleService.getListRepeatScheduleByDay(req.getDay())
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
-                .onErrorResume(e -> {
-                    log.error("Error fetching schedules for deviceId: {}", req.getDeviceId(), e);
-                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
-                });
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @PostMapping("/v1/repeat-schedule/create")
@@ -99,10 +105,13 @@ public class RepeatScheduleController {
         logService.logInfo("INIT_UPDATE_MULTIPLE_STATUS", JsonUtil.toJson(req));
         return repeatScheduleService.updateListsStatus(req.getIds(), req.getStatus(), req.getBatchSize())
                 .then(Mono.fromCallable(ApiResponse::new))
-                .onErrorResume(e -> {
-                    log.error("Error updating schedules for deviceId : {}", e.getCause().getMessage(), e);
-                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
-                });
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @PostMapping("/v1/repeat-schedule/update-single-status")
@@ -113,10 +122,13 @@ public class RepeatScheduleController {
         logService.logInfo("INIT_UPDATE_SINGLE_STATUS", JsonUtil.toJson(req));
         return repeatScheduleService.updateSingleStatus(req.getId(), req.getStatus())
                 .then(Mono.fromCallable(ApiResponse::new))
-                .onErrorResume(e -> {
-                    log.error("Error updating schedules: {}", e.getCause().getMessage(), e);
-                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
-                });
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @GetMapping("/v1/repeat-schedule/check-status-active")
@@ -124,10 +136,13 @@ public class RepeatScheduleController {
         logService.logInfo("INIT_LIST_REPEAT_SCHEDULE");
         return repeatScheduleService.getActiveRepeatSchedule()// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
-                .onErrorResume(e -> {
-                    log.error("Error fetching schedules", e);
-                    return Mono.just(new ApiResponse<>()); // Return empty list on error
-                });
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @DeleteMapping("/v1/repeat-schedule/{id}")
@@ -138,10 +153,13 @@ public class RepeatScheduleController {
         logService.logInfo("INIT_REPEAT_SCHEDULE_DELETE_RECORD");
         return repeatScheduleService.softDeleteById(id)
                 .then(Mono.just(new ApiResponse<>())
-                        .onErrorResume(e -> {
-                            log.error("Error deleting control log with ID: {}", id, e);
-                            return Mono.just(new ApiResponse<>()); // Return empty list on error
-                        }));
+                        .onErrorResume(Exception.class, ex ->
+                                Mono.just(new ApiResponse<>(
+                                        ex.getMessage(),
+                                        correlationId,
+                                        GenConstant.ERR_CODE
+                                ))
+                        ));
     }
 
 }

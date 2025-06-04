@@ -2,6 +2,7 @@ package com.agritechiot.iot.Schedule;
 
 import com.agritechiot.iot.model.IntervalSchedule;
 import com.agritechiot.iot.repository.IntervalScheduleRepo;
+import com.agritechiot.iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -67,8 +68,7 @@ public class IntervalScheduleManager {
             String taskKey = getIntervalTaskKey(schedule);
 
             // Generate cron expression for the interval
-            String cronExpression = generateIntervalCron(
-                    schedule.getRunDatetime(),
+            String cronExpression = GenUtil.generateCronEveryNMinutes(
                     schedule.getInterval()
             );
 
@@ -83,24 +83,6 @@ public class IntervalScheduleManager {
                     schedule.getDeviceId(), cronExpression);
         } catch (Exception e) {
             log.error("❌ Failed to schedule interval task", e);
-        }
-    }
-
-    private String generateIntervalCron(LocalDateTime startTime, int intervalMinutes) {
-        int minute = startTime.getMinute();
-        int hour = startTime.getHour();
-
-        // For intervals that divide 60 evenly
-        if (60 % intervalMinutes == 0) {
-            return String.format("%d/%d %d * * *", minute, intervalMinutes, hour);
-        }
-        // For irregular intervals
-        else {
-            List<String> minutes = new ArrayList<>();
-            for (int m = minute; m < 60; m += intervalMinutes) {
-                minutes.add(String.valueOf(m));
-            }
-            return String.format("%s %d * * *", String.join(",", minutes), hour);
         }
     }
 

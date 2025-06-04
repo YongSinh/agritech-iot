@@ -20,7 +20,7 @@ public interface OnetimeScheduleService {
 
     Flux<OnetimeSchedule> getListOnetimeScheduleByDeviceId(String deviceId);
 
-    void startOneTimeSchedule(OnetimeScheduleReq req) throws Exception;
+    void startOneTimeSchedule(OnetimeSchedule req) throws Exception;
 
     Mono<Void> updateListsStatus(List<Integer> ids, boolean newStatus, int batchSize);
 

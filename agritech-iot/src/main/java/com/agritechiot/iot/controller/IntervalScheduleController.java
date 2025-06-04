@@ -73,9 +73,12 @@ public class IntervalScheduleController {
         logService.logInfo("INIT_INTERVAL_SCHEDULE_DELETE_RECORD");
         return intervalScheduleService.softDeleteById(id)
                 .then(Mono.just(new ApiResponse<>())
-                        .onErrorResume(e -> {
-                            log.error("Error deleting control log with ID: {}", id, e);
-                            return Mono.just(new ApiResponse<>()); // Return empty list on error
-                        }));
+                        .onErrorResume(Exception.class, ex ->
+                                Mono.just(new ApiResponse<>(
+                                        ex.getMessage(),
+                                        correlationId,
+                                        GenConstant.ERR_CODE
+                                ))
+                        ));
     }
 }

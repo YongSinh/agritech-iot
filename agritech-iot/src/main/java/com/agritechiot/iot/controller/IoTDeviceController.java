@@ -10,7 +10,6 @@ import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.service.IoTDeviceService;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.mqtt.Publisher;
-import com.agritechiot.iot.util.ErrorHandlerUtil;
 import com.agritechiot.iot.util.JsonUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +74,13 @@ public class IoTDeviceController {
         log.info("REQ_IOT_ADD_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.saveDevice(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
-                .onErrorResume(error -> ErrorHandlerUtil.handleDuplicateError(error, "Device with ID '" + req.getDeviceId() + "' already exists.", correlationId, "IoTDevice"));
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 
     @PostMapping(value = "/v1/device/update")
@@ -105,9 +110,12 @@ public class IoTDeviceController {
         logService.logInfo("INIT_IOT_DEVICE_DELETE_RECORD");
         return ioTDeviceService.softDeleteById(id)
                 .then(Mono.just(new ApiResponse<>())
-                        .onErrorResume(e -> {
-                            log.error("Error deleting control log with ID: {}", id, e);
-                            return Mono.just(new ApiResponse<>()); // Return empty list on error
-                        }));
+                        .onErrorResume(Exception.class, ex ->
+                                Mono.just(new ApiResponse<>(
+                                        ex.getMessage(),
+                                        correlationId,
+                                        GenConstant.ERR_CODE
+                                ))
+                        ));
     }
 }

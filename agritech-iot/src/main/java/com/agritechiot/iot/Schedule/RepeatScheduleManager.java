@@ -121,11 +121,7 @@ public class RepeatScheduleManager {
 
     private void executeScheduledActions(RepeatSchedule schedule) throws Exception {
         log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
-        if (Boolean.TRUE.equals(schedule.getReadSensor()) && Boolean.TRUE.equals(schedule.getTurnOnWater())) {
-            repeatScheduleService.startRepeatSchedule(schedule);
-        } else {
-            log.warn("Schedule for device {} does not require any action", schedule.getDeviceId());
-        }
+        repeatScheduleService.startRepeatSchedule(schedule);
     }
 
     private void cancelAllScheduledTasks() {

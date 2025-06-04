@@ -157,12 +157,12 @@ const SideBar = () => {
             },
           }}
         >
-          <Item
+          {/* <Item
             title="Manage Team"
             path="/team"
             colors={colors}
             icon={<PeopleAltOutlined />}
-          />
+          /> */}
           <Item
             title="Control Logs"
             path="/control"

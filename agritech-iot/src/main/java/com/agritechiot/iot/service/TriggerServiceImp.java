@@ -31,19 +31,33 @@ public class TriggerServiceImp implements TriggerService {
     @Override
     public Flux<Trigger> saveMultipleTriggers(TriggerReq req) {
         logService.logInfo("REQ_SAVE_MULTIPLE_TRIGGERS_SERVICE: ", JsonUtil.toJson(req));
-        List<Trigger> triggers = req.getDeviceId().stream().map(deviceId -> {
-            Trigger trigger = new Trigger();
-            trigger.setAction(req.getAction());
-            trigger.setOperator(req.getOperator());
-            trigger.setDuration(req.getDuration());
-            trigger.setSensor(req.getSensor());
-            trigger.setValue(req.getValue());
-            trigger.setDeviceId(deviceId); // set different deviceId
-            trigger.setIsRemoved(false);
-            return trigger;
-        }).toList();
+        return triggerRepo.findByDeviceIds(req.getDeviceId())
+                .collectList()
+                .flatMapMany(existingTriggers -> {
+                    if (!existingTriggers.isEmpty()) {
+                        List<String> existingDeviceIds = existingTriggers.stream()
+                                .map(Trigger::getDeviceId)
+                                .toList();
+                        return Flux.error(new IllegalArgumentException(
+                                "Triggers already exist for deviceIds: " + existingDeviceIds));
+                    }
+                    // Proceed with saving if no duplicates found
+                    List<Trigger> triggers = req.getDeviceId().stream()
+                            .map(deviceId -> {
+                                Trigger trigger = new Trigger();
+                                trigger.setAction(req.getAction());
+                                trigger.setOperator(req.getOperator());
+                                trigger.setDuration(req.getDuration());
+                                trigger.setSensor(req.getSensor());
+                                trigger.setValue(req.getValue());
+                                trigger.setDeviceId(deviceId);
+                                trigger.setIsRemoved(false);
+                                return trigger;
+                            })
+                            .toList();
 
-        return triggerRepo.saveAll(triggers);
+                    return triggerRepo.saveAll(triggers);
+                });
     }
 
     @Override
@@ -57,6 +71,7 @@ public class TriggerServiceImp implements TriggerService {
         trigger.setValue(req.getValue());
         trigger.setDeviceId(req.getDeviceId());
         trigger.setIsRemoved(false);
+        trigger.setSleepDuration(req.getSleepDuration());
         return triggerRepo.save(trigger);
     }
 
@@ -72,6 +87,7 @@ public class TriggerServiceImp implements TriggerService {
                     trigger.setSensor(req.getSensor());
                     trigger.setValue(req.getValue());
                     trigger.setDeviceId(req.getDeviceId());
+                    trigger.setSleepDuration(req.getSleepDuration());
                     trigger.setIsRemoved(false);
                     return trigger;
                 }).flatMap(triggerRepo::save);

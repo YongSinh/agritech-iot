@@ -2,6 +2,7 @@ package com.agritechiot.iot.Schedule;
 
 import com.agritechiot.iot.model.OnetimeSchedule;
 import com.agritechiot.iot.repository.OnetimeScheduleRepo;
+import com.agritechiot.iot.service.OnetimeScheduleService;
 import com.agritechiot.iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.concurrent.ScheduledFuture;
 public class OnetimeScheduleManager {
     private final OnetimeScheduleRepo onetimeScheduleRepo;
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
+    private final OnetimeScheduleService onetimeScheduleService;
     private final ConcurrentMap<String, ScheduledFuture<?>> oneTimeFutures = new ConcurrentHashMap<>();
 
     public void refreshOneTimeScheduledTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -142,6 +144,7 @@ public class OnetimeScheduleManager {
 
     private void executeScheduledActions(OnetimeSchedule schedule) throws Exception {
         log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
+        onetimeScheduleService.startOneTimeSchedule(schedule);
 
     }
 

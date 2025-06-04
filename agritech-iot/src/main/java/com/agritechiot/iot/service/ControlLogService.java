@@ -10,8 +10,6 @@ public interface ControlLogService {
 
     Mono<ControlLog> updateControlLog(ControlLogReq req);
 
-    Mono<ControlLog> deleteControlLog(Integer id);
-
     Flux<ControlLog> getControlLogs();
 
     Mono<ControlLog> offAndOnControlLog(ControlLogReq req);

@@ -36,6 +36,13 @@ Y@&gSinh25
 
 Time@2023
 
+iot_log
+iot@log2025
+
+add user = mosquitto_passwd -b /mosquitto/config/passwd iot_admin iot@admin2025
+
+remove user = mosquitto_passwd -D /mosquitto/config/passwd iot_log
+
 
 mosquitto_pub -h localhost -t test -m "hello world" -u "admin" -P "admin@123"
 
@@ -122,16 +129,17 @@ FLUSH PRIVILEGES;
 mysql -u iot -h 159.65.131.28 -p
 
 SHOW GRANTS FOR 'iot'@'%';
+GRANT CREATE ON *.* TO 'iot'@'%';
 
 
 RENAME USER 'iot'@'159.65.131.28' TO 'iot'@'%';
 
-GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'iot'@'localhost' WITH GRANT OPTION;
+GRANT CREATE, ALTER, DROP, INSERT, UPDATE, DELETE, SELECT, REFERENCES, RELOAD on *.* TO 'iot'@'%' WITH GRANT OPTION;
 
 	sudo netstat -tuln | grep 3306
 
 
-telnet 159.65.131.28 3306
+	
 
 telnet 159.65.131.28 1883
 
@@ -145,6 +153,17 @@ mysql -h 159.65.131.28 -u iot -p 'iot@2025'
 
 
 
-CREATE USER 'iot'@'%' IDENTIFIED BY 'iot@2025';
-GRANT ALL PRIVILEGES ON iot_db.* TO 'iot'@'%';
-FLUSH PRIVILEGES;
+
+sudo ufw allow 8080
+
+ docker exec 0d0df00f13e5 /opt/jboss/keycloak/bin/kcadm.sh update realms/master -s sslRequired=NONE --server http://localhost:8080/auth --realm master --user admin --password admin
+ 
+ 
+ docker exec 0d0df00f13e5 -it keycloak bash
+ 
+ 
+ mkdir -p ~/keycloak-cert
+
+openssl req -x509 -newkey rsa:4096 -keyout ~/keycloak-cert/key.pem -out ~/keycloak-cert/cert.pem -days 365 -nodes -subj "/CN=localhost"
+
+chmod 755 ~/keycloak-cert/key.pem
