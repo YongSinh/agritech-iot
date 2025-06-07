@@ -20,8 +20,6 @@ public interface OnetimeScheduleRepo extends ReactiveCrudRepository<OnetimeSched
     @Query("SELECT * FROM tbl_onetime_schedule WHERE deviceId = : deviceId ORDER BY id DESC")
     Flux<OnetimeSchedule> findByDeviceId(@Param("deviceId") String deviceId);
 
-    Flux<OnetimeSchedule> findByDate(LocalDate date);
-
     @Modifying
     @Query("UPDATE tbl_onetime_schedule SET status = :status WHERE id IN (:ids)")
     Mono<Integer> updateStatusForIds(List<Integer> ids, boolean status);

@@ -22,7 +22,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         this.taskRegistrar = taskRegistrar;
         log.info("Initializing ScheduledTaskRegistrar...");
         taskRegistrar.setTaskScheduler(threadPoolTaskSchedulerConfig.taskScheduler());
-        refreshScheduledTasks();
+       //  refreshScheduledTasks();
     }
 
     public void refreshScheduledTasks() {

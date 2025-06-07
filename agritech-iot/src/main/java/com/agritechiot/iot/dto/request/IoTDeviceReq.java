@@ -12,4 +12,5 @@ public class IoTDeviceReq {
     private String remark;
     private String controller;
     private Boolean isDeviceOnline;
+    private String masterDeviceName;
 }

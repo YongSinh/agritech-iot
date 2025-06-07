@@ -6,6 +6,8 @@ import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.MqttPublishReq;
 import com.agritechiot.iot.model.MqttPublishModel;
 import com.agritechiot.iot.model.MqttSubscribeModel;
+import com.agritechiot.iot.model.Trigger;
+import com.agritechiot.iot.repository.TriggerRepo;
 import com.agritechiot.iot.service.integration.LogClient;
 import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.JsonUtil;
@@ -31,6 +33,7 @@ import java.util.concurrent.CountDownLatch;
 @Slf4j
 public class SampleController {
     private final SimpMessagingTemplate messagingTemplate;
+    private final TriggerRepo triggerRepo;
     private final Publisher publisher;
     private final Mqtt mqtt;
     private final LogClient logClient;
@@ -38,8 +41,10 @@ public class SampleController {
     @PostMapping("/sample")
     public ResponseEntity<Object> sample(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody MqttPublishReq req) throws Exception {
-        publisher.publish(req.getTopic(), JsonUtil.objectToJsonString(req.getMessage()), req.getQos(), req.getRetained());
+            @RequestBody MqttPublishReq req) throws MqttException {
+        Trigger res = triggerRepo.findByDeviceId("RC001").block();
+        log.info("Snake case res: {}",JsonUtil.toJsonSnakeCase(res));
+        publisher.publish(req.getTopic(), JsonUtil.toJsonSnakeCase(res), req.getQos(), req.getRetained());
         return ResponseEntity.ok(new ApiResponse<>(req));
     }
 
@@ -53,20 +58,6 @@ public class SampleController {
     @PostMapping("/send/genMessage")
     public void sendGenMessage(@RequestBody Object message) {
         messagingTemplate.convertAndSend("/topic/public", message);
-    }
-
-    @PostMapping("publish")
-    public void publishMessage(@RequestBody @Valid MqttPublishModel messagePublishModel,
-                               BindingResult bindingResult) throws org.eclipse.paho.client.mqttv3.MqttException {
-        if (bindingResult.hasErrors()) {
-            throw new MqttException(500);
-        }
-
-        MqttMessage mqttMessage = new MqttMessage(messagePublishModel.getMessage().getBytes());
-        mqttMessage.setQos(messagePublishModel.getQos());
-        mqttMessage.setRetained(messagePublishModel.getRetained());
-
-        mqtt.getClient().publish(messagePublishModel.getTopic(), mqttMessage);
     }
 
     @GetMapping("subscribe")

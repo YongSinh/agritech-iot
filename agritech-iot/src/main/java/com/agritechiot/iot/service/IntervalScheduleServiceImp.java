@@ -8,6 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -60,11 +61,26 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     }
 
     @Override
+    public Mono<Void> updateSingleStatus(Integer id, boolean newStatus) {
+        return intervalScheduleRepo.updateStatusById(id, newStatus)
+                .then();
+    }
+    @Override
+    public Mono<Void> updateListsStatus(List<Integer> ids, boolean newStatus, int batchSize) {
+        if (ids == null || ids.isEmpty()) {
+            return Mono.error(new IllegalArgumentException("IDs list cannot be null or empty"));
+        }
+        return Flux.fromIterable(ids)
+                .buffer(batchSize)
+                .flatMap(batch -> intervalScheduleRepo.updateStatusForIds(batch, newStatus))
+                .then();
+    }
+
+    @Override
     public Mono<Void> softDeleteById(Integer id) {
         return intervalScheduleRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception("INTERVAL_SCHEDULE_LOG_NOT_FOUND")))
-                .map(intervalSchedule -> {
-                    intervalSchedule.setId(id);
+                .flatMap(intervalSchedule -> {
                     intervalSchedule.setIsRemoved(true);
                     intervalSchedule.setDeletedAt(LocalDateTime.now());
                     return intervalScheduleRepo.save(intervalSchedule);

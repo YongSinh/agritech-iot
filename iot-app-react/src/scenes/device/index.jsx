@@ -18,6 +18,8 @@ const Device = () => {
   const [open, setOpen] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [edit, setEdit] = useState(false);
+  const [masterDeviceName, setMasterDeviceName] = useState([]);
+
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
@@ -39,6 +41,7 @@ const Device = () => {
   // Fetch devices from the API
   useEffect(() => {
     getListDevice();
+    getListMasterDeviceName()
   }, []);
 
   const getListDevice = async () => {
@@ -46,6 +49,14 @@ const Device = () => {
     if (result) {
       setDevices(result.data);
       setLoading(false);
+    }
+  };
+
+  const getListMasterDeviceName = async () => {
+    const result = await request("/iot/v1/mqtt/master-topic", "GET", null);
+    if (result) {
+      setMasterDeviceName(result.data)
+      setLoading(false)
     }
   };
 
@@ -124,6 +135,7 @@ const Device = () => {
     { field: "name", headerName: "Name", flex: 1, cellClassName: "name-column--cell" },
     { field: "controller", headerName: "Controller", flex: 1 },
     { field: "sensors", headerName: "Sensors", flex: 1 },
+    { field: "masterDeviceName", headerName: "Master Device Name", flex: 1 },
     {
       field: "DeviceOnline",
       headerName: "Device Status",
@@ -185,6 +197,7 @@ const Device = () => {
         handleSubmit={handleSubmit} // Pass the submit handler
         colors={colors}
         initialData={initialData}
+        masterDeviceName={masterDeviceName}
       />
       <Box
         mt="40px"
@@ -195,7 +208,7 @@ const Device = () => {
           "& .MuiDataGrid-cell": { border: "none" },
           "& .name-column--cell": { color: colors.greenAccent[300] },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[600],
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
@@ -203,7 +216,7 @@ const Device = () => {
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[600],
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,

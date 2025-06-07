@@ -14,9 +14,9 @@ public interface ControlLogService {
 
     Mono<ControlLog> offAndOnControlLog(ControlLogReq req);
 
-    Flux<ControlLog> getControlLogsByDeviceId(String deviceId);
-
     Flux<ControlLog> getControlLogsWithFilters(ControlLogReq req);
+
+    Mono<Void> sendTaskToDevice(Integer id) throws Exception;
 
     Mono<Void> softDeleteById(Integer id);
 }

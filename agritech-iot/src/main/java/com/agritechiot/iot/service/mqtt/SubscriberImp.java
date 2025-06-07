@@ -10,8 +10,11 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
 
 @Service
 @Slf4j
@@ -20,6 +23,8 @@ public class SubscriberImp implements Subscriber {
 
     private final TriggerService triggerService;
     private final IoTDeviceRepo ioTDeviceRepo;
+    @Value("${master.topic}")
+    private String[] topics;
     private final Mqtt mqtt;
 
     @PostConstruct
@@ -28,6 +33,7 @@ public class SubscriberImp implements Subscriber {
             sub();
             waterFlow();
             soilMoisture();
+            test();
         } catch (MqttException e) {
             log.error("❌ Error subscribing to MQTT topic", e);
         }
@@ -108,9 +114,10 @@ public class SubscriberImp implements Subscriber {
     }
 
     @Override
-    public void test() throws MqttException {
-        ioTDeviceRepo.findAllTopicNames() // Returns Flux<String>
-                .doOnNext(topic -> {
+    public void test() {
+        Arrays.stream(topics)
+                .forEach(topic -> {
+                    // Process each topic
                     try {
                         mqtt.getClient().subscribe(topic, (t, message) -> {
                             String payload = new String(message.getPayload());
@@ -121,8 +128,7 @@ public class SubscriberImp implements Subscriber {
                     } catch (MqttException e) {
                         log.error("❌ Failed to subscribe to topic: {}", topic, e);
                     }
-                })
-                .subscribe(); // Important: subscribe to trigger execution
+                });
     }
 
 }

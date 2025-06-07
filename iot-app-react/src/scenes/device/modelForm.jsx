@@ -7,11 +7,15 @@ import {
   DialogActions,
   TextField,
   Grid,
-  Button
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl
 } from "@mui/material";
 import { tokens } from "../../theme";
 import { useTheme } from "@emotion/react";
-const ModelForm = ({ open, handleClose, handleSubmit, initialData }) => {
+const ModelForm = ({ open, handleClose, handleSubmit, initialData, masterDeviceName }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [formData, setFormData] = useState({
@@ -20,6 +24,7 @@ const ModelForm = ({ open, handleClose, handleSubmit, initialData }) => {
     controller: "",
     sensors: "",
     remark: "",
+    masterDeviceName: ""
   });
 
   // Update form data when `initialData` changes
@@ -28,7 +33,7 @@ const ModelForm = ({ open, handleClose, handleSubmit, initialData }) => {
       setFormData(initialData);
     }
   }, [initialData]);
-  
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevData) => ({
@@ -95,7 +100,7 @@ const ModelForm = ({ open, handleClose, handleSubmit, initialData }) => {
             </Grid>
             <Grid item xs={6}>
               <TextField
-                required
+                // required
                 margin="dense"
                 id="sensors"
                 name="sensors"
@@ -106,6 +111,25 @@ const ModelForm = ({ open, handleClose, handleSubmit, initialData }) => {
                 value={formData.sensors}
                 onChange={handleChange}
               />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="outlined" margin="dense" required>
+                <InputLabel id="masterDeviceName-label">Master Device Name</InputLabel>
+                <Select
+                  labelId="masterDeviceName-label"
+                  id="masterDeviceName"
+                  name="masterDeviceName"
+                  value={formData.masterDeviceName}
+                  onChange={handleChange}
+                  label="Sensor"
+                >
+                  {masterDeviceName.map((name) => (
+                    <MenuItem key={name} value={name}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
             <Grid item xs={12}>
               <TextField

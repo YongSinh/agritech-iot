@@ -220,6 +220,9 @@ const OnetimeSchedule = () => {
     if (result) {
       setDeviceIds(result.data)
       setLoading(false)
+    } else {
+       setLoading(false)
+      setDeviceIds([])
     }
   };
 
@@ -360,7 +363,7 @@ const OnetimeSchedule = () => {
             color: colors.greenAccent[300],
           },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[600],
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
@@ -368,7 +371,7 @@ const OnetimeSchedule = () => {
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[600],
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,

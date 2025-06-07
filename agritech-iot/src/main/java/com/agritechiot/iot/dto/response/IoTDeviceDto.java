@@ -14,4 +14,5 @@ public class IoTDeviceDto {
     private String sensors;
     private String remark;
     private Boolean isDeviceOnline;
+    private String masterDeviceName;
 }

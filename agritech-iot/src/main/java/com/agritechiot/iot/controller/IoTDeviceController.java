@@ -90,7 +90,15 @@ public class IoTDeviceController {
     ) throws Exception {
         log.info("REQ_IOT_UPDATE_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.updateDevice(req.getDeviceId(), req)// Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
+                .map(res -> new ApiResponse<>(res, correlationId))
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
+
     }
 
     @PostMapping(value = "/v1/device/off-on")

@@ -30,7 +30,6 @@ public class ControlLogController {
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody ControlLogReq req
     ) {
-
         logService.logInfo("INIT_CREATE_CONTROL_LOG");
         return controlLogService.saveControlLog(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
@@ -62,7 +61,9 @@ public class ControlLogController {
     }
 
     @GetMapping("/v1/control-logs")
-    public Mono<ApiResponse<List<ControlLog>>> getListControlLog(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+    public Mono<ApiResponse<List<ControlLog>>> getListControlLog(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
+    ) {
         logService.logInfo("INIT_LIST_CONTROL_LOG");
         return controlLogService.getControlLogs()
                 .collectList()  // Collect the Flux into a List
@@ -97,4 +98,19 @@ public class ControlLogController {
                         ));
     }
 
+    @PostMapping("/v1/control-logs/send-task/{id}")  // Full path: `/api/device-control/send-task/{id}`
+    public Mono<Void> sendTaskToDevice(
+            @PathVariable Integer id,
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
+    ) throws Exception {
+        return controlLogService.sendTaskToDevice(id)
+                .then(Mono.just(new ApiResponse<>())
+                        .onErrorResume(Exception.class, ex ->
+                                Mono.just(new ApiResponse<>(
+                                        ex.getMessage(),
+                                        correlationId,
+                                        GenConstant.ERR_CODE
+                                ))
+                        )).then();
+    }
 }

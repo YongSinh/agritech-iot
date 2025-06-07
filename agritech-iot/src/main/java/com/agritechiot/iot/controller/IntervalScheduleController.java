@@ -3,6 +3,7 @@ package com.agritechiot.iot.controller;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.IntervalScheduleReq;
+import com.agritechiot.iot.dto.request.UpdateScheduleStatusReq;
 import com.agritechiot.iot.model.IntervalSchedule;
 import com.agritechiot.iot.service.IntervalScheduleService;
 import com.agritechiot.iot.service.LogService;
@@ -28,7 +29,7 @@ public class IntervalScheduleController {
     public Mono<ApiResponse<IntervalSchedule>> addIntervalRecord(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalSchedule req
-    ) throws Exception {
+    ) {
         log.info("REQ_INTERVAL_SCHEDULE_SAVE: {}", JsonUtil.toJson(req));
         return intervalScheduleService.saveIntervalRecord(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
@@ -38,7 +39,7 @@ public class IntervalScheduleController {
     public Mono<ApiResponse<IntervalSchedule>> updateIntervalRecord(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalSchedule req
-    ) throws Exception {
+    ) {
         log.info("REQ_INTERVAL_SCHEDULE_UPDATE: {}", JsonUtil.toJson(req));
         return intervalScheduleService.updateIntervalRecord(req.getId(), req)
                 .map(res -> new ApiResponse<>(res, correlationId)); // Map result to response
@@ -57,13 +58,12 @@ public class IntervalScheduleController {
     public Mono<ApiResponse<List<IntervalSchedule>>> getIntervalScheduleByDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IntervalScheduleReq req
-    ) throws Exception {
+    ) {
         log.info("REQ_INTERVAL_SCHEDULE: {}", JsonUtil.toJson(req));
         return intervalScheduleService.getListIntervalRecordByDeviceId(req.getDeviceId())
                 .collectList()  // Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
-
 
     @DeleteMapping("/v1/interval-schedule/{id}")
     public Mono<ApiResponse<Object>> deleteRecord(
@@ -80,5 +80,39 @@ public class IntervalScheduleController {
                                         GenConstant.ERR_CODE
                                 ))
                         ));
+    }
+
+    @PostMapping("/v1/interval-schedule/update-multiple-status")
+    public Mono<ApiResponse<Object>> updateMultipleStatus(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody UpdateScheduleStatusReq req
+    ) {
+        logService.logInfo("INIT_UPDATE_MULTIPLE_STATUS", JsonUtil.toJson(req));
+        return intervalScheduleService.updateListsStatus(req.getIds(), req.getStatus(), req.getBatchSize())
+                .then(Mono.fromCallable(ApiResponse::new))
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
+    }
+
+    @PostMapping("/v1/interval-schedule/update-single-status")
+    public Mono<ApiResponse<Object>> updateSingleStatus(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @RequestBody UpdateScheduleStatusReq req
+    ) {
+        logService.logInfo("INIT_UPDATE_SINGLE_STATUS", JsonUtil.toJson(req));
+        return intervalScheduleService.updateSingleStatus(req.getId(), req.getStatus())
+                .then(Mono.fromCallable(ApiResponse::new))
+                .onErrorResume(Exception.class, ex ->
+                        Mono.just(new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        ))
+                );
     }
 }

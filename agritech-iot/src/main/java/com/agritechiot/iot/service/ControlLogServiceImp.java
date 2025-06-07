@@ -7,6 +7,7 @@ import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,6 +23,8 @@ public class ControlLogServiceImp implements ControlLogService {
     private final LogService logService;
     private final Publisher publisher;
     private final ControlLogRepo controlLogRepo;
+    private final IoTDeviceService ioTDeviceService;
+    private final TriggerService triggerService;
 
     @Override
     public Mono<ControlLog> saveControlLog(ControlLogReq req) {
@@ -49,19 +52,7 @@ public class ControlLogServiceImp implements ControlLogService {
                     controlLog.setStatus(req.getStatus());
                     controlLog.setIsRemoved(false);
                     return controlLog;
-                }).flatMap(repo::save)
-                .flatMap(savedControlLog -> {
-                    if (Boolean.TRUE.equals(savedControlLog.getStatus())) {
-                        try {
-                            logService.logInfo("PUBLISH_MESSAGE_TO_DEVICE", JsonUtil.toJson(savedControlLog));
-                            publisher.publish("test", JsonUtil.objectToJsonString(savedControlLog), 1, true);
-                            return Mono.just(savedControlLog);
-                        } catch (Exception e) {
-                            return Mono.error(new IllegalStateException("Failed to publish event", e));
-                        }
-                    }
-                    return Mono.just(savedControlLog);
-                });
+                }).flatMap(repo::save);
     }
 
     @Override
@@ -80,15 +71,33 @@ public class ControlLogServiceImp implements ControlLogService {
                 }).flatMap(repo::save);
     }
 
-    @Override
-    public Flux<ControlLog> getControlLogsByDeviceId(String deviceId) {
-        return repo.findByDeviceId(deviceId);
-    }
 
     @Override
     public Flux<ControlLog> getControlLogsWithFilters(ControlLogReq req) {
         return repo.findWithFilters(req.getDeviceId(), req.getSentBy(), req.getStatus(), req.getStartDate(), req.getEndDate());
     }
+
+    @Override
+    public Mono<Void> sendTaskToDevice(Integer id) {
+        return controlLogRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
+                .flatMap(req ->
+                        triggerService.getTriggerByDeviceId(req.getDeviceId())
+                                .flatMap(trigger -> {
+                                    logService.logInfo("PUBLISH_MESSAGE_TO_DEVICE", JsonUtil.toJsonSnakeCase(trigger));
+                                    return Mono.fromRunnable(() ->
+                                            {
+                                                try {
+                                                    publisher.publish(req.getDeviceId(), JsonUtil.toJsonSnakeCase(trigger), 1, true);
+                                                } catch (MqttException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+                                            }
+                                    );
+                                })
+                );
+    }
+
 
     @Override
     public Mono<Void> softDeleteById(Integer id) {

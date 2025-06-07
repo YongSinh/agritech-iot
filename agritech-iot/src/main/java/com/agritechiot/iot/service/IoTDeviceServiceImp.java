@@ -29,7 +29,8 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
 
     @Override
     public Mono<IoTDevice> getDeviceById(String id) {
-        return ioTDeviceRepo.findById(id);
+        return ioTDeviceRepo.findById(id)
+                .switchIfEmpty(Mono.error(new Exception("IOT_DEVICE_NOT_FOUND")));
     }
 
     @Override
@@ -46,6 +47,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                 .sensors(req.getSensors())
                 .remark(req.getRemark())
                 .controller(req.getController())
+                .masterDeviceName(req.getMasterDeviceName())
                 .isRemoved(false)
                 .isDeviceOnline(true)
                 .deletedAt(null)
@@ -64,6 +66,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                     d.setRemark(req.getRemark());
                     d.setSensors(req.getSensors());
                     d.setController(req.getController());
+                    d.setMasterDeviceName(req.getMasterDeviceName());
                     d.setIsRemoved(false);
                     d.setDeletedAt(null);
                     d.setNewEntry(false);

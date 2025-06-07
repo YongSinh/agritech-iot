@@ -32,7 +32,8 @@ public class IoTDevice implements Persistable<String> {
     private LocalDateTime deletedAt;
     @Column("isDeviceOnline")
     private Boolean isDeviceOnline;
-
+    @Column("masterDeviceName")
+    private String masterDeviceName;
     @Transient
     private boolean isNewEntry = true;
 
@@ -47,6 +48,6 @@ public class IoTDevice implements Persistable<String> {
     }
 
     public IoTDeviceDto toDto() {
-        return new IoTDeviceDto(deviceId, name, controller, sensors, remark, isDeviceOnline);
+        return new IoTDeviceDto(deviceId, name, controller, sensors, remark, isDeviceOnline, masterDeviceName);
     }
 }

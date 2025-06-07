@@ -101,6 +101,51 @@ const IntervalSchedule = () => {
     }
   };
 
+
+const sendTaskToDevice = async (task) => {
+  // Confirmation dialog before proceeding
+  const confirmation = await Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",  // Blue confirm button
+    cancelButtonColor: "#d33",      // Red cancel button
+    confirmButtonText: "Yes, send it!",
+    cancelButtonText: "Cancel",
+    reverseButtons: true,           // Places "Confirm" on the right
+  });
+
+  // Exit if user cancels
+  if (!confirmation.isConfirmed) return;
+
+  try {
+    // Send the task to the device
+    await request(`/iot/v1/control-logs/send-task/${task.id}`, "POST", null);
+    
+    // Refresh the task list
+    await getListControlLog(); 
+
+    // Success notification
+    await Swal.fire({
+      title: "Task Sent!",
+      text: "Your task has been successfully sent.",
+      icon: "success",
+      timer: 2000,  // Auto-close after 2 seconds
+      showConfirmButton: false,
+    });
+  } catch (error) {
+    console.error("Failed to send task:", error);
+
+    // Error notification
+    await Swal.fire({
+      title: "Error!",
+      text: "Failed to send the task. Please try again.",
+      icon: "error",
+    });
+  }
+};
+
   useEffect(() => {
     getListControlLog()
     getAllDeviceIds()
@@ -153,6 +198,20 @@ const IntervalSchedule = () => {
       renderCell: ({ row: { runDatetime } }) => {
         return (
           <span>{dayjs(runDatetime).format('YYYY-MM-DD h:mm A')}</span>
+        );
+      },
+    },
+    {
+      headerName: "Send",
+      field: "Send",
+      flex: 0.5,
+      headerAlign: "center",
+      align: "center",
+      renderCell: ({ row }) => {
+        return (
+          <Button color="secondary" variant="contained" onClick={() => sendTaskToDevice(row)}>
+            send
+          </Button>
         );
       },
     },
@@ -217,7 +276,7 @@ const IntervalSchedule = () => {
             color: colors.greenAccent[300],
           },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[600],
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
@@ -225,7 +284,7 @@ const IntervalSchedule = () => {
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[600],
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
