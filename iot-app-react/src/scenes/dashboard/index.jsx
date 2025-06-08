@@ -20,7 +20,9 @@ import {
   PersonAdd,
   PointOfSale,
   Traffic,
+  CalendarToday
 } from "@mui/icons-material";
+import DevicesIcon from '@mui/icons-material/Devices';
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
 
@@ -66,8 +68,8 @@ function Dashboard() {
           isXlDevices
             ? "repeat(12, 1fr)"
             : isMdDevices
-            ? "repeat(6, 1fr)"
-            : "repeat(3, 1fr)"
+              ? "repeat(6, 1fr)"
+              : "repeat(3, 1fr)"
         }
         gridAutoRows="140px"
         gap="20px"
@@ -82,11 +84,11 @@ function Dashboard() {
         >
           <StatBox
             title="11,361"
-            subtitle="Email Sent"
+            subtitle="Total Online"
             progress="0.75"
             increase="+14%"
             icon={
-              <Email
+              <DevicesIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -101,11 +103,11 @@ function Dashboard() {
         >
           <StatBox
             title="431,225"
-            subtitle="Sales Obtained"
+            subtitle="Schedule"
             progress="0.50"
             increase="+21%"
             icon={
-              <PointOfSale
+              <CalendarToday
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -113,18 +115,18 @@ function Dashboard() {
         </Box>
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
+          bgcolor={colors.primary[400]}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
           <StatBox
-            title="32,441"
-            subtitle="New Clients"
-            progress="0.30"
-            increase="+5%"
+            title="11,361"
+            subtitle="Device Online"
+            progress="0.75"
+            increase="+14%"
             icon={
-              <PersonAdd
+              <DevicesIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -202,7 +204,7 @@ function Dashboard() {
         >
           <Box borderBottom={`4px solid ${colors.primary[500]}`} p="15px">
             <Typography color={colors.gray[100]} variant="h5" fontWeight="600">
-              Recent Transactions
+              Recent MQTT Message
             </Typography>
           </Box>
 

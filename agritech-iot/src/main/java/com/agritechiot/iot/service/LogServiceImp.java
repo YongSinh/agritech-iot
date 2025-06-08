@@ -19,4 +19,9 @@ public class LogServiceImp implements LogService {
     public void logInfo(String step) {
         log.info("TRACE_ID: [{}] - {}", MDC.get(GenConstant.CORRELATION_ID), step);
     }
+
+    @Override
+    public void logMqtt(String step, String message, String topic) {
+        log.info("📥 Received message on topic {}: {} - {}", step, topic, message);
+    }
 }

@@ -2,7 +2,7 @@ package com.agritechiot.iot.service.mqtt;
 
 import com.agritechiot.iot.config.Mqtt;
 import com.agritechiot.iot.model.Trigger;
-import com.agritechiot.iot.repository.IoTDeviceRepo;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.TriggerService;
 import com.agritechiot.iot.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,9 +20,9 @@ import java.util.Arrays;
 @Slf4j
 @RequiredArgsConstructor
 public class SubscriberImp implements Subscriber {
-
+    private final LogService logService;
     private final TriggerService triggerService;
-    private final IoTDeviceRepo ioTDeviceRepo;
+
     @Value("${master.topic}")
     private String[] topics;
     private final Mqtt mqtt;
@@ -44,6 +44,10 @@ public class SubscriberImp implements Subscriber {
         log.info("🔄 Processing message: {}", message);
     }
 
+    private void logMessage(String message, String topic) {
+        logService.logMqtt("RES_MQTT", message, topic);
+    }
+
     @Override
     public void sub() throws MqttException {
         if (!mqtt.getClient().isConnected()) {
@@ -55,7 +59,7 @@ public class SubscriberImp implements Subscriber {
 
         mqtt.getClient().subscribe("test", (topic, message) -> {
             String payload = new String(message.getPayload());
-            log.info("📥 Received message on topic {}: {}", topic, payload);
+            logMessage(payload, topic);
             processMessage(payload);
         });
 
@@ -66,7 +70,7 @@ public class SubscriberImp implements Subscriber {
     public void temperature() throws MqttException {
         mqtt.getClient().subscribe("temperature", (topic, message) -> {
             String payload = new String(message.getPayload());
-            log.info("📥 Received message on topic {}: {}", topic, payload);
+            logMessage(payload, topic);
             processMessage(payload);
         });
     }
@@ -79,7 +83,6 @@ public class SubscriberImp implements Subscriber {
             JsonNode payload = JsonUtil.parseJson(res);
             log.info(String.valueOf(payload));
             log.info("date: {}", payload.path("datetime"));
-            log.info("📥 Received message on topic {}: {}", topic, res);
             processMessage(res);
             Trigger trigger = new Trigger();
             trigger.setSensor(payload.path("datetime").asText());
@@ -99,7 +102,7 @@ public class SubscriberImp implements Subscriber {
     public void waterFlow() throws MqttException {
         mqtt.getClient().subscribe("sensors/mqtt_out", (topic, message) -> {
             String payload = new String(message.getPayload());
-            log.info("📥 Received message on topic {}: {}", topic, payload);
+            logMessage(payload, topic);
             processMessage(payload);
         });
     }
@@ -108,7 +111,7 @@ public class SubscriberImp implements Subscriber {
     public void soilMoisture() throws MqttException {
         mqtt.getClient().subscribe("sensors/mqtt_in/MasterLoRa_1", (topic, message) -> {
             String payload = new String(message.getPayload());
-            log.info("📥 Received message on topic {}: {}", topic, payload);
+            logMessage(payload, topic);
             processMessage(payload);
         });
     }
@@ -121,7 +124,7 @@ public class SubscriberImp implements Subscriber {
                     try {
                         mqtt.getClient().subscribe(topic, (t, message) -> {
                             String payload = new String(message.getPayload());
-                            log.info("📥 Received message on topic {}: {}", t, payload);
+                            logMessage( payload, topic);
                             processMessage(payload);
                         });
                         log.info("✅ Subscribed to topic: {}", topic);
