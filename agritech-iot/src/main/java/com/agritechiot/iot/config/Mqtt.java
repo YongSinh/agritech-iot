@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Mqtt {
+public class    Mqtt {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Mqtt.class);
     private static final String MQTT_PUBLISHER_ID = "spring-server-iot";

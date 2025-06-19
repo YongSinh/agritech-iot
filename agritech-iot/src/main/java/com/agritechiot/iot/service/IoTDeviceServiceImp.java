@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -98,5 +99,31 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                 .then();
     }
 
+    @Override
+    public Mono<Object> getTotalDeviceStats() {
+        Mono<Long> totalDevicesMono = ioTDeviceRepo.countAllDevices();
+        Mono<Long> onlineDevicesMono = ioTDeviceRepo.countAllDevicesIsOnline();
+
+        return Mono.zip(totalDevicesMono, onlineDevicesMono)
+                .map(tuple -> {
+                    Map<String, Long> response = new HashMap<>();
+                    response.put("totalDevices", tuple.getT1());  // Total count
+                    response.put("totalDevicesOnline", tuple.getT2());  // Online count
+                    return response;
+                });
+    }
+
+    @Override
+    public Mono<Object> getDeviceSensors(String id) {
+        return ioTDeviceRepo.findById(id)
+                .flatMap(device ->
+                        Flux.fromArray(device.getSensors().split(",\\s*"))
+                                .index()
+                                .collectMap(
+                                        tuple -> "sensor" + (tuple.getT1() + 1),
+                                        tuple -> tuple.getT2().trim()
+                                )
+                );
+    }
 
 }

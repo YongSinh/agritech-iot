@@ -25,6 +25,8 @@ import {
 import DevicesIcon from '@mui/icons-material/Devices';
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
+import { useRequest } from "../../config/api/request";
+import { useState, useEffect } from "react";
 
 function Dashboard() {
   const theme = useTheme();
@@ -32,6 +34,22 @@ function Dashboard() {
   const isXlDevices = useMediaQuery("(min-width: 1260px)");
   const isMdDevices = useMediaQuery("(min-width: 724px)");
   const isXsDevices = useMediaQuery("(max-width: 436px)");
+  const [devices, setDevices] = useState([]);
+
+ const { request } = useRequest();
+
+  const getListDevice = async () => {
+    const result = await request("/iot/v1/device/total-status", "GET", null);
+    if (result) {
+      setDevices(result.data);
+      console.log(result.data)
+    }
+  };
+
+  useEffect(() => {
+    getListDevice();
+  }, []);
+  
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between">
@@ -83,8 +101,27 @@ function Dashboard() {
           justifyContent="center"
         >
           <StatBox
-            title="11,361"
+            title={devices.totalDevices}
             subtitle="Total Online"
+            progress="100"
+            increase="100%"
+            icon={
+              <DevicesIcon
+                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+              />
+            }
+          />
+        </Box>
+         <Box
+          gridColumn="span 3"
+          bgcolor={colors.primary[400]}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <StatBox
+            title={devices.totalDevicesOnline}
+            subtitle="Device Online"
             progress="0.75"
             increase="+14%"
             icon={
@@ -113,25 +150,7 @@ function Dashboard() {
             }
           />
         </Box>
-        <Box
-          gridColumn="span 3"
-          bgcolor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <StatBox
-            title="11,361"
-            subtitle="Device Online"
-            progress="0.75"
-            increase="+14%"
-            icon={
-              <DevicesIcon
-                sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
-              />
-            }
-          />
-        </Box>
+       
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}

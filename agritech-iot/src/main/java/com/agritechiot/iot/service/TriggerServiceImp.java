@@ -24,8 +24,8 @@ public class TriggerServiceImp implements TriggerService {
     private String[] sensors;
 
     @Override
-    public Flux<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId) {
-        return triggerRepo.findByDeviceIdAndSensor(deviceId, sensor);
+    public Mono<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId) {
+        return triggerRepo.findByDeviceIdAndSensorIgnoreCase(deviceId, sensor);
     }
 
     @Override

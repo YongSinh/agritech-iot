@@ -12,6 +12,14 @@ public class GenUtil {
     private GenUtil() {
     }
 
+
+    public static String checkOffAndOn(Boolean status) {
+        if (Boolean.TRUE.equals(status)) {
+            return "ON";
+        }
+        return "OFF";
+    }
+
     /**
      * Generates a one-time cron expression for a specific date and time
      * Format: second minute hour day month ? year

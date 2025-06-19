@@ -48,10 +48,27 @@ public class IoTDeviceController {
     }
 
 
+    @GetMapping("/v1/devices/sensors/{deviceId}")
+    public Mono<ApiResponse<Object>> getListSensors(
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+            @PathVariable String deviceId
+            ) {
+        log.info("INIT_LIST_IOT_DEVICES_SENSORS");
+        return ioTDeviceService.getDeviceSensors(deviceId)
+                .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
+
     @GetMapping("/v1/device/ids")
     public Mono<ApiResponse<List<Map<String, String>>>> getAllDeviceIds(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
         return ioTDeviceService.getAllDeviceIds()
                 .collectList()  // Collect the Flux into a List
+                .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
+    @GetMapping("/v1/device/total-status")
+    public Mono<ApiResponse<Object>> getAllTotalDeviceOnline(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        return ioTDeviceService.getTotalDeviceStats()
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
@@ -105,7 +122,7 @@ public class IoTDeviceController {
     public Mono<ApiResponse<Object>> offOnDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody MqttPublishReq req
-    ) throws Exception {
+        ) throws Exception {
         publisher.publish(req.getTopic(), JsonUtil.objectToJsonString(req.getMessage()), req.getQos(), req.getRetained());
         return Mono.just(new ApiResponse<>(req.getMessage(), correlationId));
     }
@@ -126,4 +143,5 @@ public class IoTDeviceController {
                                 ))
                         ));
     }
+
 }

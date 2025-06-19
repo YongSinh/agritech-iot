@@ -25,4 +25,10 @@ public interface IoTDeviceService {
     Flux<DeviceJoinDto> getAllDevices();
 
     Mono<Void> softDeleteById(String id);
+
+    Mono<Object> getTotalDeviceStats();
+
+    Mono<Object> getDeviceSensors(String id);
+
+
 }

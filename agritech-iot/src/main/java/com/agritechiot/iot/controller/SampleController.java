@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.validation.BindingResult;
@@ -42,7 +43,7 @@ public class SampleController {
     public ResponseEntity<Object> sample(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody MqttPublishReq req) throws MqttException {
-        Trigger res = triggerRepo.findByDeviceId("RC001").block();
+        Trigger res = triggerRepo.findByDeviceId("008").block();
         log.info("Snake case res: {}",JsonUtil.toJsonSnakeCase(res));
         publisher.publish(req.getTopic(), JsonUtil.toJsonSnakeCase(res), req.getQos(), req.getRetained());
         return ResponseEntity.ok(new ApiResponse<>(req));
@@ -60,23 +61,12 @@ public class SampleController {
         messagingTemplate.convertAndSend("/topic/public", message);
     }
 
-    @GetMapping("subscribe")
-    public List<MqttSubscribeModel> subscribeChannel(@RequestParam(value = "topic") String topic,
-                                                     @RequestParam(value = "wait_millis") Integer waitMillis)
-            throws org.eclipse.paho.client.mqttv3.MqttException {
-        List<MqttSubscribeModel> messages = new ArrayList<>();
-        CountDownLatch countDownLatch = new CountDownLatch(10);
-        mqtt.getClient().subscribeWithResponse(topic, (s, mqttMessage) -> {
-            MqttSubscribeModel mqttSubscribeModel = new MqttSubscribeModel();
-            mqttSubscribeModel.setId(mqttMessage.getId());
-            mqttSubscribeModel.setMessage(new String(mqttMessage.getPayload()));
-            mqttSubscribeModel.setQos(mqttMessage.getQos());
-            messages.add(mqttSubscribeModel);
-            countDownLatch.countDown();
-        });
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
 
-
-        return messages;
+    @GetMapping("/profile")
+    public String getActiveProfile() {
+        return "Active Profile: " + activeProfile;
     }
 
 

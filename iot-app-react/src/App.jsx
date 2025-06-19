@@ -4,6 +4,7 @@ import { ColorModeContext, useMode } from "./theme";
 import { Navbar, SideBar } from "./scenes";
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
+import { WebSocketProvider } from "./utils/WebSocketProvider";
 export const ToggledContext = createContext(null);
 
 function App() {
@@ -12,7 +13,8 @@ function App() {
   const values = { toggled, setToggled };
 
   return (
-      <ColorModeContext.Provider value={colorMode}>
+    <ColorModeContext.Provider value={colorMode}>
+      <WebSocketProvider>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <ToggledContext.Provider value={values}>
@@ -36,8 +38,9 @@ function App() {
             </Box>
           </ToggledContext.Provider>
         </ThemeProvider>
-        <ToastContainer />
-      </ColorModeContext.Provider>
+      </WebSocketProvider>
+      <ToastContainer />
+    </ColorModeContext.Provider>
   );
 }
 

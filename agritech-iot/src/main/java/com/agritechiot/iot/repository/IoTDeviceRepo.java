@@ -7,6 +7,7 @@ import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 
 @Repository
@@ -16,6 +17,16 @@ public interface IoTDeviceRepo extends ReactiveCrudRepository<IoTDevice, String>
     Flux<String> findByALlDeviceId();
 
     Flux<IoTDevice> findByName(String name);
+    @Query("""
+           SELECT count(*) as 'total' FROM tbl_iotdevice
+           """)
+    Mono<Long> countAllDevices();
+
+    @Query("""
+           SELECT count(*) as 'total' FROM tbl_iotdevice as i
+           where i.isDeviceOnline = true
+           """)
+    Mono<Long> countAllDevicesIsOnline();
 
     @Query("""
             SELECT i.deviceId as deviceId, i.name as name, o.date as date, o.time as time, o.status
@@ -29,4 +40,6 @@ public interface IoTDeviceRepo extends ReactiveCrudRepository<IoTDevice, String>
 
     @Query("SELECT * FROM tbl_iotdevice as i where i.isRemoved = false or i.isRemoved IS NULL")
     Flux<IoTDevice> findByIsNotDeleted();
+
+    Mono<IoTDevice> findByDeviceIdAndMasterDeviceName(String deviceId, String masterDeviceName);
 }

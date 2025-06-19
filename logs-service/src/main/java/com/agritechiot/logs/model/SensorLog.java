@@ -26,16 +26,7 @@ public class SensorLog {
     private LocalDateTime dateTime;
     @Field("deviceId")
     private String deviceId;
-    private Double temperature;
-    private Double humidity;
-    @Field("sensorId")
-    private Double sensorId;
-    @Field("soil_moisture")
-    private Double soilMoisture;
-    @Field("flowRate")
-    private Double flowRate;
-    @Field("flow_quantity")
-    private Double flowQuantity;
-    @Field("total_water")
-    private Double totalWater;
+    private Double value;
+    private String action;
+
 }

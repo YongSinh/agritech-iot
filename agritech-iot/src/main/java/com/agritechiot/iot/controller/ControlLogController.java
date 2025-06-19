@@ -98,12 +98,13 @@ public class ControlLogController {
                         ));
     }
 
-    @PostMapping("/v1/control-logs/send-task/{id}")  // Full path: `/api/device-control/send-task/{id}`
+    @PostMapping("/v1/control-logs/send-task/{id}/{sensor}")  // Full path: `/api/device-control/send-task/{id}`
     public Mono<Void> sendTaskToDevice(
             @PathVariable Integer id,
+            @PathVariable String sensor,
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
     ) throws Exception {
-        return controlLogService.sendTaskToDevice(id)
+        return controlLogService.sendTaskToDevice(id, sensor)
                 .then(Mono.just(new ApiResponse<>())
                         .onErrorResume(Exception.class, ex ->
                                 Mono.just(new ApiResponse<>(

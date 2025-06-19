@@ -40,21 +40,6 @@ public class TriggerController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping("/v1/triggers/get-by-sensor-device")
-    public Mono<ApiResponse<List<Trigger>>> getTriggerBySensorAndDeviceId(
-            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody Trigger req
-
-    ) {
-        log.info("fetching trigger for deviceId: {} and {}", req.getSensor(), req.getDeviceId());
-        return triggerService.getTriggerBySensorAndDeviceId(req.getSensor(), req.getDeviceId())
-                .collectList()  // Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId))
-                .onErrorResume(e -> {
-                    log.error("Error fetching trigger for deviceId: {} and {}", req.getSensor(), req.getDeviceId(), e);
-                    return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response
-                });
-    }
 
     @PostMapping(value = "/v1/triggers/multiple-create")
     public Mono<ApiResponse<List<Trigger>>> createMultipleTrigger(

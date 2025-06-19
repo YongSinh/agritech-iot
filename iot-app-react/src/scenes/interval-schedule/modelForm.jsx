@@ -18,7 +18,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs from "dayjs";
 
-const ModelForm = ({ open, handleClose, handleSubmit, deviceIds, initialData }) => {
+const ModelForm = ({ open, handleClose, handleSubmit, deviceIds = [], initialData }) => {
   const booleans = [true, false];
 
   const payload = {

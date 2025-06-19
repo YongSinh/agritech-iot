@@ -54,6 +54,6 @@ public class SensorLogServiceImp implements SensorLogService {
 
     @Override
     public Flux<SensorLog> getSensorLogByDeviceId(String deviceId) {
-        return getSensorLogByDeviceId(deviceId);
+        return sensorLogRepo.findByDeviceId(deviceId);
     }
 }

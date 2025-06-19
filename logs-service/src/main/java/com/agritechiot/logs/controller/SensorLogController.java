@@ -29,7 +29,7 @@ public class SensorLogController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/add-sensor-log")
+    @PostMapping(value = "/v1/sensor-log/add")
     public Mono<ApiResponse<SensorLog>> addSensorLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody SensorLog req
@@ -39,7 +39,7 @@ public class SensorLogController {
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/update-sensor-log")
+    @PostMapping(value = "/v1/sensor-log/update")
     public Mono<ApiResponse<SensorLog>> updateSensorLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody SensorLog req
@@ -48,5 +48,13 @@ public class SensorLogController {
         return sensorLogService.updateSensorLog(req.getId(), req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
-
+    @GetMapping("/v1/sensor-logs/{deviceId}")
+    public Mono<ApiResponse<List<SensorLog>>> getSensorLogByDeviceId
+            (@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
+             @PathVariable String deviceId
+            ) {
+        return sensorLogService.getSensorLogByDeviceId(deviceId)
+                .collectList()  // Collect the Flux into a List
+                .map(res -> new ApiResponse<>(res, correlationId));
+    }
 }

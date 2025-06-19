@@ -22,7 +22,7 @@ const ModelForm = ({
   open,
   handleClose,
   handleSubmit,
-  deviceIds,
+  deviceIds = [],
   initialData,
   sensors,
   isEdit

@@ -12,6 +12,9 @@ public class GenConstant {
     public static final String ONETIME_SCHEDULE_TYPE = "Onetime Schedule";
     public static final String REPEAT_SCHEDULE_TYPE = "Repeat Schedule";
 
+    public static final String NOT_FOUND = "NOT FOUND";
+
+
     private GenConstant() {
 
     }

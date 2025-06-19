@@ -12,6 +12,7 @@ import {
   MapOutlined,
   MenuOutlined,
   PeopleAltOutlined,
+  PersonalVideoOutlined,
   PersonOutlined,
   TimelineOutlined,
   WavesOutlined,
@@ -170,6 +171,12 @@ const SideBar = () => {
             icon={<Tune />}
           />
           <Item
+            title="MQTT Message"
+            path="/console"
+            colors={colors}
+            icon={<PersonalVideoOutlined />}
+          />
+          <Item
             title="Device"
             path="/device"
             colors={colors}
@@ -256,7 +263,7 @@ const SideBar = () => {
             icon={<HelpOutlineOutlined />}
           />
         </Menu>
-        <Typography
+        {/* <Typography
           variant="h6"
           color={colors.gray[300]}
           sx={{ m: "15px 0 5px 20px" }}
@@ -304,7 +311,7 @@ const SideBar = () => {
             colors={colors}
             icon={<WavesOutlined />}
           />
-        </Menu>
+        </Menu> */}
       </Box>
     </Sidebar>
   );

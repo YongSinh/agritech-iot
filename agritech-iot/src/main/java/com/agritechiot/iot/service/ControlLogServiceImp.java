@@ -1,9 +1,12 @@
 package com.agritechiot.iot.service;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.ControlLogReq;
+import com.agritechiot.iot.dto.request.IotReq;
 import com.agritechiot.iot.model.ControlLog;
 import com.agritechiot.iot.repository.ControlLogRepo;
 import com.agritechiot.iot.service.mqtt.Publisher;
+import com.agritechiot.iot.util.GenUtil;
 import com.agritechiot.iot.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,23 +81,26 @@ public class ControlLogServiceImp implements ControlLogService {
     }
 
     @Override
-    public Mono<Void> sendTaskToDevice(Integer id) {
+    public Mono<Void> sendTaskToDevice(Integer id, String sensor) throws Exception {
         return controlLogRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
-                .flatMap(req ->
-                        triggerService.getTriggerByDeviceId(req.getDeviceId())
-                                .flatMap(trigger -> {
-                                    logService.logInfo("PUBLISH_MESSAGE_TO_DEVICE", JsonUtil.toJsonSnakeCase(trigger));
-                                    return Mono.fromRunnable(() ->
-                                            {
-                                                try {
-                                                    publisher.publish(req.getDeviceId(), JsonUtil.toJsonSnakeCase(trigger), 1, true);
-                                                } catch (MqttException e) {
-                                                    throw new RuntimeException(e);
-                                                }
+                .switchIfEmpty(Mono.error(new Exception(GenConstant.NOT_FOUND)))
+                .flatMap(req -> ioTDeviceService.getDeviceById(req.getDeviceId())
+                        .flatMap(device ->
+                                triggerService.getTriggerBySensorAndDeviceId(sensor.trim().toLowerCase(), req.getDeviceId())
+                                        .flatMap(trigger -> {
+                                            IotReq iotReq = new IotReq();
+                                            iotReq.setAction(trigger.getSensor());
+                                            iotReq.setDeviceId(trigger.getDeviceId());
+                                            iotReq.setValue(GenUtil.checkOffAndOn(req.getStatus()));
+                                            logService.logInfo("PUBLISH_MESSAGE_TO_DEVICE", iotReq.toString());
+                                            try {
+                                                publisher.publish(device.getMasterDeviceName(), JsonUtil.toJson(iotReq), 1, true);
+                                                return Mono.empty();
+                                            } catch (MqttException e) {
+                                                return Mono.error(new RuntimeException(e));
                                             }
-                                    );
-                                })
+                                        })
+                        )
                 );
     }
 

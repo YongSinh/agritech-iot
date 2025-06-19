@@ -19,7 +19,8 @@ import {
   OnetimeSchedule,
   IntervalSchedule,
   Trigger,
-  Control
+  Control, 
+  Console
 } from "./scenes";
 
 const AppRouter = () => {
@@ -45,6 +46,7 @@ const AppRouter = () => {
           <Route path="/onetime-schedule" element={<OnetimeSchedule />} />
           <Route path="/trigger" element={<Trigger />} />
           <Route path="/control" element={<Control />} />
+           <Route path="/console" element={<Console />} />
         </Route>
       </Routes>
     </Router>

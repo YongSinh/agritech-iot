@@ -18,6 +18,7 @@ import IntervalSchedule from "./interval-schedule";
 import OnetimeSchedule from "./onetime-schedule";
 import Trigger from "./trigger";
 import Control from "./control"
+import Console from "./console"
 export {
   Navbar,
   SideBar,
@@ -38,5 +39,6 @@ export {
   IntervalSchedule,
   OnetimeSchedule,
   Trigger,
-  Control
+  Control,
+  Console
 };

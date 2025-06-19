@@ -1,8 +1,8 @@
-import { Box, useTheme, Button, Stack, IconButton } from "@mui/material";
+import { Box, useTheme, Button, Stack, IconButton, Chip } from "@mui/material";
 import { Header } from "../../components";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { EditRounded } from "@mui/icons-material";
+import { EditRounded, CloudDone, HighlightOffOutlined } from "@mui/icons-material";
 import { tokens } from "../../theme";
 import { useState, useEffect } from "react";
 import { useRequest } from "../../config/api/request"
@@ -20,7 +20,6 @@ const IntervalSchedule = () => {
   const [open, setOpen] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [edit, setEdit] = useState(false);
-
   // Open the form dialog
   const handleClickOpen = () => {
     setOpen(true);
@@ -102,49 +101,90 @@ const IntervalSchedule = () => {
   };
 
 
-const sendTaskToDevice = async (task) => {
-  // Confirmation dialog before proceeding
-  const confirmation = await Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",  // Blue confirm button
-    cancelButtonColor: "#d33",      // Red cancel button
-    confirmButtonText: "Yes, send it!",
-    cancelButtonText: "Cancel",
-    reverseButtons: true,           // Places "Confirm" on the right
-  });
+  const sendTaskToDevice = async (task) => {
+    try {
+      // First fetch the sensors for the device
+      const result = await request(`/iot/v1/devices/sensors/${task.deviceId}`, "GET", null);
 
-  // Exit if user cancels
-  if (!confirmation.isConfirmed) return;
+      if (!result || !result.data) {
+        throw new Error('No sensor data received');
+      }
 
-  try {
-    // Send the task to the device
-    await request(`/iot/v1/control-logs/send-task/${task.id}`, "POST", null);
-    
-    // Refresh the task list
-    await getListControlLog(); 
+      // The data comes as an object like {"sensor1": "Humidity", "sensor2": "Temperature"}
+      const sensorObject = result.data;
 
-    // Success notification
-    await Swal.fire({
-      title: "Task Sent!",
-      text: "Your task has been successfully sent.",
-      icon: "success",
-      timer: 2000,  // Auto-close after 2 seconds
-      showConfirmButton: false,
-    });
-  } catch (error) {
-    console.error("Failed to send task:", error);
+      // Convert the sensor object to the format Swal expects for select options
+      const sensorOptions = {};
+      Object.entries(sensorObject).forEach(([sensorId, sensorName]) => {
+        sensorOptions[sensorId] = sensorName;
+      });
 
-    // Error notification
-    await Swal.fire({
-      title: "Error!",
-      text: "Failed to send the task. Please try again.",
-      icon: "error",
-    });
-  }
-};
+      // First dialog with select box
+      const { value: selectedSensorId } = await Swal.fire({
+        title: "Select Sensor",
+        input: 'select',
+        inputOptions: sensorOptions,
+        inputPlaceholder: 'Select a Sensor',
+        showCancelButton: true,
+        confirmButtonText: 'Next',
+        cancelButtonText: 'Cancel',
+        inputValidator: (value) => {
+          if (!value) {
+            return 'You need to select a sensor!';
+          }
+        }
+      });
+
+      // Exit if user cancels device selection
+      if (!selectedSensorId) return;
+
+      const selectedSensorName = sensorOptions[selectedSensorId];
+
+      // Confirmation dialog before proceeding
+      const confirmation = await Swal.fire({
+        title: "Are you sure?",
+        text: `You are about to send this task to ${selectedSensorName} . You won't be able to revert this!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, send it!",
+        cancelButtonText: "Cancel",
+        reverseButtons: true,
+      });
+
+      // Exit if user cancels confirmation
+      if (!confirmation.isConfirmed) return;
+
+      // Send the task to the selected device
+      await request(
+        `/iot/v1/control-logs/send-task/${task.id}/${selectedSensorName}`,
+        "POST",
+        null // Send the selected sensor ID
+      );
+
+      // Refresh the task list
+      await getListControlLog();
+
+      // Success notification
+      await Swal.fire({
+        title: "Task Sent!",
+        text: `Your task has been successfully sent to ${selectedSensorName}.`,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Failed to send task:", error);
+
+      // Error notification
+      await Swal.fire({
+        title: "Error!",
+        text: `Failed to send the task: ${error.message}`,
+        icon: "error",
+      });
+    }
+  };
 
   useEffect(() => {
     getListControlLog()
@@ -185,6 +225,16 @@ const sendTaskToDevice = async (task) => {
       field: "status",
       headerName: "Status",
       flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Chip
+            label={row.status ? "Online" : "Offline"}
+            color={row.status ? "success" : "error"}
+            icon={row.status ? <CloudDone /> : <HighlightOffOutlined />}
+          //variant="outlined"
+          />
+        );
+      },
     },
     {
       field: "sentBy",

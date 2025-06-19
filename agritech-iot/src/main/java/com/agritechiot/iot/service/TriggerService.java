@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface TriggerService {
-    Flux<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId);
+    Mono<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId);
 
     Flux<Trigger> saveMultipleTriggers(TriggerReq req);
 
