@@ -11,8 +11,10 @@ import com.agritechiot.iot.repository.RepeatScheduleRepo;
 import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.GenUtil;
 import com.agritechiot.iot.util.JsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -70,7 +72,7 @@ public class RepeatScheduleServiceImp implements RepeatScheduleService {
     }
 
     @Override
-    public void startRepeatSchedule(RepeatSchedule repeatSchedule) throws Exception {
+    public void startRepeatSchedule(RepeatSchedule repeatSchedule) throws JsonProcessingException, MqttException {
         log.info("Reading sensors for device {} at {}", repeatSchedule.getDeviceId(), LocalDateTime.now());
         log.info(JsonUtil.objectToJsonString(repeatSchedule));
         IoTDevice ioTDevice = ioTDeviceRepo.findById(repeatSchedule.getDeviceId()).block();

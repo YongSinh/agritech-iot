@@ -5,8 +5,6 @@ import com.agritechiot.iot.model.ControlLog;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 public interface ControlLogService {
     Mono<ControlLog> saveControlLog(ControlLogReq req);
 
@@ -18,7 +16,7 @@ public interface ControlLogService {
 
     Flux<ControlLog> getControlLogsWithFilters(ControlLogReq req);
 
-    Mono<Void> sendTaskToDevice(Integer id, String sensor) throws Exception;
+    Mono<Void> sendTaskToDevice(Integer id, String sensor);
 
     Mono<Void> softDeleteById(Integer id);
 }

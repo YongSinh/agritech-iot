@@ -3,6 +3,8 @@ package com.agritechiot.iot.service;
 import com.agritechiot.iot.dto.request.RepeatScheduleReq;
 import com.agritechiot.iot.dto.response.ActiveScheduleRes;
 import com.agritechiot.iot.model.RepeatSchedule;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -15,7 +17,7 @@ public interface RepeatScheduleService {
 
     Flux<RepeatSchedule> getListRepeatSchedule();
 
-    void startRepeatSchedule(RepeatSchedule repeatSchedule) throws Exception;
+    void startRepeatSchedule(RepeatSchedule repeatSchedule) throws JsonProcessingException, MqttException;
 
     Flux<RepeatSchedule> getListRepeatScheduleByDay(String day);
 

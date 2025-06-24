@@ -11,8 +11,10 @@ import com.agritechiot.iot.repository.OnetimeScheduleRepo;
 import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.GenUtil;
 import com.agritechiot.iot.util.JsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -76,7 +78,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     }
 
     @Override
-    public void startOneTimeSchedule(OnetimeSchedule req) throws Exception {
+    public void startOneTimeSchedule(OnetimeSchedule req) throws JsonProcessingException, MqttException {
         log.info("Reading sensors one time Schedule for device {} at {}", req.getDeviceId(), LocalDateTime.now());
         IoTDevice ioTDevice = ioTDeviceRepo.findById(req.getDeviceId()).block();
         Trigger trigger = triggerService.getTriggerByDeviceId(req.getDeviceId()).block();

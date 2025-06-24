@@ -13,7 +13,7 @@ public class GenConstant {
     public static final String REPEAT_SCHEDULE_TYPE = "Repeat Schedule";
 
     public static final String NOT_FOUND = "NOT FOUND";
-
+    public static final String INTERVAL_SCHEDULE_LOG_NOT_FOUND = "INTERVAL SCHEDULE LOG NOT FOUND";
 
     private GenConstant() {
 

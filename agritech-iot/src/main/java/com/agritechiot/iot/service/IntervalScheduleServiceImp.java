@@ -1,5 +1,6 @@
 package com.agritechiot.iot.service;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.model.IntervalSchedule;
 import com.agritechiot.iot.repository.IntervalScheduleRepo;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     @Override
     public Mono<IntervalSchedule> updateIntervalRecord(Integer id, IntervalSchedule req) {
         return intervalScheduleRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("INTERVAL_SCHEDULE_LOG_NOT_FOUND")))
+                .switchIfEmpty(Mono.error(new Exception(GenConstant.INTERVAL_SCHEDULE_LOG_NOT_FOUND)))
                 .map(intervalSchedule -> {
                     intervalSchedule.setId(req.getId());
                     intervalSchedule.setInterval(req.getInterval());
@@ -57,7 +58,7 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     @Override
     public Mono<IntervalSchedule> getIntervalRecordById(Integer id) {
         return intervalScheduleRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("INTERVAL_SCHEDULE_LOG_NOT_FOUND")));
+                .switchIfEmpty(Mono.error(new Exception(GenConstant.INTERVAL_SCHEDULE_LOG_NOT_FOUND)));
     }
 
     @Override
@@ -65,6 +66,7 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
         return intervalScheduleRepo.updateStatusById(id, newStatus)
                 .then();
     }
+
     @Override
     public Mono<Void> updateListsStatus(List<Integer> ids, boolean newStatus, int batchSize) {
         if (ids == null || ids.isEmpty()) {
@@ -79,7 +81,7 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     @Override
     public Mono<Void> softDeleteById(Integer id) {
         return intervalScheduleRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("INTERVAL_SCHEDULE_LOG_NOT_FOUND")))
+                .switchIfEmpty(Mono.error(new Exception(GenConstant.INTERVAL_SCHEDULE_LOG_NOT_FOUND)))
                 .flatMap(intervalSchedule -> {
                     intervalSchedule.setIsRemoved(true);
                     intervalSchedule.setDeletedAt(LocalDateTime.now());

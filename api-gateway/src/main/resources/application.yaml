@@ -3,6 +3,7 @@ server:
     context-path: /
   port: 8085
 
+
 spring:
   application:
     name: api-gateway
@@ -40,10 +41,10 @@ spring:
             fallbackUri: forward:/fallback
   security:
     oauth2:
-      resource server:
+      resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8080/realms/development
-          jwk-set-uri: http://keycloak:8080/realms/development/protocol/openid-connect/certs
+          issuer-uri: https://159.65.131.28:8443/realms/uat
+          jwk-set-uri: https://159.65.131.28:8443/realms/uat/protocol/openid-connect/certs
 
 springdoc:
   api-docs:
@@ -94,3 +95,7 @@ logging:
 
     # Swagger / Springdoc
     org.springdoc: INFO
+
+file:
+  path:
+    cert: D:\Work and School\Project\IoT\keycloak.crt

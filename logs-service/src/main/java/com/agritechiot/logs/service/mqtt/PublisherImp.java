@@ -1,7 +1,6 @@
 package com.agritechiot.logs.service.mqtt;
 
 
-import com.agritechiot.logs.config.Mqtt;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -18,9 +17,6 @@ public class PublisherImp implements Publisher {
         mqttMessage.setPayload(payload.getBytes());
         mqttMessage.setQos(qos);
         mqttMessage.setRetained(retained);
-        Mqtt.getInstance().publish(topic, mqttMessage);
-        //mqttClient.publish(topic, payload.getBytes(), qos, retained);
-        // Mqtt.getInstance().disconnect();
     }
 
 }

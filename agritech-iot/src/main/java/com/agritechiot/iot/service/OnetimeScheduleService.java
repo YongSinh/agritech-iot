@@ -4,6 +4,8 @@ package com.agritechiot.iot.service;
 import com.agritechiot.iot.dto.request.OnetimeScheduleReq;
 import com.agritechiot.iot.dto.response.ActiveScheduleRes;
 import com.agritechiot.iot.model.OnetimeSchedule;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -20,7 +22,7 @@ public interface OnetimeScheduleService {
 
     Flux<OnetimeSchedule> getListOnetimeScheduleByDeviceId(String deviceId);
 
-    void startOneTimeSchedule(OnetimeSchedule req) throws Exception;
+    void startOneTimeSchedule(OnetimeSchedule req) throws JsonProcessingException, MqttException;
 
     Mono<Void> updateListsStatus(List<Integer> ids, boolean newStatus, int batchSize);
 

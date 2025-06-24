@@ -2,6 +2,7 @@ package com.agritechiot.logs.service;
 
 
 import com.agritechiot.logs.model.SensorLog;
+import com.fasterxml.jackson.databind.JsonNode;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -14,4 +15,5 @@ public interface SensorLogService {
 
     Flux<SensorLog> getSensorLogByDeviceId(String deviceId);
 
+    Mono<SensorLog> saveSensorLog(JsonNode req);
 }

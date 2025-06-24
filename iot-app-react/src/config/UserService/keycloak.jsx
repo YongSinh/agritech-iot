@@ -5,6 +5,7 @@ import React, {
   useRef,
 } from 'react';
 import Keycloak from 'keycloak-js';
+import LoadingPage from '../../components/LoadingPage';
 
 const KeycloakContext = createContext(undefined);
 
@@ -12,6 +13,8 @@ const KeycloakProvider = ({ children }) => {
   const isRun = useRef(false);
   const [keycloak, setKeycloak] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
+  const [token, setToken] = useState("")
+  const [refreshToken, setRefreshToken] = useState("")
 
   useEffect(() => {
     if (isRun.current) return;
@@ -29,12 +32,18 @@ const KeycloakProvider = ({ children }) => {
 
       keycloakInstance
         .init({
-           onLoad: "check-sso", // check-sso | login-required
+          onLoad: "login-required", // check-sso | login-required
           KeycloakResponseType: "code",
-          silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html'
+          silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+          pkceMethod: 'S256',
+          checkLoginIframe: false,
+          refreshToken : refreshToken,
+          token: token
         })
         .then((authenticated) => {
           setAuthenticated(authenticated);
+          setRefreshToken(keycloakInstance.refreshToken);
+          setToken(keycloakInstance.token)
         })
         .catch((error) => {
           console.error('Keycloak initialization failed:', error);
@@ -51,10 +60,9 @@ const KeycloakProvider = ({ children }) => {
 
   return (
     <KeycloakContext.Provider value={{ keycloak, authenticated }}>
-      {children}
+      {authenticated ? children : <LoadingPage/>}
     </KeycloakContext.Provider>
   );
 };
 
 export { KeycloakProvider, KeycloakContext };
-    

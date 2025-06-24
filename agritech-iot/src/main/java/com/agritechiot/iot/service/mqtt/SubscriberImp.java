@@ -1,9 +1,7 @@
 package com.agritechiot.iot.service.mqtt;
 
 import com.agritechiot.iot.config.Mqtt;
-import com.agritechiot.iot.model.Trigger;
 import com.agritechiot.iot.service.LogService;
-import com.agritechiot.iot.service.TriggerService;
 import com.agritechiot.iot.util.JsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.PostConstruct;
@@ -23,10 +21,9 @@ import java.util.Arrays;
 public class SubscriberImp implements Subscriber {
     private final LogService logService;
     private final SimpMessagingTemplate messagingTemplate;
-
+    private final Mqtt mqtt;
     @Value("${master.topic}")
     private String[] topics;
-    private final Mqtt mqtt;
 
     @PostConstruct
     public void init() {
@@ -114,7 +111,7 @@ public class SubscriberImp implements Subscriber {
                     try {
                         mqtt.getClient().subscribe(topic, (t, message) -> {
                             String payload = new String(message.getPayload());
-                            logMessage( payload, topic);
+                            logMessage(payload, topic);
                             messagingTemplate.convertAndSend("/topic/genMessage", payload);
                             processMessage(payload);
                         });

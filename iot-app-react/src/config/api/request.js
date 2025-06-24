@@ -1,6 +1,7 @@
 import axios from "axios";
 import { toast, Bounce } from 'react-toastify';
-
+import { useContext } from "react";
+import useKeycloak from "../UserService/useKeycloak";
 // Constants for status codes and messages
 const STATUS_CODES = {
   NOT_FOUND: 404,
@@ -54,13 +55,14 @@ const notifyWarning = (message) => {
 };
 // Wrap the request function in a hook to use notifications
 export const useRequest = () => {
+  const { keycloak, authenticated } = useKeycloak();
 
   const request = async (url, method, param) => {
     const headers = {
       "Content-Type": param instanceof FormData ? "multipart/form-data" : "application/json",
       accept: param instanceof FormData ? "application/json" : "*/*",
-      "correlation_id": self.crypto.randomUUID()
-      // Authorization: `Bearer ${getLocalAccessToken()}`,
+      "correlation_id": self.crypto.randomUUID(),
+   //   Authorization: `Bearer ${keycloak.token}`,
     };
 
     try {

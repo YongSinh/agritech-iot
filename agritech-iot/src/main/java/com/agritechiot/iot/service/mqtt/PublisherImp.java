@@ -24,8 +24,6 @@ public class PublisherImp implements Publisher {
         mqttMessage.setQos(qos);
         mqttMessage.setRetained(retained);
         mqtt.getClient().publish(topic, mqttMessage);
-        //mqttClient.publish(topic, payload.getBytes(), qos, retained);
-        // Mqtt.getInstance().disconnect();
     }
 
     @Override

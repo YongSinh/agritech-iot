@@ -8,7 +8,7 @@ const keycloakConfig = {
 const _kc = new Keycloak(keycloakConfig);
 const doLogin = _kc.login;
 
-//  const doLogout = _kc.logout;
+// const doLogout = _kc.logout;
 
 
 const doLogout = async () => {

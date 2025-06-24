@@ -11,9 +11,11 @@ import com.agritechiot.iot.service.IoTDeviceService;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.JsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -52,7 +54,7 @@ public class IoTDeviceController {
     public Mono<ApiResponse<Object>> getListSensors(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @PathVariable String deviceId
-            ) {
+    ) {
         log.info("INIT_LIST_IOT_DEVICES_SENSORS");
         return ioTDeviceService.getDeviceSensors(deviceId)
                 .map(res -> new ApiResponse<>(res, correlationId));
@@ -122,7 +124,7 @@ public class IoTDeviceController {
     public Mono<ApiResponse<Object>> offOnDevice(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody MqttPublishReq req
-        ) throws Exception {
+    ) throws JsonProcessingException, MqttException {
         publisher.publish(req.getTopic(), JsonUtil.objectToJsonString(req.getMessage()), req.getQos(), req.getRetained());
         return Mono.just(new ApiResponse<>(req.getMessage(), correlationId));
     }

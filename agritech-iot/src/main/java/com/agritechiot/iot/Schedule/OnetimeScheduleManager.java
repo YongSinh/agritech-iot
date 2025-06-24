@@ -23,6 +23,7 @@ public class OnetimeScheduleManager {
     private final OnetimeScheduleRepo onetimeScheduleRepo;
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
     private final OnetimeScheduleService onetimeScheduleService;
+    private final SchedulingUtil schedulingUtil;
     private final ConcurrentMap<String, ScheduledFuture<?>> oneTimeFutures = new ConcurrentHashMap<>();
 
     public void refreshOneTimeScheduledTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -30,36 +31,35 @@ public class OnetimeScheduleManager {
             log.warn("TaskRegistrar not initialized yet");
             return;
         }
+        schedulingUtil.withTaskRegistrar(taskRegistrar, registrar -> {
+            // Re-schedule default task
+            log.info("🧹 Cancelling all existing oneTime_schedule tasks...");
+            cancelAllScheduledTasks();
 
-        log.info("🧹 Cancelling all existing tasks...");
-        cancelAllScheduledTasks();
+            log.info("🔁 Re-registering tasks...");
+            // Re-schedule default task
+            onetimeScheduleRepo.findByIsNotDeleted()
+                    .flatMap(schedule -> {
+                        if (Boolean.FALSE.equals(schedule.getStatus())) {
+                            cancelDeviceTasks(schedule.getId());
+                            return Mono.empty();  // Skip if we're canceling
+                        }
+                        return Mono.just(schedule);  // Continue with processing
+                    })
+                    .switchIfEmpty(Mono.defer(() -> {
+                        log.warn("⚠️ No schedules found to process");
+                        return Mono.empty();
+                    }))
+                    .subscribe(
+                            this::scheduleRepeatTask,
+                            error -> log.error("Failed to schedule tasks", error),
+                            () -> log.info("Completed scheduling all tasks")
+                    );
+        });
 
-        log.info("🔁 Re-registering tasks...");
-        // Re-schedule default task
-        log.info("🧹 Cancelling all existing oneTime_schedule tasks...");
-        cancelAllScheduledTasks();
-
-        log.info("🔁 Re-registering tasks...");
-        // Re-schedule default task
-        onetimeScheduleRepo.findByIsNotDeleted()
-                .flatMap(schedule -> {
-                    if (Boolean.FALSE.equals(schedule.getStatus())) {
-                        cancelDeviceTasks(schedule.getId());
-                        return Mono.empty();  // Skip if we're canceling
-                    }
-                    return Mono.just(schedule);  // Continue with processing
-                })
-                .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("⚠️ No schedules found to process");
-                    return Mono.empty();
-                }))
-                .subscribe(
-                        this::scheduleRepeatTask,
-                        error -> log.error("Failed to schedule tasks", error),
-                        () -> log.info("Completed scheduling all tasks")
-                );
 
     }
+
 
     private void scheduleRepeatTask(OnetimeSchedule schedule) {
         try {
@@ -90,40 +90,38 @@ public class OnetimeScheduleManager {
     }
 
     public void refreshOneTimeScheduledTasksById(Integer id, ScheduledTaskRegistrar taskRegistrar) {
-        if (taskRegistrar == null) {
-            log.warn("TaskRegistrar not initialized yet: {}", id);
-            return;
-        }
-        log.info("🧹 One time Cancelling tasks for device {}...", id);
-        cancelDeviceTasks(id);
+        schedulingUtil.withTaskRegistrar(taskRegistrar, registrar -> {
+            log.info("🧹 One time Cancelling tasks for device {}...", id);
+            cancelDeviceTasks(id);
 
-        log.info("🔁 Re-registering tasks for device {}...", id);
-        onetimeScheduleRepo.findById(id)
-                .flatMap(schedule -> {
-                    if (Boolean.FALSE.equals(schedule.getStatus())) {
-                        cancelDeviceTasks(id);
-                        return Mono.empty();  // Skip if we're canceling
-                    }
-                    return Mono.just(schedule);  // Continue with processing
-                })
-                // .doOnNext(this::scheduleRepeatTask)
-                .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("⚠️ No schedules found for device {}", id);
-                    return Mono.empty();
-                }))
-                .subscribe(
-                        this::scheduleRepeatTask,
-                        error -> log.error("Failed to schedule tasks for device {}", id, error),
-                        () -> log.info("Completed scheduling tasks for device {}", id)
-                );
+            log.info("🔁 Re-registering tasks for device {}...", id);
+            onetimeScheduleRepo.findById(id)
+                    .flatMap(schedule -> {
+                        if (Boolean.FALSE.equals(schedule.getStatus())) {
+                            cancelDeviceTasks(id);
+                            return Mono.empty();  // Skip if we're canceling
+                        }
+                        return Mono.just(schedule);  // Continue with processing
+                    })
+                    // .doOnNext(this::scheduleRepeatTask)
+                    .switchIfEmpty(Mono.defer(() -> {
+                        log.warn("⚠️ No schedules found for device {}", id);
+                        return Mono.empty();
+                    }))
+                    .subscribe(
+                            this::scheduleRepeatTask,
+                            error -> log.error("Failed to schedule tasks for device {}", id, error),
+                            () -> log.info("Completed scheduling tasks for device {}", id)
+                    );
+        });
+
     }
 
 
     private void cancelDeviceTasks(Integer id) {
         try {
             String taskKey = "oneTime_schedule|" + id;
-            ScheduledFuture<?> future = oneTimeFutures.get(taskKey);
-
+            ScheduledFuture<?> future = schedulingUtil.getScheduledFuture(taskKey, oneTimeFutures);
             if (future != null) {
                 log.debug("Cancelling task with key: {}", taskKey);
                 boolean cancelled = future.cancel(false);

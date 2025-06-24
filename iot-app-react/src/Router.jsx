@@ -23,6 +23,8 @@ import {
   Console
 } from "./scenes";
 
+import LoadingPage from "./components/LoadingPage";
+
 const AppRouter = () => {
   return (
     <Router>
@@ -47,6 +49,7 @@ const AppRouter = () => {
           <Route path="/trigger" element={<Trigger />} />
           <Route path="/control" element={<Control />} />
            <Route path="/console" element={<Console />} />
+            <Route path="/loading" element={<LoadingPage />} />
         </Route>
       </Routes>
     </Router>

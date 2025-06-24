@@ -17,15 +17,16 @@ public interface IoTDeviceRepo extends ReactiveCrudRepository<IoTDevice, String>
     Flux<String> findByALlDeviceId();
 
     Flux<IoTDevice> findByName(String name);
+
     @Query("""
-           SELECT count(*) as 'total' FROM tbl_iotdevice
-           """)
+            SELECT count(*) as 'total' FROM tbl_iotdevice
+            """)
     Mono<Long> countAllDevices();
 
     @Query("""
-           SELECT count(*) as 'total' FROM tbl_iotdevice as i
-           where i.isDeviceOnline = true
-           """)
+            SELECT count(*) as 'total' FROM tbl_iotdevice as i
+            where i.isDeviceOnline = true
+            """)
     Mono<Long> countAllDevicesIsOnline();
 
     @Query("""

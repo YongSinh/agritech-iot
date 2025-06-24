@@ -15,7 +15,11 @@ import {
   PersonOutlined,
   SearchOutlined,
   SettingsOutlined,
+  Logout
 } from "@mui/icons-material";
+
+import useKeycloak from "../../../config/UserService/useKeycloak";
+
 import { ToggledContext } from "../../../App";
 const Navbar = () => {
   const theme = useTheme();
@@ -24,6 +28,12 @@ const Navbar = () => {
   const isMdDevices = useMediaQuery("(max-width:768px)");
   const isXsDevices = useMediaQuery("(max-width:466px)");
   const colors = tokens(theme.palette.mode);
+  const { keycloak, authenticated } = useKeycloak();
+  
+  const handleLogout = () => {
+     keycloak?.logout();
+  };
+  
   return (
     <Box
       display="flex"
@@ -68,6 +78,9 @@ const Navbar = () => {
         </IconButton>
         <IconButton>
           <PersonOutlined />
+        </IconButton>
+        <IconButton onClick={handleLogout}>
+          <Logout />
         </IconButton>
       </Box>
     </Box>

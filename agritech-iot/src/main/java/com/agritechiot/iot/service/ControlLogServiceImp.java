@@ -81,7 +81,7 @@ public class ControlLogServiceImp implements ControlLogService {
     }
 
     @Override
-    public Mono<Void> sendTaskToDevice(Integer id, String sensor) throws Exception {
+    public Mono<Void> sendTaskToDevice(Integer id, String sensor) {
         return controlLogRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception(GenConstant.NOT_FOUND)))
                 .flatMap(req -> ioTDeviceService.getDeviceById(req.getDeviceId())

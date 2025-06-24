@@ -5,9 +5,9 @@ import './index.css';
 import { KeycloakProvider } from './config/UserService/keycloak'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.StrictMode>
-        <KeycloakProvider>
+    <KeycloakProvider>
+        <React.StrictMode>
             <AppRouter />
-        </KeycloakProvider>
-    </React.StrictMode>
+        </React.StrictMode>
+    </KeycloakProvider>
 );

@@ -10,10 +10,7 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
@@ -24,43 +21,37 @@ import java.util.concurrent.ScheduledFuture;
 public class IntervalScheduleManager {
     private final IntervalScheduleRepo intervalScheduleRepo;
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
+    private final SchedulingUtil schedulingUtil;
     private final ConcurrentMap<String, ScheduledFuture<?>> intervalSchedule = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Boolean> deviceStatusMap = new ConcurrentHashMap<>();
 
     public void refreshIntervalScheduledTasks(ScheduledTaskRegistrar taskRegistrar) {
-        if (taskRegistrar == null) {
-            log.warn("TaskRegistrar not initialized yet");
-            return;
-        }
+        schedulingUtil.withTaskRegistrar(taskRegistrar, registrar -> {
+            log.info("🔁 Re-registering tasks...");
+            // Re-schedule default task
+            log.info("🧹 Cancelling all existing oneTime_schedule tasks...");
+            cancelAllScheduledTasks();
 
-        log.info("🧹 Cancelling all existing tasks...");
-        cancelAllScheduledTasks();
-
-        log.info("🔁 Re-registering tasks...");
-        // Re-schedule default task
-        log.info("🧹 Cancelling all existing oneTime_schedule tasks...");
-        cancelAllScheduledTasks();
-
-        log.info("🔁 Re-registering tasks...");
-        // Re-schedule default task
-        intervalScheduleRepo.findByIsNotDeleted()
-                .flatMap(schedule -> {
-                    if (Boolean.FALSE.equals(schedule.getStatus())) {
-                        cancelDeviceTasks(schedule.getId());
-                        return Mono.empty();  // Skip if we're canceling
-                    }
-                    return Mono.just(schedule);  // Continue with processing
-                })
-                .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("⚠️ No schedules found to process");
-                    return Mono.empty();
-                }))
-                .subscribe(
-                        this::scheduleRepeatTask,
-                        error -> log.error("Failed to schedule tasks", error),
-                        () -> log.info("Completed scheduling all tasks")
-                );
-
+            log.info("🔁 Re-registering tasks...");
+            // Re-schedule default task
+            intervalScheduleRepo.findByIsNotDeleted()
+                    .flatMap(schedule -> {
+                        if (Boolean.FALSE.equals(schedule.getStatus())) {
+                            cancelDeviceTasks(schedule.getId());
+                            return Mono.empty();  // Skip if we're canceling
+                        }
+                        return Mono.just(schedule);  // Continue with processing
+                    })
+                    .switchIfEmpty(Mono.defer(() -> {
+                        log.warn("⚠️ No schedules found to process");
+                        return Mono.empty();
+                    }))
+                    .subscribe(
+                            this::scheduleRepeatTask,
+                            error -> log.error("Failed to schedule tasks", error),
+                            () -> log.info("Completed scheduling all tasks")
+                    );
+        });
     }
 
     private void scheduleRepeatTask(IntervalSchedule schedule) {
@@ -119,8 +110,7 @@ public class IntervalScheduleManager {
     private void cancelDeviceTasks(Integer id) {
         try {
             String taskKey = "interval_schedule|" + id;
-            ScheduledFuture<?> future = intervalSchedule.get(taskKey);
-
+            ScheduledFuture<?> future = schedulingUtil.getScheduledFuture(taskKey, intervalSchedule);
             if (future != null) {
                 log.debug("Cancelling task with key: {}", taskKey);
                 boolean cancelled = future.cancel(false);

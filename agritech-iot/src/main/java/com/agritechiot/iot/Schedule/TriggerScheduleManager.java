@@ -1,15 +1,12 @@
 package com.agritechiot.iot.Schedule;
 
 import com.agritechiot.iot.model.RepeatSchedule;
-import com.agritechiot.iot.repository.RepeatScheduleRepo;
-import com.agritechiot.iot.service.RepeatScheduleService;
 import com.agritechiot.iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,42 +17,20 @@ import java.util.concurrent.ScheduledFuture;
 @Slf4j
 @Component
 public class TriggerScheduleManager {
-    private final RepeatScheduleRepo repeatScheduleRepo;
-    private final RepeatScheduleService repeatScheduleService;
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
     private final ConcurrentMap<String, ScheduledFuture<?>> scheduledFutures = new ConcurrentHashMap<>();
-
+    private final SchedulingUtil schedulingUtil;
 
     public void refreshScheduledTasksById(Integer id, ScheduledTaskRegistrar taskRegistrar) {
-        if (taskRegistrar == null) {
-            log.warn("TaskRegistrar not initialized yet: {}", id);
-            return;
-        }
+        schedulingUtil.withTaskRegistrar(taskRegistrar, registrar -> {
+            log.info("🧹 Cancelling tasks for device {}...", id);
+            cancelDeviceTasks(id);
 
-        log.info("🧹 Cancelling tasks for device {}...", id);
-        cancelDeviceTasks(id);
+            log.info("🔁 Re-registering tasks for device {}...", id);
 
-        log.info("🔁 Re-registering tasks for device {}...", id);
-        repeatScheduleRepo.findById(id)
-                .flatMap(schedule -> {
-                    if (Boolean.FALSE.equals(schedule.getStatus())) {
-                        cancelDeviceTasks(id);
-                        return Mono.empty();  // Skip if we're canceling
-                    }
-                    return Mono.just(schedule);  // Continue with processing
-                })
-                // .doOnNext(this::scheduleRepeatTask)
-                .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("⚠️ No schedules found for device {}", id);
-                    return Mono.empty();
-                }))
-                .subscribe(
-                        this::scheduleRepeatTask,
-                        error -> log.error("Failed to schedule tasks for device {}", id, error),
-                        () -> log.info("Completed scheduling tasks for device {}", id)
-                );
+        });
+
     }
-
 
     private void scheduleRepeatTask(RepeatSchedule schedule) {
         try {
@@ -78,7 +53,6 @@ public class TriggerScheduleManager {
             log.error("❌ Failed to schedule task for device {}", schedule.getDeviceId(), e);
         }
     }
-
 
 
     private void cancelAllScheduledTasks() {

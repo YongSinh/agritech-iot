@@ -12,7 +12,6 @@ public class GenUtil {
     private GenUtil() {
     }
 
-
     public static String checkOffAndOn(Boolean status) {
         if (Boolean.TRUE.equals(status)) {
             return "ON";
@@ -24,6 +23,7 @@ public class GenUtil {
      * Generates a one-time cron expression for a specific date and time
      * Format: second minute hour day month ? year
      */
+
     public static String createOneTimeCronExpression(String date, LocalTime time) {
         LocalDate localDate = LocalDate.parse(date);
         String cronExpression = String.format("%d %d %d %d %d ?",
@@ -32,7 +32,7 @@ public class GenUtil {
                 time.getHour(),
                 localDate.getDayOfMonth(),
                 localDate.getMonthValue());
-        log.info("ONE_TIME_CRON_EXPRESSION: {} ", cronExpression);
+        logCronExpression(cronExpression);
         return cronExpression;
     }
 
@@ -52,12 +52,18 @@ public class GenUtil {
                 time.getMinute(),
                 time.getHour(),
                 dayOfWeek);
-
-        log.info("Cron_Expression: {} ", cronExpression);
-
+        logCronExpression(cronExpression);
         // Build cron expression: second minute hour ? * DAY
         return cronExpression;
     }
+
+    public static String buildMinCronExpression(int minutes) {
+        String cronExpression = String.format("0 */%d * * * *", minutes);
+        logCronExpression(cronExpression);
+        // Build cron expression: second minute hour ? * DAY
+        return cronExpression;
+    }
+
 
     private static int convertDayToCronValue(String day) {
         return switch (day.toLowerCase()) {
@@ -89,5 +95,9 @@ public class GenUtil {
                 throw new IllegalArgumentException("Invalid time format. Expected HH:mm:ss.SSS or HH:mm:ss");
             }
         }
+    }
+
+    private static void logCronExpression(String cronExpression) {
+        log.info("CRON_EXPRESSION: {} ", cronExpression);
     }
 }
