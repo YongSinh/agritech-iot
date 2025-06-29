@@ -24,7 +24,7 @@ public class ControlLog {
     private String deviceId;
     private Boolean status;
     private Integer duration;
-    @Column("sentby")
+    @Column("sentBy")
     private String sentBy;
     @Column("isRemoved")
     private Boolean isRemoved;

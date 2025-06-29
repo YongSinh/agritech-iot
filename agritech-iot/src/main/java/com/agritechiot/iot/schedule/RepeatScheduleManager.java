@@ -1,4 +1,4 @@
-package com.agritechiot.iot.Schedule;
+package com.agritechiot.iot.schedule;
 
 import com.agritechiot.iot.model.RepeatSchedule;
 import com.agritechiot.iot.repository.RepeatScheduleRepo;

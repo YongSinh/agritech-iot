@@ -73,7 +73,7 @@ public class TriggerController {
     public Mono<ApiResponse<Trigger>> updateTrigger(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody Trigger req
-    ) throws Exception {
+    ) {
         log.info("REQ_UPDATE_TRIGGER: {}", JsonUtil.toJson(req));
         return triggerService.updateTrigger(req.getId(), req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))

@@ -1,8 +1,10 @@
 package com.agritechiot.iot.service;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.IoTDeviceReq;
 import com.agritechiot.iot.dto.response.DeviceJoinDto;
 import com.agritechiot.iot.dto.response.IoTDeviceDto;
+import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
     @Override
     public Mono<IoTDevice> getDeviceById(String id) {
         return ioTDeviceRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("IOT_DEVICE_NOT_FOUND")));
+                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)));
     }
 
     @Override
@@ -60,7 +62,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
     @Override
     public Mono<IoTDevice> updateDevice(String id, IoTDeviceReq req) {
         return ioTDeviceRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("IOT_DEVICE_NOT_FOUND")))
+                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)))
                 .map(d -> {
                     d.setDeviceId(id);
                     d.setName(req.getName());
@@ -89,7 +91,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
     @Override
     public Mono<Void> softDeleteById(String id) {
         return ioTDeviceRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
+                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)))
                 .flatMap(req -> {
                     req.setIsRemoved(true);
                     req.setDeletedAt(LocalDateTime.now());
@@ -124,6 +126,18 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                                         tuple -> tuple.getT2().trim()
                                 )
                 );
+    }
+
+    @Override
+    public Mono<Void> updateDeviceStats(String id, boolean status) {
+        return ioTDeviceRepo.findById(id)
+                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)))
+                .flatMap(req -> {
+                    req.setIsDeviceOnline(status);
+                    req.setNewEntry(false);
+                    return ioTDeviceRepo.save(req);
+                })
+                .then();
     }
 
 }

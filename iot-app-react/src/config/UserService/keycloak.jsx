@@ -51,7 +51,6 @@ const KeycloakProvider = ({ children }) => {
         })
         .finally(() => {
           setKeycloak(keycloakInstance);
-          console.log('keycloak', keycloakInstance);
         });
     };
 

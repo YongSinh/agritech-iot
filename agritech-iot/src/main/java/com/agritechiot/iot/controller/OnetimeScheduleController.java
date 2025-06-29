@@ -1,12 +1,12 @@
 package com.agritechiot.iot.controller;
 
-import com.agritechiot.iot.Schedule.SchedulingConfig;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.OnetimeScheduleReq;
 import com.agritechiot.iot.dto.request.UpdateScheduleStatusReq;
 import com.agritechiot.iot.dto.response.ActiveScheduleRes;
 import com.agritechiot.iot.model.OnetimeSchedule;
+import com.agritechiot.iot.schedule.SchedulingConfig;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.OnetimeScheduleService;
 import com.agritechiot.iot.util.JsonUtil;
@@ -44,7 +44,7 @@ public class OnetimeScheduleController {
     public Mono<ApiResponse<OnetimeSchedule>> createSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody OnetimeScheduleReq req
-    ) throws Exception {
+    ) {
         log.info("REQ_IOT_ADD_ONE_TIME_SCHEDULE: {}", JsonUtil.toJson(req));
         return onetimeScheduleService.saveOnetimeSchedule(req)// Collect the Flux into a List
                 .publishOn(Schedulers.boundedElastic())
@@ -63,7 +63,7 @@ public class OnetimeScheduleController {
     public Mono<ApiResponse<OnetimeSchedule>> updateSchedule(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody OnetimeScheduleReq req
-    ) throws Exception {
+    ) {
         log.info("REQ_IOT_UPDATE_ONE_TIME_SCHEDULE: {}", JsonUtil.toJson(req));
         return onetimeScheduleService.updateOnetimeSchedule(req.getId(), req)// Collect the Flux into a List
                 .publishOn(Schedulers.boundedElastic())
@@ -75,7 +75,7 @@ public class OnetimeScheduleController {
     public Mono<ApiResponse<List<OnetimeSchedule>>> getListOnetimeScheduleByDeviceId(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody OnetimeScheduleReq req
-    ) throws Exception {
+    ) {
         log.info("REQ_IOT_U_ONE_TIME_SCHEDULE: {}", JsonUtil.toJson(req));
         return onetimeScheduleService.getListOnetimeScheduleByDeviceId(req.getDeviceId())
                 .collectList()// Collect the Flux into a List

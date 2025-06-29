@@ -30,5 +30,6 @@ public interface IoTDeviceService {
 
     Mono<Object> getDeviceSensors(String id);
 
+    Mono<Void> updateDeviceStats(String id, boolean status);
 
 }

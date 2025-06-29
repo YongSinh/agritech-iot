@@ -1,12 +1,12 @@
 package com.agritechiot.iot.controller;
 
-import com.agritechiot.iot.Schedule.SchedulingConfig;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.RepeatScheduleReq;
 import com.agritechiot.iot.dto.request.UpdateScheduleStatusReq;
 import com.agritechiot.iot.dto.response.ActiveScheduleRes;
 import com.agritechiot.iot.model.RepeatSchedule;
+import com.agritechiot.iot.schedule.SchedulingConfig;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.RepeatScheduleService;
 import com.agritechiot.iot.util.JsonUtil;

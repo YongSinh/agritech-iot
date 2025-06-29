@@ -1,19 +1,21 @@
 package com.agritechiot.iot.service.mqtt;
 
 import com.agritechiot.iot.config.Mqtt;
+import com.agritechiot.iot.constant.GenConstant;
+import com.agritechiot.iot.dto.response.MqttMessageRes;
+import com.agritechiot.iot.repository.MqttTopicRepo;
+import com.agritechiot.iot.service.IoTDeviceService;
 import com.agritechiot.iot.service.LogService;
+import com.agritechiot.iot.util.GenUtil;
 import com.agritechiot.iot.util.JsonUtil;
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -21,6 +23,8 @@ import java.util.Arrays;
 public class SubscriberImp implements Subscriber {
     private final LogService logService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final IoTDeviceService ioTDeviceService;
+    private final MqttTopicRepo mqttTopicRepo;
     private final Mqtt mqtt;
     @Value("${master.topic}")
     private String[] topics;
@@ -29,9 +33,7 @@ public class SubscriberImp implements Subscriber {
     public void init() {
         try {
             sub();
-            waterFlow();
-            soilMoisture();
-            test();
+            updateStateDevice();
         } catch (MqttException e) {
             log.error("❌ Error subscribing to MQTT topic", e);
         }
@@ -52,7 +54,6 @@ public class SubscriberImp implements Subscriber {
             log.warn("⚠️ MQTT Client is not connected! Trying to reconnect...");
             mqtt.getClient().connect();
         }
-
         log.info("📡 Subscribing to MQTT topic: test");
 
         mqtt.getClient().subscribe("test", (topic, message) -> {
@@ -64,62 +65,31 @@ public class SubscriberImp implements Subscriber {
         log.info("✅ Successfully subscribed to MQTT topic: test");
     }
 
-    @Override
-    public void temperature() throws MqttException {
-        mqtt.getClient().subscribe("temperature", (topic, message) -> {
-            String payload = new String(message.getPayload());
-            logMessage(payload, topic);
-            processMessage(payload);
-        });
-    }
-
-    @Async
-    @Override
-    public void humidity() throws MqttException {
-        mqtt.getClient().subscribe("humidity", (topic, message) -> {
-            String res = new String(message.getPayload());
-            JsonNode payload = JsonUtil.parseJson(res);
-            log.info(String.valueOf(payload));
-            log.info("date: {}", payload.path("datetime"));
-            processMessage(res);
-        });
-    }
 
     @Override
-    public void waterFlow() throws MqttException {
-        mqtt.getClient().subscribe("sensors/mqtt_out", (topic, message) -> {
-            String payload = new String(message.getPayload());
-            logMessage(payload, topic);
-            processMessage(payload);
-        });
-    }
-
-    @Override
-    public void soilMoisture() throws MqttException {
-        mqtt.getClient().subscribe("sensors/mqtt_in/MasterLoRa_1", (topic, message) -> {
-            String payload = new String(message.getPayload());
-            logMessage(payload, topic);
-            processMessage(payload);
-        });
-    }
-
-    @Override
-    public void test() {
-        Arrays.stream(topics)
-                .forEach(topic -> {
-                    // Process each topic
+    public void updateStateDevice() throws MqttException {
+        mqttTopicRepo.findByIsNotDeleted()
+                .flatMap(topic -> {
                     try {
-                        mqtt.getClient().subscribe(topic, (t, message) -> {
-                            String payload = new String(message.getPayload());
-                            logMessage(payload, topic);
-                            messagingTemplate.convertAndSend("/topic/genMessage", payload);
-                            processMessage(payload);
+                        mqtt.getClient().subscribe(topic.getTopic(), (t, message) -> {
+                            String res = new String(message.getPayload());
+                            MqttMessageRes dto = JsonUtil.fromJson(res, MqttMessageRes.class);
+                            log.info("Res: {}", dto);
+                            GenUtil.validateFields(dto);
+                            logMessage(res, topic.toString());
+                            ioTDeviceService.updateDeviceStats(dto.getDeviceId(), GenUtil.checkOffAndOn(dto.getValue()))
+                                    .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
+                                    .doOnError(error -> log.error("❌ Failed to save", error))
+                                    .subscribe();
+                            processMessage(res);
                         });
-                        log.info("✅ Subscribed to topic: {}", topic);
+                        log.info(GenConstant.SUBSCRIBE_MSG_LOG, topic);
                     } catch (MqttException e) {
                         log.error("❌ Failed to subscribe to topic: {}", topic, e);
                     }
-                });
+                    return Mono.just(topics);  // Continue with processing
+                }).subscribe();
+
     }
 
 }

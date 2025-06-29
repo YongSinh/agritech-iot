@@ -1,4 +1,4 @@
-package com.agritechiot.iot.Schedule;
+package com.agritechiot.iot.schedule;
 
 import com.agritechiot.iot.model.OnetimeSchedule;
 import com.agritechiot.iot.repository.OnetimeScheduleRepo;
@@ -33,7 +33,7 @@ public class OnetimeScheduleManager {
         }
         schedulingUtil.withTaskRegistrar(taskRegistrar, registrar -> {
             // Re-schedule default task
-            log.info("🧹 Cancelling all existing oneTime_schedule tasks...");
+            log.info("🧹 Cancelling all existing oneTime schedule tasks...");
             cancelAllScheduledTasks();
 
             log.info("🔁 Re-registering tasks...");

@@ -1,6 +1,7 @@
 package com.agritechiot.logs.service;
 
 
+import com.agritechiot.logs.dto.MqttMessageRes;
 import com.agritechiot.logs.model.SensorLog;
 import com.fasterxml.jackson.databind.JsonNode;
 import reactor.core.publisher.Flux;
@@ -15,5 +16,5 @@ public interface SensorLogService {
 
     Flux<SensorLog> getSensorLogByDeviceId(String deviceId);
 
-    Mono<SensorLog> saveSensorLog(JsonNode req);
+    Mono<SensorLog> saveSensorLog(MqttMessageRes req);
 }

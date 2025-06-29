@@ -18,7 +18,7 @@ import IntervalSchedule from "./interval-schedule";
 import OnetimeSchedule from "./onetime-schedule";
 import Trigger from "./trigger";
 import Control from "./control"
-import Console from "./console"
+import MQTT from "./mqtt"
 export {
   Navbar,
   SideBar,
@@ -40,5 +40,5 @@ export {
   OnetimeSchedule,
   Trigger,
   Control,
-  Console
+  MQTT
 };

@@ -21,4 +21,6 @@ public interface TriggerService {
     Mono<Void> softDeleteById(Integer id);
 
     Mono<Trigger> getTriggerByDeviceId(String deviceId);
+
+    Mono<Void> sendTaskToDevice(Trigger req, String status, String topic);
 }

@@ -1,11 +1,16 @@
 package com.agritechiot.iot.service;
 
+import com.agritechiot.iot.constant.GenConstant;
+import com.agritechiot.iot.dto.request.IotReq;
 import com.agritechiot.iot.dto.request.TriggerReq;
+import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.Trigger;
 import com.agritechiot.iot.repository.TriggerRepo;
+import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -20,12 +25,14 @@ import java.util.List;
 public class TriggerServiceImp implements TriggerService {
     private final TriggerRepo triggerRepo;
     private final LogService logService;
+    private final Publisher publisher;
     @Value("${sensor.value}")
     private String[] sensors;
 
     @Override
     public Mono<Trigger> getTriggerBySensorAndDeviceId(String sensor, String deviceId) {
-        return triggerRepo.findByDeviceIdAndSensorIgnoreCase(deviceId, sensor);
+        return triggerRepo.findByDeviceIdAndSensorIgnoreCase(deviceId, sensor)
+                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)));
     }
 
     @Override
@@ -120,6 +127,23 @@ public class TriggerServiceImp implements TriggerService {
     public Mono<Trigger> getTriggerByDeviceId(String deviceId) {
         return triggerRepo.findByDeviceId(deviceId)
                 .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")));
+    }
+
+    @Override
+    public Mono<Void> sendTaskToDevice(Trigger req, String status, String topic) {
+        Integer duration = status.equalsIgnoreCase(GenConstant.STATUS_OFF) ? req.getSleepDuration() : null;
+        IotReq iotReq = new IotReq();
+        iotReq.setValue(req.getSensor());
+        iotReq.setDeviceId(req.getDeviceId());
+        iotReq.setStatus(status);
+        iotReq.setDuration(duration);
+        logService.logInfo("PUBLISH_MESSAGE_TO_DEVICE", iotReq.toString());
+        try {
+            publisher.publish(topic, JsonUtil.toJson(iotReq), 1, true);
+            return Mono.empty();
+        } catch (MqttException e) {
+            return Mono.error(new RuntimeException(e));
+        }
     }
 
 }

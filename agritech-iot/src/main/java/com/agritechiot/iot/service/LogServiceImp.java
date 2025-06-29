@@ -16,6 +16,11 @@ public class LogServiceImp implements LogService {
     }
 
     @Override
+    public void logInfo(String step, Object message) {
+        log.info("TRACE_ID: [{}] - {}: {}", MDC.get(GenConstant.CORRELATION_ID), step, message);
+    }
+
+    @Override
     public void logInfo(String step) {
         log.info("TRACE_ID: [{}] - {}", MDC.get(GenConstant.CORRELATION_ID), step);
     }

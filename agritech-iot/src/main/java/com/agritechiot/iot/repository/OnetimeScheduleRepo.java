@@ -14,7 +14,6 @@ import java.util.List;
 
 @Repository
 public interface OnetimeScheduleRepo extends ReactiveCrudRepository<OnetimeSchedule, Integer> {
-    Flux<OnetimeSchedule> findAllByDurationBetween(Integer duration, Integer duration2);
 
     @Query("SELECT * FROM tbl_onetime_schedule WHERE deviceId = : deviceId ORDER BY id DESC")
     Flux<OnetimeSchedule> findByDeviceId(@Param("deviceId") String deviceId);

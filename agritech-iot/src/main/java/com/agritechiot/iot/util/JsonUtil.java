@@ -1,5 +1,6 @@
 package com.agritechiot.iot.util;
 
+import com.agritechiot.iot.exception.AppException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +36,22 @@ public class JsonUtil {
             return objectMapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Failed to serialize object to JSON", e);
+        }
+    }
+
+    /**
+     * Convert JSON string to given class type.
+     *
+     * @param json  the input JSON string
+     * @param clazz the target class type
+     * @return instance of the class with JSON data
+     * @throws RuntimeException if conversion fails
+     */
+    public static <T> T fromJson(String json, Class<T> clazz) {
+        try {
+            return objectMapper.readValue(json, clazz);
+        } catch (Exception e) {
+            throw new AppException("❌ Failed to deserialize JSON to " + clazz.getSimpleName());
         }
     }
 

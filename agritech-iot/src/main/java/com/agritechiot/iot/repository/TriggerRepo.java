@@ -13,9 +13,6 @@ import java.util.List;
 @Repository
 public interface TriggerRepo extends ReactiveCrudRepository<Trigger, Integer> {
 
-    @Query("SELECT * FROM tbl_trigger t WHERE t.sensor = :sensensor AND t.deviceId = :deviceid AND (t.isRemoved = false or t.isRemoved IS NULL)")
-    Mono<Trigger> findByDeviceIdAndSensor(@Param("deviceId") String deviceId, @Param("sensor") String sensor);
-
     @Query("SELECT * FROM tbl_trigger t WHERE LOWER(t.sensor) = LOWER(:sensor) AND t.deviceId = :deviceId AND (t.isRemoved = false OR t.isRemoved IS NULL)")
     Mono<Trigger> findByDeviceIdAndSensorIgnoreCase(@Param("deviceId") String deviceId, @Param("sensor") String sensor);
 

@@ -78,7 +78,7 @@ public class IoTDeviceController {
     public Mono<ApiResponse<List<IoTDeviceDto>>> getIoTDevicesByName(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq ioTDeviceReq
-    ) throws Exception {
+    ) {
         log.info("REQ_IOT_DEVICE: {}", JsonUtil.toJson(ioTDeviceReq));
         return ioTDeviceService.getDeviceByName(ioTDeviceReq.getName())
                 .collectList()// Collect the Flux into a List
@@ -89,7 +89,7 @@ public class IoTDeviceController {
     public Mono<ApiResponse<IoTDevice>> addDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
-    ) throws Exception {
+    ) {
         log.info("REQ_IOT_ADD_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.saveDevice(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
@@ -106,7 +106,7 @@ public class IoTDeviceController {
     public Mono<ApiResponse<IoTDevice>> updateDevices(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody IoTDeviceReq req
-    ) throws Exception {
+    ) {
         log.info("REQ_IOT_UPDATE_DEVICE: {}", JsonUtil.toJson(req));
         return ioTDeviceService.updateDevice(req.getDeviceId(), req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))

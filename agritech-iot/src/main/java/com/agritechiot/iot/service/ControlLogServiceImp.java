@@ -2,15 +2,13 @@ package com.agritechiot.iot.service;
 
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.ControlLogReq;
-import com.agritechiot.iot.dto.request.IotReq;
 import com.agritechiot.iot.model.ControlLog;
 import com.agritechiot.iot.repository.ControlLogRepo;
+import com.agritechiot.iot.schedule.TriggerScheduleManager;
 import com.agritechiot.iot.service.mqtt.Publisher;
-import com.agritechiot.iot.util.GenUtil;
 import com.agritechiot.iot.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,6 +26,7 @@ public class ControlLogServiceImp implements ControlLogService {
     private final ControlLogRepo controlLogRepo;
     private final IoTDeviceService ioTDeviceService;
     private final TriggerService triggerService;
+    private final TriggerScheduleManager triggerScheduleManager;
 
     @Override
     public Mono<ControlLog> saveControlLog(ControlLogReq req) {
@@ -87,20 +86,13 @@ public class ControlLogServiceImp implements ControlLogService {
                 .flatMap(req -> ioTDeviceService.getDeviceById(req.getDeviceId())
                         .flatMap(device ->
                                 triggerService.getTriggerBySensorAndDeviceId(sensor.trim().toLowerCase(), req.getDeviceId())
-                                        .flatMap(trigger -> {
-                                            IotReq iotReq = new IotReq();
-                                            iotReq.setAction(trigger.getSensor());
-                                            iotReq.setDeviceId(trigger.getDeviceId());
-                                            iotReq.setValue(GenUtil.checkOffAndOn(req.getStatus()));
-                                            logService.logInfo("PUBLISH_MESSAGE_TO_DEVICE", iotReq.toString());
-                                            try {
-                                                publisher.publish(device.getMasterDeviceName(), JsonUtil.toJson(iotReq), 1, true);
-                                                return Mono.empty();
-                                            } catch (MqttException e) {
-                                                return Mono.error(new RuntimeException(e));
-                                            }
-                                        })
-                        )
+                                        .flatMap(trigger ->
+                                                {
+                                                    triggerScheduleManager.scheduleTriggerTask(trigger, device.getMasterDeviceName());
+                                                    return triggerService.sendTaskToDevice(trigger, GenConstant.STATUS_ON, device.getMasterDeviceName());
+                                                }
+
+                                        ))
                 );
     }
 

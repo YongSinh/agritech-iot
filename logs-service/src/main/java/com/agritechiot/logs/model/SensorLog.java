@@ -28,7 +28,7 @@ public class SensorLog {
     private LocalDateTime dateTime;
     @Field("deviceId")
     private String deviceId;
-    private Double value;
+    private String value;
     private String action;
 
 }

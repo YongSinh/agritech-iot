@@ -2,6 +2,7 @@ package com.agritechiot.logs.service;
 
 
 import com.agritechiot.logs.constant.Fields;
+import com.agritechiot.logs.dto.MqttMessageRes;
 import com.agritechiot.logs.model.SensorLog;
 import com.agritechiot.logs.repository.SensorLogRepo;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -52,22 +53,20 @@ public class SensorLogServiceImp implements SensorLogService {
     }
 
     @Override
-    public Mono<SensorLog> saveSensorLog(JsonNode req) {
+    public Mono<SensorLog> saveSensorLog(MqttMessageRes req) {
         return validateFields(req)
                 .flatMap(validReq -> {
                     SensorLog sensorLog = new SensorLog();
-                    sensorLog.setDeviceId(validReq.path(Fields.DEVICE_ID).asText());
+                    sensorLog.setDeviceId(validReq.getDeviceId());
                     sensorLog.setDateTime(LocalDateTime.now());
-                    sensorLog.setAction(validReq.path(Fields.ACTION).asText());
-                    sensorLog.setValue(validReq.path(Fields.VALUE).doubleValue());
+                    sensorLog.setAction(validReq.getAction());
+                    sensorLog.setValue(validReq.getValue());
                     return sensorLogRepo.save(sensorLog);
                 });
     }
 
-    private Mono<JsonNode> validateFields(JsonNode req) {
-        if (req.path(Fields.DEVICE_ID).isMissingNode() || req.path(Fields.DEVICE_ID).isNull()
-                || req.path(Fields.ACTION).isMissingNode() || req.path(Fields.ACTION).isNull()
-        || req.path(Fields.VALUE).isMissingNode() || req.path(Fields.VALUE).isNull()){
+    private Mono<MqttMessageRes> validateFields(MqttMessageRes req) {
+        if (req.getDeviceId() == null || req.getValue() == null){
             return Mono.empty(); // validation failed
         }
         return Mono.just(req); // validation passed

@@ -145,7 +145,7 @@ const SideBar = () => {
           color={colors.gray[300]}
           sx={{ m: "15px 0 5px 20px" }}
         >
-          {!collapsed ? "Data" : " "}
+          {!collapsed ? "Manage Data" : " "}
         </Typography>{" "}
         <Menu
           menuItemStyles={{
@@ -171,8 +171,8 @@ const SideBar = () => {
             icon={<Tune />}
           />
           <Item
-            title="MQTT Message"
-            path="/console"
+            title="MQTT Topic"
+            path="/mqtt-topic"
             colors={colors}
             icon={<PersonalVideoOutlined />}
           />
@@ -256,12 +256,12 @@ const SideBar = () => {
             colors={colors}
             icon={<CalendarTodayOutlined />}
           />
-          <Item
+          {/* <Item
             title="FAQ Page"
             path="/faq"
             colors={colors}
             icon={<HelpOutlineOutlined />}
-          />
+          /> */}
         </Menu>
         {/* <Typography
           variant="h6"

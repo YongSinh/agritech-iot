@@ -1,0 +1,169 @@
+{"deviceid": "slave_1", "status": "check"}
+
+{
+	"deviceid": "slave_1",
+	"status": "online"
+}
+
+{"deviceid": "slave_1", "status": "off"}
+
+{
+	"deviceid": "slave_1",
+	"status": "off"
+}
+
+{"deviceid": "slave_1", "status": "on", "duration": 5}
+
+{
+	"deviceid": "slave_1",
+	"status": "on",
+	"duration": 5
+}
+
+{"deviceid": "slave_1", "status": "valve"}
+
+{
+	"deviceid": "slave_1",
+	"status": "on"
+}
+
+{
+	"deviceid": "slave_1",
+	"status": "off"
+}
+
+{
+	"deviceid": "slave_1",
+	"status": "unknown"
+}
+
+{"deviceid": "slave_1", "status": "water_flow"}
+
+{
+	"deviceid": "slave_1",
+	"status": "water_flow",
+	"flow_rate": 0.00,
+	"flow_quantity": 0.00,
+	"total_water": 0.00
+}
+
+{"deviceid": "slave_1", "status": "soil_moisture"}
+
+{
+	"deviceid": "slave_1",
+	"status": "soil_moisture",
+	"valve": 0.00
+}
+
+{"deviceid": "slave_1", "status": "soil_temperature"}
+
+{
+	"deviceid": "slave_1",
+	"status": "soil_temperature",
+	"valve": 0.00
+}
+
+{"deviceid": "slave_1", "status": "ambien_temperature"}
+
+{
+	"deviceid": "slave_1",
+	"status": "ambien_temperature",
+	"valve": 0.00
+}
+
+{"deviceid": "master_1", "status": "voltage"}
+
+{
+	"deviceid": "slave_1",
+	"status": "voltage",
+	"voltage": "0.00",
+	"battery": "0"
+}
+
+{"deviceid": "slave_1", "status": "work"}
+
+{
+	"deviceid": "slave_1",
+	"status": "work",
+	"run": 10,
+	"sleep": 600
+}
+
+{"deviceid": "master_1", "status": "wifi"}
+
+{
+	"deviceid": "master_1",
+	"status": "wifi",
+	"ssid": "HUA",
+	"pass": "44443333"
+}
+
+{"deviceid": "master_1", "status": "mqtt"}
+
+{
+	"deviceid": "master_1",
+	"status": "mqtt",
+	"MQTT_HOST": "159.65.131.28",
+	"MQTT_PORT": "1883",
+	"MQTT_USER": "iot",
+	"MQTT_PASS": "iot@2025",
+	"MQTT_SUB_TOPIC": "mqtt_in/",
+	"MQTT_PUB_TOPIC": "mqtt_out"
+}
+
+{"deviceid": "slave_1", "status": "lora"}
+
+{
+	"deviceid": "slave_1",
+	"status": "lora",
+	"lora_M_address": 1000,
+	"lora_M_channel": 10
+}
+
+{"deviceid": "slave_1", "set": "sleep"}
+
+{
+	"deviceid": "slave_1",
+	"set": "sleep"
+}
+
+{"deviceid": "slave_1", "set": "work", "run": "1", "sleep": "10"}
+
+{
+	"deviceid": "slave_1",
+	"set": "work",
+	"run": 10,
+	"sleep": 600
+}
+
+{"deviceid": "master_1", "set": "wifi", "ssid": "HUA", "pass": "44443333"}
+
+{
+	"deviceid": "master_1",
+	"set": "wifi",
+	"ssid": "HUA",
+	"pass": "44443333"
+}
+
+{"deviceid": "master_1", "set": "mqtt", "HOSTNAME": "master_1", "MQTT_HOST": "159.65.131.28", "MQTT_PORT": "1883", "MQTT_USER": "iot", "MQTT_PASS": "iot@2025", "MQTT_SUB_TOPIC": "mqtt_in/", "MQTT_PUB_TOPIC": "mqtt_out"}
+
+{
+	"deviceid": "master_1",
+	"set": "mqtt",
+	"HOSTNAME": "master_1",
+	"MQTT_HOST": "159.65.131.28",
+	"MQTT_PORT": "1883",
+	"MQTT_USER": "iot",
+	"MQTT_PASS": "iot@2025",
+	"MQTT_SUB_TOPIC": "mqtt_in/",
+	"MQTT_PUB_TOPIC": "mqtt_out"
+}
+
+{"deviceid": "slave_1", "set": "lora", "lora_M_address": 1000, "lora_M_channel": 10}
+
+{
+	"deviceid": "slave_1",
+	"status": "lora",
+	"lora_M_address": 1000,
+	"lora_M_channel": 10
+}

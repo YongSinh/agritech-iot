@@ -11,9 +11,12 @@ public class GenConstant {
     public static final String DEFAULT_CORRELATION_ID = UUID.randomUUID().toString();
     public static final String ONETIME_SCHEDULE_TYPE = "Onetime Schedule";
     public static final String REPEAT_SCHEDULE_TYPE = "Repeat Schedule";
-
-    public static final String NOT_FOUND = "NOT FOUND";
+    public static final String SUBSCRIBE_MSG_LOG = "✅ Subscribed to topic: {}";
+    public static final String NOT_FOUND = "DATA NOT FOUND";
     public static final String INTERVAL_SCHEDULE_LOG_NOT_FOUND = "INTERVAL SCHEDULE LOG NOT FOUND";
+
+    public static final String STATUS_ON = "on";
+    public static final String STATUS_OFF = "off";
 
     private GenConstant() {
 

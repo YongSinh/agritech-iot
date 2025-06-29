@@ -1,7 +1,5 @@
 package com.agritechiot.iot.controller;
 
-import com.agritechiot.iot.config.Mqtt;
-import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.MqttPublishReq;
 import com.agritechiot.iot.model.Trigger;
@@ -27,14 +25,12 @@ public class SampleController {
     private final SimpMessagingTemplate messagingTemplate;
     private final TriggerRepo triggerRepo;
     private final Publisher publisher;
-    private final Mqtt mqtt;
     private final LogClient logClient;
     @Value("${spring.profiles.active}")
     private String activeProfile;
 
     @PostMapping("/sample")
     public ResponseEntity<Object> sample(
-            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
             @RequestBody MqttPublishReq req) throws MqttException {
         Trigger res = triggerRepo.findByDeviceId("008").block();
         log.info("Snake case res: {}", JsonUtil.toJsonSnakeCase(res));

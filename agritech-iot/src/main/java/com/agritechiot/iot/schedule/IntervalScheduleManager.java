@@ -1,4 +1,4 @@
-package com.agritechiot.iot.Schedule;
+package com.agritechiot.iot.schedule;
 
 import com.agritechiot.iot.model.IntervalSchedule;
 import com.agritechiot.iot.repository.IntervalScheduleRepo;
@@ -29,7 +29,7 @@ public class IntervalScheduleManager {
         schedulingUtil.withTaskRegistrar(taskRegistrar, registrar -> {
             log.info("🔁 Re-registering tasks...");
             // Re-schedule default task
-            log.info("🧹 Cancelling all existing oneTime_schedule tasks...");
+            log.info("🧹 Cancelling all existing interval schedule tasks...");
             cancelAllScheduledTasks();
 
             log.info("🔁 Re-registering tasks...");

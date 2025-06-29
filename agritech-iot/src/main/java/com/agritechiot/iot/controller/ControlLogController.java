@@ -72,8 +72,7 @@ public class ControlLogController {
 
     @PostMapping("/v1/control-logs/filter")
     public Mono<ApiResponse<List<ControlLog>>> getFilteredControlLogs(
-            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody ControlLogReq req
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
     ) {
         logService.logInfo("INIT_FILTERED_CONTROL_LOGS");
         return controlLogService.getControlLogs()
@@ -103,7 +102,8 @@ public class ControlLogController {
             @PathVariable Integer id,
             @PathVariable String sensor,
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
-    ) throws Exception {
+    ) {
+        logService.logInfo("INIT_SEND_TASK_CONTROL_LOGS");
         return controlLogService.sendTaskToDevice(id, sensor)
                 .then(Mono.just(new ApiResponse<>())
                         .onErrorResume(Exception.class, ex ->

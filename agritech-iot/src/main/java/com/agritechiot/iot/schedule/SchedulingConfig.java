@@ -1,4 +1,4 @@
-package com.agritechiot.iot.Schedule;
+package com.agritechiot.iot.schedule;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
     private final RepeatScheduleManager repeatScheduleManager;
     private final OnetimeScheduleManager onetimeScheduleManager;
     private final IntervalScheduleManager intervalScheduleManager;
+    private final TriggerScheduleManager triggerScheduleManager;
     private ScheduledTaskRegistrar taskRegistrar;
 
     @Override
@@ -30,9 +31,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
             log.warn("TaskRegistrar not initialized yet");
             return;
         }
-        repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
-        onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
-        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
+        triggerScheduleManager.refreshScheduledTasks(taskRegistrar);
+//        repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
+//        onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
+//        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
     }
 
     public void refreshRepeatScheduledTasksById(Integer id) {
@@ -41,6 +43,10 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     public void refreshOnetimeScheduledTasksById(Integer id) {
         onetimeScheduleManager.refreshOneTimeScheduledTasksById(id, taskRegistrar);
+    }
+
+    public void refreshOnetimeIntervalTasksById(Integer id) {
+        intervalScheduleManager.refreshIntervalScheduledTasksById(id, taskRegistrar);
     }
 
 

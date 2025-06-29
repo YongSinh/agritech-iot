@@ -13,7 +13,6 @@ public class IntervalScheduleReq {
     private Boolean readSensor;
     private Boolean turnOnWater;
     private Integer duration;
-    //    @JsonProperty("device_id")
     private String deviceId;
     private Integer runDatetime;
 }

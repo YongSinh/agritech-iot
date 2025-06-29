@@ -1,4 +1,4 @@
-package com.agritechiot.iot.Schedule;
+package com.agritechiot.iot.schedule;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

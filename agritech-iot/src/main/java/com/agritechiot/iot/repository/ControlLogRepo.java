@@ -31,5 +31,4 @@ public interface ControlLogRepo extends ReactiveCrudRepository<ControlLog, Integ
             @Param("endDate") LocalDate endDate
     );
 
-    Flux<ControlLog> findByDeviceId(String deviceId);
 }

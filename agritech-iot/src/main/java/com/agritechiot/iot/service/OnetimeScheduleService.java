@@ -18,7 +18,6 @@ public interface OnetimeScheduleService {
 
     Flux<OnetimeSchedule> getListOnetimeSchedule();
 
-    Flux<OnetimeSchedule> getListOnetimeScheduleDuration(Integer duration, Integer duration2);
 
     Flux<OnetimeSchedule> getListOnetimeScheduleByDeviceId(String deviceId);
 

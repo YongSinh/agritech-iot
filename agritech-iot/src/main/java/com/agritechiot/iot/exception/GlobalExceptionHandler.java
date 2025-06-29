@@ -1,33 +1,32 @@
 package com.agritechiot.iot.exception;
 
-import com.agritechiot.iot.dto.ApiErrResponse;
-import com.agritechiot.iot.dto.ApiResponse;
-import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
+import com.agritechiot.iot.dto.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
 
 @RestControllerAdvice
-@ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    public Mono<ResponseEntity<ApiResponse<String>>> runtimeException(Exception ex, ServerWebExchange exchange) {
-        return Mono.just(new ResponseEntity<>(new ApiResponse<>(ex.getMessage()), HttpStatus.CONFLICT));
+    public ResponseEntity<ErrorResponse<Void>> handleGeneric(Exception ex, HttpServletRequest request) {
+        ErrorResponse<Void> error = new ErrorResponse<>(
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
-    @ExceptionHandler(InvalidDefinitionException.class)
-    public Mono<ResponseEntity<ApiResponse<String>>> invalidDefinitionException(InvalidDefinitionException ex) {
-        return Mono.just(new ResponseEntity<>(new ApiResponse<>(ex.getMessage()), HttpStatus.CONFLICT));
+    @ExceptionHandler(AppException.class)
+    public ResponseEntity<ErrorResponse<Void>> handleAppException(AppException ex, HttpServletRequest request) {
+        ErrorResponse<Void> error = new ErrorResponse<>(
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public Mono<ResponseEntity<ApiErrResponse<String>>> nullPointerException(NullPointerException ex) {
-        return Mono.just(new ResponseEntity<>(new ApiErrResponse<>(ex.getMessage()), HttpStatus.BAD_REQUEST));
-    }
 
 }

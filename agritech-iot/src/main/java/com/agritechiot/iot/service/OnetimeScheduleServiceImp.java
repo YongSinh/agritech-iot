@@ -3,6 +3,7 @@ package com.agritechiot.iot.service;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.OnetimeScheduleReq;
 import com.agritechiot.iot.dto.response.ActiveScheduleRes;
+import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.model.OnetimeSchedule;
 import com.agritechiot.iot.model.Trigger;
@@ -34,6 +35,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
 
     @Override
     public Mono<OnetimeSchedule> saveOnetimeSchedule(OnetimeScheduleReq req) {
+        logService.logInfo("REQ_CREATE_ONETIME_SCHEDULE", JsonUtil.toJson(req));
         OnetimeSchedule onetimeSchedule = new OnetimeSchedule();
         onetimeSchedule.setDuration(req.getDuration());
         onetimeSchedule.setDeviceId(req.getDeviceId());
@@ -47,8 +49,9 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
 
     @Override
     public Mono<OnetimeSchedule> updateOnetimeSchedule(Integer id, OnetimeScheduleReq req) {
+        logService.logInfo("REQ_UPDATE_ONETIME_SCHEDULE", JsonUtil.toJson(req));
         return onetimeScheduleRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("ONE_TIME_SCHEDULE_NOT_FOUND")))
+                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)))
                 .map(onetimeSchedule -> {
                     onetimeSchedule.setId(id);
                     onetimeSchedule.setDuration(req.getDuration());
@@ -67,10 +70,6 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
         return onetimeScheduleRepo.findByIsNotDeleted();
     }
 
-    @Override
-    public Flux<OnetimeSchedule> getListOnetimeScheduleDuration(Integer duration, Integer duration2) {
-        return onetimeScheduleRepo.findAllByDurationBetween(duration, duration2);
-    }
 
     @Override
     public Flux<OnetimeSchedule> getListOnetimeScheduleByDeviceId(String deviceId) {
@@ -118,7 +117,7 @@ public class OnetimeScheduleServiceImp implements OnetimeScheduleService {
     @Override
     public Mono<Void> softDeleteById(Integer id) {
         return onetimeScheduleRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception("NOT_FOUND")))
+                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)))
                 .flatMap(req -> {
                     req.setIsRemoved(true);
                     req.setDeletedAt(LocalDateTime.now());

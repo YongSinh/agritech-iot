@@ -20,7 +20,7 @@ import {
   IntervalSchedule,
   Trigger,
   Control, 
-  Console
+  MQTT
 } from "./scenes";
 
 import LoadingPage from "./components/LoadingPage";
@@ -48,8 +48,8 @@ const AppRouter = () => {
           <Route path="/onetime-schedule" element={<OnetimeSchedule />} />
           <Route path="/trigger" element={<Trigger />} />
           <Route path="/control" element={<Control />} />
-           <Route path="/console" element={<Console />} />
-            <Route path="/loading" element={<LoadingPage />} />
+          <Route path="/mqtt-topic" element={<MQTT />} />
+          <Route path="/loading" element={<LoadingPage />} />
         </Route>
       </Routes>
     </Router>

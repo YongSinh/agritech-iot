@@ -1,5 +1,7 @@
 package com.agritechiot.iot.util;
 
+import com.agritechiot.iot.dto.response.MqttMessageRes;
+import com.agritechiot.iot.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
@@ -18,6 +20,17 @@ public class GenUtil {
         }
         return "OFF";
     }
+
+    public static Boolean checkOffAndOn(String status) {
+        return status.equalsIgnoreCase("ON");
+    }
+
+    public static void validateFields(MqttMessageRes req) {
+        if (req.getDeviceId() == null || req.getValue() == null) {
+            throw new AppException("Missing required field(s): device_id or value");
+        }
+    }
+
 
     /**
      * Generates a one-time cron expression for a specific date and time
