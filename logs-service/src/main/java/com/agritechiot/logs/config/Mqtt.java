@@ -1,7 +1,6 @@
 package com.agritechiot.logs.config;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;

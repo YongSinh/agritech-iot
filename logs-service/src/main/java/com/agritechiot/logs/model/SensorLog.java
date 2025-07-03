@@ -6,19 +6,21 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Document(collection = "sensor_log")
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SensorLog {
     @Id
@@ -29,6 +31,16 @@ public class SensorLog {
     @Field("deviceId")
     private String deviceId;
     private String value;
-    private String action;
+    private String status;
+    // Sensor-specific measurements
+    private Map<String, Object> measurements;
+    // Optional: For quick access to common values
+    @Field("valve_status")
+    private Double valveStatus; // Only for soil_moisture
 
+    @Field("flow_rate")
+    private Double flowRate; // Only for water_flow
+
+    @Field("total_water")
+    private Double totalWater; // Only for water_flow
 }

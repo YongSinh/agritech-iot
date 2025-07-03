@@ -48,6 +48,7 @@ public class SensorLogController {
         return sensorLogService.updateSensorLog(req.getId(), req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
+
     @GetMapping("/v1/sensor-logs/{deviceId}")
     public Mono<ApiResponse<List<SensorLog>>> getSensorLogByDeviceId
             (@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,

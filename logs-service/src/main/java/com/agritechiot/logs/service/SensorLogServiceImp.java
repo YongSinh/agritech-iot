@@ -1,20 +1,22 @@
 package com.agritechiot.logs.service;
 
 
-import com.agritechiot.logs.constant.Fields;
 import com.agritechiot.logs.dto.MqttMessageRes;
 import com.agritechiot.logs.model.SensorLog;
 import com.agritechiot.logs.repository.SensorLogRepo;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SensorLogServiceImp implements SensorLogService {
     private final SensorLogRepo sensorLogRepo;
 
@@ -23,7 +25,6 @@ public class SensorLogServiceImp implements SensorLogService {
         SensorLog sensorLog = new SensorLog();
         sensorLog.setDeviceId(req.getDeviceId());
         sensorLog.setDateTime(req.getDateTime());
-        sensorLog.setAction(req.getAction());
         sensorLog.setValue(req.getValue());
         return sensorLogRepo.save(sensorLog);
     }
@@ -36,7 +37,6 @@ public class SensorLogServiceImp implements SensorLogService {
                     sensorLog.setId(id);
                     sensorLog.setDeviceId(req.getDeviceId());
                     sensorLog.setDateTime(req.getDateTime());
-                    sensorLog.setAction(req.getAction());
                     sensorLog.setValue(req.getValue());
                     return sensorLog;
                 }).flatMap(sensorLogRepo::save);
@@ -54,22 +54,44 @@ public class SensorLogServiceImp implements SensorLogService {
 
     @Override
     public Mono<SensorLog> saveSensorLog(MqttMessageRes req) {
-        return validateFields(req)
-                .flatMap(validReq -> {
-                    SensorLog sensorLog = new SensorLog();
-                    sensorLog.setDeviceId(validReq.getDeviceId());
-                    sensorLog.setDateTime(LocalDateTime.now());
-                    sensorLog.setAction(validReq.getAction());
-                    sensorLog.setValue(validReq.getValue());
-                    return sensorLogRepo.save(sensorLog);
-                });
+        return validateMqttMessage(req)
+                .flatMap(this::convertToSensorLog)
+                .flatMap(sensorLogRepo::save)
+                .doOnSuccess(sensorLog -> log.debug("Saved sensor log: {}", sensorLog))
+                .doOnError(e -> log.error("Failed to save sensor log", e));
     }
 
-    private Mono<MqttMessageRes> validateFields(MqttMessageRes req) {
-        if (req.getDeviceId() == null || req.getValue() == null){
-            return Mono.empty(); // validation failed
-        }
-        return Mono.just(req); // validation passed
+
+    private Mono<MqttMessageRes> validateMqttMessage(MqttMessageRes req) {
+        return Mono.just(req)
+                .filter(r -> r.getDeviceId() != null)
+                .filter(r -> r.getValveStatus() != null ||
+                        (r.getFlowRate() != null || r.getTotalWater() != null))
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Invalid sensor data")))
+                .doOnNext(r -> log.debug("Validated MQTT message for device: {}", r.getDeviceId()));
     }
 
+    private Mono<SensorLog> convertToSensorLog(MqttMessageRes req) {
+        return Mono.fromCallable(() -> {
+            String sensorType = req.determineSensorType();
+
+            Map<String, Object> measurements = new HashMap<>();
+            if ("water_flow".equals(sensorType)) {
+                measurements.put("flow_rate", req.getFlowRate());
+                measurements.put("total_water", req.getTotalWater());
+            } else {
+                measurements.put("valve_status", req.getValveStatus());
+            }
+
+            return SensorLog.builder()
+                    .deviceId(req.getDeviceId())
+                    .dateTime(LocalDateTime.now())
+                    .status(sensorType)
+                    .valveStatus(req.getValveStatus())
+                    .flowRate(req.getFlowRate())
+                    .totalWater(req.getTotalWater())
+                    .measurements(measurements)
+                    .build();
+        });
+    }
 }
