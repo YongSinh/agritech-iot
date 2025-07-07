@@ -2,6 +2,8 @@ package com.agritechiot.iot.service;
 
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.ControlLogReq;
+import com.agritechiot.iot.dto.request.WorkCommand;
+import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.ControlLog;
 import com.agritechiot.iot.repository.ControlLogRepo;
 import com.agritechiot.iot.schedule.TriggerScheduleManager;
@@ -9,6 +11,7 @@ import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -75,11 +78,6 @@ public class ControlLogServiceImp implements ControlLogService {
 
 
     @Override
-    public Flux<ControlLog> getControlLogsWithFilters(ControlLogReq req) {
-        return repo.findWithFilters(req.getDeviceId(), req.getSentBy(), req.getStatus(), req.getStartDate(), req.getEndDate());
-    }
-
-    @Override
     public Mono<Void> sendTaskToDevice(Integer id, String sensor) {
         return controlLogRepo.findById(id)
                 .switchIfEmpty(Mono.error(new Exception(GenConstant.NOT_FOUND)))
@@ -108,4 +106,23 @@ public class ControlLogServiceImp implements ControlLogService {
                 })
                 .then();
     }
+
+    @Override
+    public Mono<Void> sendDeviceToSleep(String id, String topic) {
+        return null;
+    }
+
+    @Override
+    public Mono<Void> sendDeviceToWork(String id, String sleepDuration, String run , String topic) {
+
+        return Mono.fromRunnable(() -> {
+            WorkCommand req = new WorkCommand(id, run, sleepDuration);
+            try {
+                publisher.publish(topic, JsonUtil.toJson(req), 1, true);
+            } catch (MqttException e) {
+                throw new AppException(e.getMessage());
+            }
+        });
+    }
+
 }

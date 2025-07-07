@@ -14,6 +14,6 @@ import lombok.ToString;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MqttMessageRes {
     private String deviceId;
-    private String value;
+    private String status;
     private String action;
 }

@@ -1,5 +1,6 @@
 package com.agritechiot.iot.util;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.response.MqttMessageRes;
 import com.agritechiot.iot.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
@@ -14,23 +15,19 @@ public class GenUtil {
     private GenUtil() {
     }
 
-    public static String checkOffAndOn(Boolean status) {
-        if (Boolean.TRUE.equals(status)) {
-            return "ON";
-        }
-        return "OFF";
-    }
 
     public static Boolean checkOffAndOn(String status) {
-        return status.equalsIgnoreCase("ON");
+        if (!status.equalsIgnoreCase(GenConstant.STATUS_ON) && !status.equalsIgnoreCase(GenConstant.STATUS_OFF)) {
+            throw new AppException("Invalid status: " + status);
+        }
+        return status.equalsIgnoreCase(GenConstant.STATUS_ON);
     }
 
     public static void validateFields(MqttMessageRes req) {
-        if (req.getDeviceId() == null || req.getValue() == null) {
+        if (req.getDeviceId() == null || req.getStatus() == null) {
             throw new AppException("Missing required field(s): device_id or value");
         }
     }
-
 
     /**
      * Generates a one-time cron expression for a specific date and time

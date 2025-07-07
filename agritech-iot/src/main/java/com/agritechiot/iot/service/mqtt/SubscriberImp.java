@@ -77,7 +77,7 @@ public class SubscriberImp implements Subscriber {
                             log.info("Res: {}", dto);
                             GenUtil.validateFields(dto);
                             logMessage(res, topic.toString());
-                            ioTDeviceService.updateDeviceStats(dto.getDeviceId(), GenUtil.checkOffAndOn(dto.getValue()))
+                            ioTDeviceService.updateDeviceStats(dto.getDeviceId(), GenUtil.checkOffAndOn(dto.getStatus()))
                                     .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
                                     .doOnError(error -> log.error("❌ Failed to save", error))
                                     .subscribe();

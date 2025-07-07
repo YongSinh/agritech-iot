@@ -23,4 +23,6 @@ public interface TriggerService {
     Mono<Trigger> getTriggerByDeviceId(String deviceId);
 
     Mono<Void> sendTaskToDevice(Trigger req, String status, String topic);
+
+
 }

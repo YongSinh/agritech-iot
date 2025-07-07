@@ -1,6 +1,8 @@
 package com.agritechiot.logs.service;
 
 
+import com.agritechiot.logs.constant.Fields;
+import com.agritechiot.logs.constant.GenConstant;
 import com.agritechiot.logs.dto.MqttMessageRes;
 import com.agritechiot.logs.model.SensorLog;
 import com.agritechiot.logs.repository.SensorLogRepo;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,31 +68,26 @@ public class SensorLogServiceImp implements SensorLogService {
     private Mono<MqttMessageRes> validateMqttMessage(MqttMessageRes req) {
         return Mono.just(req)
                 .filter(r -> r.getDeviceId() != null)
-                .filter(r -> r.getValveStatus() != null ||
-                        (r.getFlowRate() != null || r.getTotalWater() != null))
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("Invalid sensor data")))
                 .doOnNext(r -> log.debug("Validated MQTT message for device: {}", r.getDeviceId()));
     }
 
     private Mono<SensorLog> convertToSensorLog(MqttMessageRes req) {
         return Mono.fromCallable(() -> {
-            String sensorType = req.determineSensorType();
-
             Map<String, Object> measurements = new HashMap<>();
-            if ("water_flow".equals(sensorType)) {
-                measurements.put("flow_rate", req.getFlowRate());
-                measurements.put("total_water", req.getTotalWater());
+            if (GenConstant.WATER_FLOW_STATUS.equals(req.getStatus())) {
+                measurements.put(Fields.FLOW_RATE, req.getFlowRate());
+                measurements.put(Fields.FLOW_QUANTITY,req.getFlowQuantity());
+                measurements.put(Fields.TOTAL_WATER, req.getTotalWater());
             } else {
-                measurements.put("valve_status", req.getValveStatus());
+                measurements.put("valve_status", req.getValue());
             }
 
             return SensorLog.builder()
                     .deviceId(req.getDeviceId())
                     .dateTime(LocalDateTime.now())
-                    .status(sensorType)
-                    .valveStatus(req.getValveStatus())
-                    .flowRate(req.getFlowRate())
-                    .totalWater(req.getTotalWater())
+                    .status(req.getStatus())
+                    .value(req.getValue())
                     .measurements(measurements)
                     .build();
         });

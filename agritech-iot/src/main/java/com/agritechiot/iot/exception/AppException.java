@@ -3,6 +3,7 @@ package com.agritechiot.iot.exception;
 import com.agritechiot.iot.constant.GenConstant;
 import lombok.Getter;
 import lombok.ToString;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 @Getter
 @ToString
@@ -20,4 +21,5 @@ public class AppException extends RuntimeException {
         this.message = message;
         this.code = code;
     }
+
 }

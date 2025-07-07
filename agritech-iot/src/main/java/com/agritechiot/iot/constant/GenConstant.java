@@ -17,7 +17,7 @@ public class GenConstant {
 
     public static final String STATUS_ON = "on";
     public static final String STATUS_OFF = "off";
-
+    public static final Integer DEFAULT_SLEEP_DURATION = 600;
     private GenConstant() {
 
     }

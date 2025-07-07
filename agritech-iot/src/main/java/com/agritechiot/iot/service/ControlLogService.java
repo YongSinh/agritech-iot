@@ -14,10 +14,13 @@ public interface ControlLogService {
 
     Mono<ControlLog> offAndOnControlLog(ControlLogReq req);
 
-    Flux<ControlLog> getControlLogsWithFilters(ControlLogReq req);
-
     Mono<Void> sendTaskToDevice(Integer id, String sensor);
 
     Mono<Void> softDeleteById(Integer id);
+
+    Mono<Void> sendDeviceToSleep(String id, String topic);
+
+    Mono<Void> sendDeviceToWork(String id, String sleepDuration, String run, String topic);
+
 }
 

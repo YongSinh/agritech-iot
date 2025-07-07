@@ -8,7 +8,7 @@
         <version>3.4.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.agritechiot</groupId>
+    <groupId>com.rac</groupId>
     <artifactId>agritech-iot</artifactId>
     <version>1.0.0</version>
     <name>agritech-iot</name>

@@ -14,5 +14,5 @@ public class IotReq {
     private String deviceId;
     private String value;
     private String status;
-    private Integer duration;
+    private Integer sleep;
 }

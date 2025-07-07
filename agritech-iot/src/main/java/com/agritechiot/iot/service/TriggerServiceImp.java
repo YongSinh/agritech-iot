@@ -45,7 +45,7 @@ public class TriggerServiceImp implements TriggerService {
                         List<String> existingDeviceIds = existingTriggers.stream()
                                 .map(Trigger::getDeviceId)
                                 .toList();
-                        return Flux.error(new IllegalArgumentException(
+                        return Flux.error(new AppException(
                                 "Triggers already exist for deviceIds: " + existingDeviceIds));
                     }
                     // Proceed with saving if no duplicates found
@@ -131,12 +131,12 @@ public class TriggerServiceImp implements TriggerService {
 
     @Override
     public Mono<Void> sendTaskToDevice(Trigger req, String status, String topic) {
-        Integer duration = status.equalsIgnoreCase(GenConstant.STATUS_OFF) ? req.getSleepDuration() : null;
+        Integer duration = status.equalsIgnoreCase(GenConstant.STATUS_OFF) ? req.getSleepDuration() : GenConstant.DEFAULT_SLEEP_DURATION;
         IotReq iotReq = new IotReq();
         iotReq.setValue(req.getSensor());
         iotReq.setDeviceId(req.getDeviceId());
         iotReq.setStatus(status);
-        iotReq.setDuration(duration);
+        iotReq.setSleep(duration);
         logService.logInfo("PUBLISH_MESSAGE_TO_DEVICE", iotReq.toString());
         try {
             publisher.publish(topic, JsonUtil.toJson(iotReq), 1, true);

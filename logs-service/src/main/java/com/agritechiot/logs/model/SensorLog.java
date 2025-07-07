@@ -34,13 +34,4 @@ public class SensorLog {
     private String status;
     // Sensor-specific measurements
     private Map<String, Object> measurements;
-    // Optional: For quick access to common values
-    @Field("valve_status")
-    private Double valveStatus; // Only for soil_moisture
-
-    @Field("flow_rate")
-    private Double flowRate; // Only for water_flow
-
-    @Field("total_water")
-    private Double totalWater; // Only for water_flow
 }
