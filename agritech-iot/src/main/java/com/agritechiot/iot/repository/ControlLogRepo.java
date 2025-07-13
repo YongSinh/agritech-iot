@@ -1,11 +1,13 @@
 package com.agritechiot.iot.repository;
 
 import com.agritechiot.iot.model.ControlLog;
+import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
@@ -14,6 +16,10 @@ public interface ControlLogRepo extends ReactiveCrudRepository<ControlLog, Integ
 
     @Query("SELECT * FROM control_log as cl where cl.isRemoved =false or cl.isRemoved IS NULL")
     Flux<ControlLog> findByIsNotDeleted();
+
+    @Modifying
+    @Query("UPDATE control_log SET status = :status WHERE deviceId = :id")
+    Mono<Integer> updateStatusByDeviceId(String deviceId, boolean status);
 
     @Query("""
                 SELECT * FROM control_log

@@ -13,4 +13,5 @@ public class IoTDeviceReq {
     private String controller;
     private Boolean isDeviceOnline;
     private String masterDeviceName;
+    private String sleepDuration;
 }

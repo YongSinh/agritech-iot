@@ -32,9 +32,9 @@ public class SchedulingConfig implements SchedulingConfigurer {
             return;
         }
         triggerScheduleManager.refreshScheduledTasks(taskRegistrar);
-//        repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
-//        onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
-//        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
+        repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
+        onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
+        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
     }
 
     public void refreshRepeatScheduledTasksById(Integer id) {

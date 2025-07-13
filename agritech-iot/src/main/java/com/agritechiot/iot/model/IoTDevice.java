@@ -34,6 +34,9 @@ public class IoTDevice implements Persistable<String> {
     private Boolean isDeviceOnline;
     @Column("masterDeviceName")
     private String masterDeviceName;
+    @Column("sleepDuration")
+    private String sleepDuration;
+
     @Transient
     private boolean isNewEntry = true;
 
@@ -48,6 +51,6 @@ public class IoTDevice implements Persistable<String> {
     }
 
     public IoTDeviceDto toDto() {
-        return new IoTDeviceDto(deviceId, name, controller, sensors, remark, isDeviceOnline, masterDeviceName);
+        return new IoTDeviceDto(deviceId, name, controller, sensors, remark, isDeviceOnline, masterDeviceName, sleepDuration);
     }
 }

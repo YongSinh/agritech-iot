@@ -4,6 +4,8 @@ package com.agritechiot.iot.controller;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.ControlLogReq;
+import com.agritechiot.iot.dto.request.DeviceCommandReq;
+import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.ControlLog;
 import com.agritechiot.iot.service.ControlLogService;
 import com.agritechiot.iot.service.LogService;
@@ -107,6 +109,23 @@ public class ControlLogController {
         return controlLogService.sendTaskToDevice(id, sensor)
                 .then(Mono.just(new ApiResponse<>())
                         .onErrorResume(Exception.class, ex ->
+                                Mono.just(new ApiResponse<>(
+                                        ex.getMessage(),
+                                        correlationId,
+                                        GenConstant.ERR_CODE
+                                ))
+                        )).then();
+    }
+
+    @PostMapping("/v1/control-logs/send-commands")
+    public Mono<Void> sendDeviceCommand(
+            @RequestBody DeviceCommandReq req,
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
+    ) {
+        logService.logInfo("INIT_SEND_COMMAND_CONTROL_LOGS");
+        return controlLogService.sendDeviceCommand(req)
+                .then(Mono.just(new ApiResponse<>())
+                        .onErrorResume(AppException.class, ex ->
                                 Mono.just(new ApiResponse<>(
                                         ex.getMessage(),
                                         correlationId,

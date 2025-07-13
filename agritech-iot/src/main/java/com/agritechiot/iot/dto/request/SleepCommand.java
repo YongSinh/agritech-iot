@@ -1,18 +1,11 @@
 package com.agritechiot.iot.dto.request;
 
-import lombok.RequiredArgsConstructor;
+import com.agritechiot.iot.constant.GenConstant;
 
-@RequiredArgsConstructor
-public class SleepCommand implements DeviceCommand{
-    private final String deviceId;
-
-    @Override
-    public String getDeviceId() {
-        return deviceId;
-    }
+public record SleepCommand(String deviceId) implements DeviceCommand {
 
     @Override
     public String getSet() {
-        return "sleep";
+        return GenConstant.TYPE_SLEEP;
     }
 }

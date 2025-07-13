@@ -3,6 +3,7 @@ package com.agritechiot.logs.controller;
 
 import com.agritechiot.logs.constant.GenConstant;
 import com.agritechiot.logs.dto.ApiResponse;
+import com.agritechiot.logs.dto.SensorLogReq;
 import com.agritechiot.logs.model.SensorLog;
 import com.agritechiot.logs.service.SensorLogService;
 import com.agritechiot.logs.util.JsonUtil;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -32,30 +34,29 @@ public class SensorLogController {
     @PostMapping(value = "/v1/sensor-log/add")
     public Mono<ApiResponse<SensorLog>> addSensorLog(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody SensorLog req
+            @RequestBody SensorLogReq req
     ) throws Exception {
         log.info("REQ_CREATE_SENSOR_LOG: {}", JsonUtil.toJson(req));
-        return sensorLogService.saveSensorLog(req)// Collect the Flux into a List
+        return sensorLogService.saveSensorLog(req.getData())// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @PostMapping(value = "/v1/sensor-log/update")
-    public Mono<ApiResponse<SensorLog>> updateSensorLog(
+    @GetMapping("/v1/sensor-logs/filter")
+    public Mono<ApiResponse<List<SensorLog>>> getSensorLogs(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-            @RequestBody SensorLog req
-    ) throws Exception {
-        log.info("REQ_SENSOR_LOG: {}", JsonUtil.toJson(req));
-        return sensorLogService.updateSensorLog(req.getId(), req)// Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
+            @RequestParam(required = false) String deviceId,
+            @RequestParam(required = false) String status
+    ) {
+        Flux<SensorLog> logs;
+        if (deviceId != null) {
+            logs = sensorLogService.getSensorLogByDeviceId(deviceId);
+        } else if (status != null) {
+            logs = sensorLogService.getSensorLogByStatus(status);
+        } else {
+            logs = Flux.empty();
+        }
+
+        return logs.collectList().map(res -> new ApiResponse<>(res, correlationId));
     }
 
-    @GetMapping("/v1/sensor-logs/{deviceId}")
-    public Mono<ApiResponse<List<SensorLog>>> getSensorLogByDeviceId
-            (@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,
-             @PathVariable String deviceId
-            ) {
-        return sensorLogService.getSensorLogByDeviceId(deviceId)
-                .collectList()  // Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
-    }
 }

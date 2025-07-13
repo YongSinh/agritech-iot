@@ -84,9 +84,7 @@ const Device = () => {
       setLoading(false);
       getListDevice()
       handleClose(); // Close the dialog after submission
-
     } else {
-      console.log(result.code)
       Swal.fire({
         title: "Error!",
         text: result.message,
@@ -100,7 +98,6 @@ const Device = () => {
   };
 
   const handleOnDelete = async (value) => {
-    console.log(value)
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -136,6 +133,11 @@ const Device = () => {
     { field: "controller", headerName: "Controller", flex: 1 },
     { field: "sensors", headerName: "Sensors", flex: 1 },
     { field: "masterDeviceName", headerName: "Master Device Name", flex: 1 },
+    {
+      field: "sleepDuration", headerName: "Sleep Duration", flex: 1,
+      renderCell: (params) => params.value ? `${params.value} min` : '-'
+
+    },
     {
       field: "DeviceOnline",
       headerName: "Device Status",

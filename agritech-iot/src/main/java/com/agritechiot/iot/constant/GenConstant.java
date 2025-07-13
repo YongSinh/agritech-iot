@@ -16,8 +16,12 @@ public class GenConstant {
     public static final String INTERVAL_SCHEDULE_LOG_NOT_FOUND = "INTERVAL SCHEDULE LOG NOT FOUND";
 
     public static final String STATUS_ON = "on";
+    public static final String STATUS_ONLINE = "online";
     public static final String STATUS_OFF = "off";
+    public static final String TYPE_SLEEP = "sleep";
+    public static final String TYPE_WORK = "work";
     public static final Integer DEFAULT_SLEEP_DURATION = 600;
+
     private GenConstant() {
 
     }

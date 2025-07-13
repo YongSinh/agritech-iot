@@ -8,6 +8,9 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface SensorLogRepo extends ReactiveMongoRepository<SensorLog, String> {
-    @Query("{deviceId: ?0}")
+    @Query("{ 'data.deviceid': ?0 }")
     Flux<SensorLog> findByDeviceId(String deviceId);
+
+    @Query("{ 'data.status': ?0 }")
+    Flux<SensorLog> findByStatus(String status);
 }

@@ -4,6 +4,7 @@ import com.agritechiot.iot.config.Mqtt;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.response.MqttMessageRes;
 import com.agritechiot.iot.repository.MqttTopicRepo;
+import com.agritechiot.iot.service.ControlLogService;
 import com.agritechiot.iot.service.IoTDeviceService;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.util.GenUtil;
@@ -24,6 +25,7 @@ public class SubscriberImp implements Subscriber {
     private final LogService logService;
     private final SimpMessagingTemplate messagingTemplate;
     private final IoTDeviceService ioTDeviceService;
+    private final ControlLogService controlLogService;
     private final MqttTopicRepo mqttTopicRepo;
     private final Mqtt mqtt;
     @Value("${master.topic}")
@@ -77,10 +79,13 @@ public class SubscriberImp implements Subscriber {
                             log.info("Res: {}", dto);
                             GenUtil.validateFields(dto);
                             logMessage(res, topic.toString());
-                            ioTDeviceService.updateDeviceStats(dto.getDeviceId(), GenUtil.checkOffAndOn(dto.getStatus()))
-                                    .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
-                                    .doOnError(error -> log.error("❌ Failed to save", error))
-                                    .subscribe();
+                            if (dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ON) || dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ONLINE)) {
+                                updateStatus(dto.getDeviceId(), dto.getStatus())
+                                        .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
+                                        .doOnError(error -> log.error("❌ Failed to save", error))
+                                        .subscribe();
+                            }
+
                             processMessage(res);
                         });
                         log.info(GenConstant.SUBSCRIBE_MSG_LOG, topic);
@@ -90,6 +95,12 @@ public class SubscriberImp implements Subscriber {
                     return Mono.just(topics);  // Continue with processing
                 }).subscribe();
 
+    }
+
+    private Mono<Void> updateStatus(String status, String deviceId) {
+        boolean success = GenUtil.checkOffAndOn(status);
+        return controlLogService.offAndOnControlLogDeviceId(deviceId, success)
+                .then(ioTDeviceService.updateDeviceStats(deviceId, success));
     }
 
 }

@@ -17,14 +17,18 @@ public class GenUtil {
 
 
     public static Boolean checkOffAndOn(String status) {
-        if (!status.equalsIgnoreCase(GenConstant.STATUS_ON) && !status.equalsIgnoreCase(GenConstant.STATUS_OFF)) {
+        if (!status.equalsIgnoreCase(GenConstant.STATUS_ON)
+                && !status.equalsIgnoreCase(GenConstant.STATUS_OFF)
+                && !status.equalsIgnoreCase(GenConstant.STATUS_ONLINE)) {
             throw new AppException("Invalid status: " + status);
         }
-        return status.equalsIgnoreCase(GenConstant.STATUS_ON);
+        return status.equalsIgnoreCase(GenConstant.STATUS_ON)
+                || status.equalsIgnoreCase(GenConstant.STATUS_ONLINE);
     }
 
+
     public static void validateFields(MqttMessageRes req) {
-        if (req.getDeviceId() == null || req.getStatus() == null) {
+        if (req.getDeviceId() == null) {
             throw new AppException("Missing required field(s): device_id or value");
         }
     }

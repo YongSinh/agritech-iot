@@ -13,19 +13,22 @@ import {
   InputLabel,
   FormControl
 } from "@mui/material";
+import InputAdornment from '@mui/material/InputAdornment';
 import { tokens } from "../../theme";
 import { useTheme } from "@emotion/react";
 const ModelForm = ({ open, handleClose, handleSubmit, initialData, masterDeviceName }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [formData, setFormData] = useState({
+  const payload = {
     deviceId: "",
     name: "",
     controller: "",
     sensors: "",
     remark: "",
-    masterDeviceName: ""
-  });
+    masterDeviceName: "",
+    sleepDuration: 5
+  };
+  const [formData, setFormData] = useState(payload);
 
   // Update form data when `initialData` changes
   useEffect(() => {
@@ -47,8 +50,13 @@ const ModelForm = ({ open, handleClose, handleSubmit, initialData, masterDeviceN
     handleSubmit(formData); // Pass form data to the parent component
   };
 
+  const onCancel = () => {
+    handleClose()
+    setFormData(payload)
+  }
+
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={onCancel}>
       <form onSubmit={onSubmit}>
         <DialogTitle>IoT DEVICE</DialogTitle>
         <DialogContent>
@@ -112,7 +120,24 @@ const ModelForm = ({ open, handleClose, handleSubmit, initialData, masterDeviceN
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
+              <TextField
+                required
+                margin="dense"
+                id="sleepDuration"
+                name="sleepDuration"
+                label="Sleep Duration"
+                type="number"  // Changed from "text" to "number" for better input control
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">min</InputAdornment>,
+                }}
+                fullWidth
+                variant="outlined"
+                value={formData.sleepDuration}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={6}>
               <FormControl fullWidth variant="outlined" margin="dense" required>
                 <InputLabel id="masterDeviceName-label">Master Device Name</InputLabel>
                 <Select
@@ -150,7 +175,7 @@ const ModelForm = ({ open, handleClose, handleSubmit, initialData, masterDeviceN
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} variant="outlined" color="error" >Cancel</Button>
+          <Button onClick={onCancel} variant="outlined" color="error" >Cancel</Button>
           <Button type="submit" variant="outlined" color="primary" >Save</Button>
         </DialogActions>
       </form>

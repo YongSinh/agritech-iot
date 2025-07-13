@@ -4,35 +4,33 @@ import { useContext, useState } from "react";
 import { tokens } from "../../../theme";
 import { Menu, MenuItem, Sidebar } from "react-pro-sidebar";
 import {
-  BarChartOutlined,
   CalendarTodayOutlined,
   DashboardOutlined,
-  DonutLargeOutlined,
-  HelpOutlineOutlined,
-  MapOutlined,
   MenuOutlined,
-  PeopleAltOutlined,
   PersonalVideoOutlined,
   PersonOutlined,
-  TimelineOutlined,
-  WavesOutlined,
   ConnectedTv,
   EventRepeat,
   LooksOne,
   CalendarToday,
-  FlashAuto,
-  Tune
+  Tune,
+  SettingsApplications
 } from "@mui/icons-material";
 import avatar from "../../../assets/images/RAC-Logo No Background.png";
 import logo from "../../../assets/images/RAC-Logo No Background.png";
 import Item from "./Item";
 import { ToggledContext } from "../../../App";
 
+import useKeycloak from "../../../config/UserService/useKeycloak";
+
 const SideBar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { toggled, setToggled } = useContext(ToggledContext);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { keycloak } = useKeycloak();
+  const getFirstname = keycloak.tokenParsed?.given_name;
+
   return (
     <Sidebar
       backgroundColor={colors.primary[400]}
@@ -115,7 +113,7 @@ const SideBar = () => {
               fontWeight="500"
               color={colors.greenAccent[500]}
             >
-              RAC Admin
+              {getFirstname.toUpperCase()}
             </Typography>
           </Box>
         </Box>
@@ -158,17 +156,11 @@ const SideBar = () => {
             },
           }}
         >
-          {/* <Item
-            title="Manage Team"
-            path="/team"
-            colors={colors}
-            icon={<PeopleAltOutlined />}
-          /> */}
           <Item
-            title="Control Logs"
-            path="/control"
+            title="Device Info"
+            path="/device"
             colors={colors}
-            icon={<Tune />}
+            icon={<ConnectedTv />}
           />
           <Item
             title="MQTT Topic"
@@ -177,16 +169,16 @@ const SideBar = () => {
             icon={<PersonalVideoOutlined />}
           />
           <Item
-            title="Device"
-            path="/device"
+            title="Control Logs"
+            path="/control"
             colors={colors}
-            icon={<ConnectedTv />}
+            icon={<Tune />}
           />
           <Item
             title="Trigger"
             path="/trigger"
             colors={colors}
-            icon={<FlashAuto   />}
+            icon={<SettingsApplications />}
           />
         </Menu>
         <Typography
@@ -206,7 +198,7 @@ const SideBar = () => {
               },
             },
           }}
-        > 
+        >
           <Item
             title="Onetime Schedule"
             path="/onetime-schedule"
@@ -256,12 +248,6 @@ const SideBar = () => {
             colors={colors}
             icon={<CalendarTodayOutlined />}
           />
-          {/* <Item
-            title="FAQ Page"
-            path="/faq"
-            colors={colors}
-            icon={<HelpOutlineOutlined />}
-          /> */}
         </Menu>
         {/* <Typography
           variant="h6"

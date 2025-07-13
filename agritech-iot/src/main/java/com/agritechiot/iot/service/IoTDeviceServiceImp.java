@@ -51,6 +51,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                 .remark(req.getRemark())
                 .controller(req.getController())
                 .masterDeviceName(req.getMasterDeviceName())
+                .sleepDuration(req.getSleepDuration())
                 .isRemoved(false)
                 .isDeviceOnline(true)
                 .deletedAt(null)
@@ -69,6 +70,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                     d.setRemark(req.getRemark());
                     d.setSensors(req.getSensors());
                     d.setController(req.getController());
+                    d.setSleepDuration(req.getSleepDuration());
                     d.setMasterDeviceName(req.getMasterDeviceName());
                     d.setIsRemoved(false);
                     d.setDeletedAt(null);

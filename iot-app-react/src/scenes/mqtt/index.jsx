@@ -1,86 +1,192 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Button, Stack, IconButton } from "@mui/material";
 import { Header } from "../../components";
 import { tokens } from "../../theme";
-import { useWebSocket } from "../../utils/WebSocketProvider";
-import ReactJson from 'react-json-view'
 import { DataGrid } from "@mui/x-data-grid";
-import { mockDataTeam } from "../../data/mockData";
-import {
-  AdminPanelSettingsOutlined,
-  LockOpenOutlined,
-  SecurityOutlined,
-} from "@mui/icons-material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useRequest } from "../../config/api/request";
+import { EditRounded } from "@mui/icons-material";
+import ModelForm from "./modelForm";
+import Swal from "sweetalert2";
 
-
+import { useState, useEffect } from "react";
 const MQTT = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { data } = useWebSocket(); // Get data from context
+  const { request } = useRequest();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [edit, setEdit] = useState(false);
+  const [initialData, setInitialData] = useState(null);
 
-    const columns = [
-      { field: "id", headerName: "ID" },
-      {
-        field: "Topic Name",
-        headerName: "Name",
-        flex: 1,
-        cellClassName: "name-column--cell",
-      },
-      {
-        field: "Create By",
-        headerName: "Age",
-        type: "number",
-        headerAlign: "left",
-        align: "left",
-      },
-      {
-        field: "access",
-        headerName: "Access Level",
-        flex: 1,
-        renderCell: ({ row: { access } }) => {
-          return (
-            <Box
-              width="120px"
-              p={1}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={1}
-              bgcolor={
-                access === "admin"
-                  ? colors.greenAccent[600]
-                  : colors.greenAccent[700]
-              }
-              borderRadius={1}
+  const getListTopic = async () => {
+    const result = await request("/iot/v1/mqtt/topic", "GET", null);
+    if (result) {
+      setLoading(false);
+      setData(result.data)
+    }
+  };
+
+  const handleUpdate = (value) => {
+    setInitialData(value);
+    setOpen(true);
+    setEdit(true)
+  };
+  // Open the form dialog
+  const handleClickOpen = () => {
+    setOpen(true);
+    setEdit(false)
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setInitialData(null)
+  };
+
+  const handleOnDelete = async (value) => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    });
+    console.log(value)
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await request(`/iot/v1/mqtt/delete/${value.id}`, "DELETE", null);
+      await getListTopic(); // Assuming this is async
+      Swal.fire({
+        title: "Deleted!",
+        text: "Your record has been deleted.",
+        icon: "success"
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to delete the item.",
+        icon: "error"
+      });
+    }
+  };
+
+
+  // Handle form submission
+  const handleSubmit = async (formData) => {
+    // You can now send the formData to your API or perform other actions
+    let url = edit ? "/iot/v1/mqtt/update" : "/iot/v1/mqtt/add";
+    let method = "post";
+
+    const result = await request(url, method, formData);
+    if (result.code === "SUC-000") {
+      Swal.fire({
+        title: "Success!",
+        text: "Your has been saved",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setLoading(false);
+      getListTopic()
+      handleClose(); // Close the dialog after submission
+    } else {
+      Swal.fire({
+        title: "Error!",
+        text: result.message,
+        icon: "error",
+        showConfirmButton: true,
+        timer: 3000,
+      });
+      getListTopic()
+      handleClose(); // Close the dialog after submission
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getListTopic();
+  }, []);
+
+
+  const columns = [
+    { field: "id", headerName: "ID" },
+    {
+      field: "topic",
+      headerName: "Topic Name",
+      flex: 1,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "createdBy",
+      headerName: "Created By",
+      headerAlign: "left",
+      align: "left",
+    },
+    {
+      headerName: "Actions",
+      field: "actions",
+      flex: 0.5,
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: ({ row }) => {
+        return (
+          <Stack direction="row" spacing={0.5}>
+            <IconButton aria-label="edit"
+              color="secondary"
+              onClick={() => handleUpdate(row)}
+              size="large"
             >
-              {access === "admin" && <AdminPanelSettingsOutlined />}
-              {access === "manager" && <SecurityOutlined />}
-              {access === "user" && <LockOpenOutlined />}
-              <Typography textTransform="capitalize">{access}</Typography>
-            </Box>
-          );
-        },
+              <EditRounded />
+            </IconButton>
+            <IconButton
+              aria-label="delete"
+              size="large"
+              color="error"
+              onClick={() => handleOnDelete(row)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Stack>
+        );
       },
-    ];
+    }
+  ];
 
   return (
     <Box m="20px">
       <Header title="MQTT Topic" subtitle="Managing the MQTT Topic" />
+      <Button
+        color="secondary"
+        variant="contained"
+        onClick={handleClickOpen}
+      >
+        Add Topic
+      </Button>
+
+      <ModelForm
+        open={open}
+        handleClose={handleClose}
+        handleSubmit={handleSubmit} // Pass the submit handler
+        colors={colors}
+        initialData={initialData}
+      />
       <Box
         mt="40px"
         height="75vh"
         flex={1}
         sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            border: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
+          "& .MuiDataGrid-root": { border: "none" },
+          "& .MuiDataGrid-cell": { border: "none" },
+          "& .name-column--cell": { color: colors.greenAccent[300] },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[600],
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
@@ -88,7 +194,7 @@ const MQTT = () => {
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: colors.greenAccent[600],
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,
@@ -99,8 +205,9 @@ const MQTT = () => {
         }}
       >
         <DataGrid
-          rows={mockDataTeam}
+          rows={data}
           columns={columns}
+          loading={loading}
           initialState={{
             pagination: {
               paginationModel: {

@@ -1,10 +1,8 @@
 package com.agritechiot.logs.service.mqtt;
 
 import com.agritechiot.logs.config.Mqtt;
-import com.agritechiot.logs.dto.MqttMessageRes;
 import com.agritechiot.logs.service.SensorLogService;
 import com.agritechiot.logs.util.JsonUtil;
-import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,11 +55,11 @@ public class SubscriberImp implements Subscriber {
     private void saveSensorLog() throws MqttException {
         mqtt.getClient().subscribe("#", (topic, message) -> {
             String res = new String(message.getPayload());
-            MqttMessageRes dto = JsonUtil.fromJson(res, MqttMessageRes.class);
-            logMessage(dto.toString(), topic);
+            Object payload = JsonUtil.fromJson(res, Object.class);
+            log.info("Object: {}", JsonUtil.toJson(payload));
             log.info("📥 Received message on topic {}: {}", topic, res);
             processMessage(res);
-            service.saveSensorLog(dto)
+            service.saveSensorLog(payload)
                     .doOnSuccess(savedTrigger -> log.info("✅ Trigger saved successfully: {}", savedTrigger))
                     .doOnError(error -> log.error("❌ Failed to save trigger", error))
                     .subscribe();

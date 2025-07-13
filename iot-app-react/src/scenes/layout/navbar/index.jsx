@@ -28,12 +28,17 @@ const Navbar = () => {
   const isMdDevices = useMediaQuery("(max-width:768px)");
   const isXsDevices = useMediaQuery("(max-width:466px)");
   const colors = tokens(theme.palette.mode);
-  const { keycloak, authenticated } = useKeycloak();
-  
+  const { keycloak } = useKeycloak();
+
   const handleLogout = () => {
-     keycloak?.logout();
+    keycloak?.logout();
   };
-  
+  const handleAccManagement = () => {
+    if (keycloak) {
+      const accountManagementUrl = keycloak.createAccountUrl();
+      window.open(accountManagementUrl, '_blank'); // Opens in a new tab
+    }
+  };
   return (
     <Box
       display="flex"
@@ -73,10 +78,10 @@ const Navbar = () => {
         <IconButton>
           <NotificationsOutlined />
         </IconButton>
-        <IconButton>
+        {/* <IconButton>
           <SettingsOutlined />
-        </IconButton>
-        <IconButton>
+        </IconButton> */}
+        <IconButton onClick={handleAccManagement}>
           <PersonOutlined />
         </IconButton>
         <IconButton onClick={handleLogout}>

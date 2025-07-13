@@ -2,10 +2,8 @@ package com.agritechiot.logs.config;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +23,8 @@ public class Mqtt {
     @PostConstruct
     public void init() {
         try {
-            instance = new MqttClient(mqttUrl, MQTT_PUBLISHER_ID);
+            MqttClientPersistence persistence = new MemoryPersistence(); // 👈 Use memory persistence
+            instance = new MqttClient(mqttUrl, MQTT_PUBLISHER_ID, persistence);
             connectClient();
         } catch (MqttException e) {
             log.error("Failed to create MQTT client", e);

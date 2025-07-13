@@ -101,6 +101,52 @@ const IntervalSchedule = () => {
   };
 
 
+  const handleOnSleep = async (value) => {
+    // Confirm action with user
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, sleep it!"
+    });
+
+    if (!result.isConfirmed) return;
+
+    // Prepare payload
+    const payload = {
+      controlLogId: value.id,
+      deviceId: value.deviceId,
+      type: "sleep"
+    };
+
+    try {
+      // Send command to server
+      await request(`/iot/v1/control-logs/send-commands`, "POST", payload);
+
+      // Refresh the list
+      await getListControlLog();
+
+      // Show success message
+      await Swal.fire({
+        title: "Success!",
+        text: `Your device (ID: ${value.deviceId}) has been put to sleep.`,
+        icon: "success"
+      });
+    } catch (error) {
+      console.error("Sleep command failed:", error);
+
+      // Show error message
+      await Swal.fire({
+        title: "Error!",
+        text: `Failed to put device (ID: ${value.deviceId}) to sleep. Please try again.`,
+        icon: "error"
+      });
+    }
+  };
+
   const sendTaskToDevice = async (task) => {
     try {
       // First fetch the sensors for the device
@@ -157,32 +203,34 @@ const IntervalSchedule = () => {
       if (!confirmation.isConfirmed) return;
 
       // Send the task to the selected device
-      await request(
+      const result2 = await request(
         `/iot/v1/control-logs/send-task/${task.id}/${selectedSensorName}`,
         "POST",
         null // Send the selected sensor ID
       );
 
+      if (result2 === false) {
+        // Error notification
+        await Swal.fire({
+          title: "Error!",
+          text: `Failed to send the task: ${task.deviceId}`,
+          icon: "error",
+        });
+      } else {
+        // Success notification (empty result or other truthy value)
+        await Swal.fire({
+          title: "Task Sent!",
+          text: `Your task has been successfully sent to ${selectedSensorName}.`,
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      }
       // Refresh the task list
       await getListControlLog();
 
-      // Success notification
-      await Swal.fire({
-        title: "Task Sent!",
-        text: `Your task has been successfully sent to ${selectedSensorName}.`,
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-      });
     } catch (error) {
       console.error("Failed to send task:", error);
-
-      // Error notification
-      await Swal.fire({
-        title: "Error!",
-        text: `Failed to send the task: ${error.message}`,
-        icon: "error",
-      });
     }
   };
 
@@ -231,7 +279,6 @@ const IntervalSchedule = () => {
             label={row.status ? "Online" : "Offline"}
             color={row.status ? "success" : "error"}
             icon={row.status ? <CloudDone /> : <HighlightOffOutlined />}
-          //variant="outlined"
           />
         );
       },
@@ -254,14 +301,19 @@ const IntervalSchedule = () => {
     {
       headerName: "Send",
       field: "Send",
-      flex: 0.5,
+      flex: 1,
       headerAlign: "center",
       align: "center",
       renderCell: ({ row }) => {
         return (
-          <Button color="secondary" variant="contained" onClick={() => sendTaskToDevice(row)}>
-            send
-          </Button>
+          <Stack direction="row" spacing={0.5}>
+            <Button color="secondary" variant="contained" size="small" onClick={() => sendTaskToDevice(row)}>
+              send
+            </Button>
+            <Button color="secondary" variant="contained" size="small" onClick={() => handleOnSleep(row)}>
+              sleep device
+            </Button>
+          </Stack>
         );
       },
     },
@@ -297,6 +349,7 @@ const IntervalSchedule = () => {
       },
     }
   ];
+  
   return (
     <Box m="20px">
       <Header title="CONTROL LOGS" subtitle="Managing the IOT Deivce" />

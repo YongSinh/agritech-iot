@@ -28,10 +28,5 @@ public class SensorLog {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime dateTime;
-    @Field("deviceId")
-    private String deviceId;
-    private String value;
-    private String status;
-    // Sensor-specific measurements
-    private Map<String, Object> measurements;
+    private Object data;
 }

@@ -1,6 +1,7 @@
 package com.agritechiot.iot.service;
 
 import com.agritechiot.iot.dto.request.ControlLogReq;
+import com.agritechiot.iot.dto.request.DeviceCommandReq;
 import com.agritechiot.iot.model.ControlLog;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,15 +13,15 @@ public interface ControlLogService {
 
     Flux<ControlLog> getControlLogs();
 
-    Mono<ControlLog> offAndOnControlLog(ControlLogReq req);
+    Mono<Void> offAndOnControlLogDeviceId(String deviceId, boolean status);
+
+    Mono<Void> offAndOnControlLog(Integer id, boolean stats);
 
     Mono<Void> sendTaskToDevice(Integer id, String sensor);
 
     Mono<Void> softDeleteById(Integer id);
 
-    Mono<Void> sendDeviceToSleep(String id, String topic);
-
-    Mono<Void> sendDeviceToWork(String id, String sleepDuration, String run, String topic);
+    Mono<Void> sendDeviceCommand(DeviceCommandReq req);
 
 }
 

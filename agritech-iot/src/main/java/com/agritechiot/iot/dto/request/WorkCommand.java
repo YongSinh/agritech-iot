@@ -1,21 +1,15 @@
 package com.agritechiot.iot.dto.request;
 
-import lombok.RequiredArgsConstructor;
+import com.agritechiot.iot.constant.GenConstant;
 
-@RequiredArgsConstructor
-public class WorkCommand implements DeviceCommand {
-
-    private final String deviceId;
-    private final String run;
-    private final String sleep;
-
-    @Override
-    public String getDeviceId() {
-        return deviceId;
-    }
+public record WorkCommand(
+        String deviceId,
+        String run,
+        String sleep
+) implements DeviceCommand {
 
     @Override
     public String getSet() {
-        return "work";
+        return GenConstant.TYPE_WORK;
     }
 }
