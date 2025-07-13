@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.agritechiot</groupId>
-    <artifactId>api-gateway</artifactId>
+    <artifactId>api-gateway-service</artifactId>
     <version>1.0.0</version>
     <name>api-gateway</name>
     <description>API Gateway project for Spring Boot</description>

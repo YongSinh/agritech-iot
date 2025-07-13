@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.rac</groupId>
-    <artifactId>agritech-iot</artifactId>
+    <artifactId>agritech-iot-service</artifactId>
     <version>1.0.0</version>
     <name>agritech-iot</name>
     <description>A Spring Boot project for IoT-based agriculture solutions</description>

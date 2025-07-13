@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.rac</groupId>
-    <artifactId>logs</artifactId>
+    <artifactId>logs-service</artifactId>
     <version>1.0.0</version>
     <name>agritech-iot</name>
     <description>A Spring Boot project for logs store</description>
