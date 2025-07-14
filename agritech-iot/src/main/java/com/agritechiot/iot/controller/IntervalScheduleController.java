@@ -5,6 +5,7 @@ import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.IntervalScheduleReq;
 import com.agritechiot.iot.dto.request.UpdateScheduleStatusReq;
 import com.agritechiot.iot.model.IntervalSchedule;
+import com.agritechiot.iot.schedule.SchedulingConfig;
 import com.agritechiot.iot.service.IntervalScheduleService;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.util.JsonUtil;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
@@ -24,6 +26,7 @@ import java.util.List;
 public class IntervalScheduleController {
     private final IntervalScheduleService intervalScheduleService;
     private final LogService logService;
+    private final SchedulingConfig config;
 
     @PostMapping(value = "/v1/interval-schedule/create")
     public Mono<ApiResponse<IntervalSchedule>> addIntervalRecord(
@@ -32,6 +35,8 @@ public class IntervalScheduleController {
     ) {
         log.info("REQ_INTERVAL_SCHEDULE_SAVE: {}", JsonUtil.toJson(req));
         return intervalScheduleService.saveIntervalRecord(req)// Collect the Flux into a List
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshOnetimeIntervalTasksById(req.getId()))
                 .map(res -> new ApiResponse<>(res, correlationId));
     }
 
@@ -42,6 +47,8 @@ public class IntervalScheduleController {
     ) {
         log.info("REQ_INTERVAL_SCHEDULE_UPDATE: {}", JsonUtil.toJson(req));
         return intervalScheduleService.updateIntervalRecord(req.getId(), req)
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshOnetimeIntervalTasksById(req.getId()))
                 .map(res -> new ApiResponse<>(res, correlationId)); // Map result to response
 
     }
