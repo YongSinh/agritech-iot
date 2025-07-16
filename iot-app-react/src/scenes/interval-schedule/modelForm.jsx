@@ -23,7 +23,7 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds = [], initialDat
 
   const payload = {
     id: initialData == null ? "" : initialData.id,
-    device_id: "",
+    deviceId: "",
     interval: "",
     turnOnWater: "",
     duration: "",
@@ -176,9 +176,9 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds = [], initialDat
                 <InputLabel id="device-id-label">Device ID</InputLabel>
                 <Select
                   labelId="device-id-label"
-                  id="device-id"
-                  name="device_id"
-                  value={formData.device_id}
+                  id="deviceId"
+                  name="deviceId"
+                  value={formData.deviceId}
                   label="Device ID"
                   onChange={handleChange}
                   fullWidth
