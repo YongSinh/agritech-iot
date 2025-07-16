@@ -3,7 +3,7 @@ version: "3.8"
 services:
   # API Gateway should be the entry point and can depend on other services
   api-gateway:
-    image: api-gateway:1.0.0
+    image: api-gateway-service:1.0.0
     container_name: api-gateway
     ports:
       - "8085:8085"
@@ -23,8 +23,8 @@ services:
 
   # IoT Service shouldn't depend on API Gateway
   iot-service:
-    image: agritech-iot:1.0.0
-    container_name: iot-service
+    image: agritech-iot-service:1.0.0
+    container_name: agritech-iot-service
     ports:
       - "8083:8083"
     networks:
@@ -38,8 +38,8 @@ services:
 
   # Log Service should be independent
   log-service:
-    image: logs:1.0.0
-    container_name: log-service
+    image: logs-service:1.0.0
+    container_name: logs-service
     ports:
       - "8082:8082"
     networks:
