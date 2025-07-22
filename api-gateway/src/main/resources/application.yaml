@@ -1,8 +1,12 @@
 server:
+  port: 8085
   servlet:
     context-path: /
-  port: 8085
-
+  ssl:
+    key-store: classpath:apiGateway.p12  # or use file:/... if external
+    key-store-password: ApiG@teway@2025
+    key-store-type: PKCS12
+    key-alias: apigateway
 
 spring:
   profiles:
