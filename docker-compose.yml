@@ -3,7 +3,7 @@ version: "3.8"
 services:
   # API Gateway should be the entry point and can depend on other services
   api-gateway:
-    image: api-gateway-service:1.0.0
+    image: api-gateway-service :1.0.0
     container_name: api-gateway
     ports:
       - "8085:8085"
