@@ -101,7 +101,7 @@ function Dashboard() {
           justifyContent="center"
         >
           <StatBox
-            title={devices.totalDevices}
+            title={devices?.totalDevices ?? 'Default title'}
             subtitle="Total Online"
             progress="100"
             increase="100%"
@@ -120,7 +120,7 @@ function Dashboard() {
           justifyContent="center"
         >
           <StatBox
-            title={devices.totalDevicesOnline}
+            title={devices.totalDevicesOnline ?? 'Default title'}
             subtitle="Device Online"
             progress="0.75"
             increase="+14%"
