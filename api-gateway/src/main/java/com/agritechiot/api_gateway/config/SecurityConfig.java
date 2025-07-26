@@ -79,6 +79,7 @@ public class SecurityConfig {
                 "http://localhost:443",
                 "https://localhost:5173",
                 "http://localhost:80",
+                "https://159.65.131.28:5173",
                 "http://localhost:8083"  // Changed from ws:// to http://
         ));
 
