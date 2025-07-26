@@ -76,6 +76,7 @@ public class SecurityConfig {
         // Use allowedOriginPatterns for flexibility (note: WebSocket handshake uses HTTP protocol)
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:5173",
+                "http://localhost:443",
                 "https://localhost:5173",
                 "http://localhost:80",
                 "http://localhost:8083"  // Changed from ws:// to http://

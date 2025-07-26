@@ -14,6 +14,10 @@ FROM nginx:1.23.2
 RUN rm /etc/nginx/conf.d/default.conf
 COPY default.conf /etc/nginx/conf.d/
 
+# Copy SSL certificates
+COPY ssl/cert.pem /etc/nginx/ssl/cert.pem
+COPY ssl/key.pem /etc/nginx/ssl/key.pem
+
 # Copy built Vite assets
 COPY --from=builder /app/dist /usr/share/nginx/html
 
@@ -21,5 +25,6 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 RUN chown -R nginx:nginx /usr/share/nginx/html
 
 EXPOSE 80
+EXPOSE 443
 
 CMD ["nginx", "-g", "daemon off;"]
