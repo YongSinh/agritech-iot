@@ -2,7 +2,7 @@ package com.agritechiot.iot.service.mqtt;
 
 import com.agritechiot.iot.config.Mqtt;
 import com.agritechiot.iot.constant.GenConstant;
-import com.agritechiot.iot.dto.response.MqttMessageRes;
+import com.agritechiot.iot.dto.response.MqttMessageSlaveRes;
 import com.agritechiot.iot.repository.MqttTopicRepo;
 import com.agritechiot.iot.service.ControlLogService;
 import com.agritechiot.iot.service.IoTDeviceService;
@@ -75,12 +75,12 @@ public class SubscriberImp implements Subscriber {
                     try {
                         mqtt.getClient().subscribe(topic.getTopic(), (t, message) -> {
                             String res = new String(message.getPayload());
-                            MqttMessageRes dto = JsonUtil.fromJson(res, MqttMessageRes.class);
+                            MqttMessageSlaveRes dto = JsonUtil.fromJson(res, MqttMessageSlaveRes.class);
                             log.info("Res: {}", dto);
                             GenUtil.validateFields(dto);
                             logMessage(res, topic.toString());
                             if (dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ON) || dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ONLINE)) {
-                                updateStatus(dto.getDeviceId(), dto.getStatus())
+                                updateStatus(dto.getDevice(), dto.getStatus())
                                         .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
                                         .doOnError(error -> log.error("❌ Failed to save", error))
                                         .subscribe();

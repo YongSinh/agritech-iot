@@ -1,0 +1,23 @@
+// vite.config.js
+import { defineConfig } from "file:///D:/Work%20and%20School/Project/IoT/iot-app-react/node_modules/vite/dist/node/index.js";
+import react from "file:///D:/Work%20and%20School/Project/IoT/iot-app-react/node_modules/@vitejs/plugin-react/dist/index.mjs";
+import fs from "fs";
+import path from "path";
+var __vite_injected_original_dirname = "D:\\Work and School\\Project\\IoT\\iot-app-react";
+var vite_config_default = defineConfig({
+  plugins: [react()],
+  server: {
+    https: {
+      key: fs.readFileSync(path.resolve(__vite_injected_original_dirname, "./ssl/key.pem")),
+      cert: fs.readFileSync(path.resolve(__vite_injected_original_dirname, "./ssl/cert.pem"))
+    }
+  },
+  define: {
+    global: "window"
+    // 👈 define global for browser
+  }
+});
+export {
+  vite_config_default as default
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcuanMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCJEOlxcXFxXb3JrIGFuZCBTY2hvb2xcXFxcUHJvamVjdFxcXFxJb1RcXFxcaW90LWFwcC1yZWFjdFwiO2NvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9maWxlbmFtZSA9IFwiRDpcXFxcV29yayBhbmQgU2Nob29sXFxcXFByb2plY3RcXFxcSW9UXFxcXGlvdC1hcHAtcmVhY3RcXFxcdml0ZS5jb25maWcuanNcIjtjb25zdCBfX3ZpdGVfaW5qZWN0ZWRfb3JpZ2luYWxfaW1wb3J0X21ldGFfdXJsID0gXCJmaWxlOi8vL0Q6L1dvcmslMjBhbmQlMjBTY2hvb2wvUHJvamVjdC9Jb1QvaW90LWFwcC1yZWFjdC92aXRlLmNvbmZpZy5qc1wiO2ltcG9ydCB7IGRlZmluZUNvbmZpZyB9IGZyb20gJ3ZpdGUnXHJcbmltcG9ydCByZWFjdCBmcm9tICdAdml0ZWpzL3BsdWdpbi1yZWFjdCdcclxuaW1wb3J0IGZzIGZyb20gJ2ZzJztcclxuaW1wb3J0IHBhdGggZnJvbSAncGF0aCc7XHJcblxyXG4vLyBodHRwczovL3ZpdGVqcy5kZXYvY29uZmlnL1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgZGVmaW5lQ29uZmlnKHtcclxuICBwbHVnaW5zOiBbcmVhY3QoKV0sXHJcbiAgc2VydmVyOiB7XHJcbiAgICBodHRwczoge1xyXG4gICAgICBrZXk6IGZzLnJlYWRGaWxlU3luYyhwYXRoLnJlc29sdmUoX19kaXJuYW1lLCAnLi9zc2wva2V5LnBlbScpKSxcclxuICAgICAgY2VydDogZnMucmVhZEZpbGVTeW5jKHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsICcuL3NzbC9jZXJ0LnBlbScpKSxcclxuICB9fSxcclxuICBkZWZpbmU6IHtcclxuICAgIGdsb2JhbDogJ3dpbmRvdycsIC8vIFx1RDgzRFx1REM0OCBkZWZpbmUgZ2xvYmFsIGZvciBicm93c2VyXHJcbiAgfVxyXG59KVxyXG4iXSwKICAibWFwcGluZ3MiOiAiO0FBQW9VLFNBQVMsb0JBQW9CO0FBQ2pXLE9BQU8sV0FBVztBQUNsQixPQUFPLFFBQVE7QUFDZixPQUFPLFVBQVU7QUFIakIsSUFBTSxtQ0FBbUM7QUFPekMsSUFBTyxzQkFBUSxhQUFhO0FBQUEsRUFDMUIsU0FBUyxDQUFDLE1BQU0sQ0FBQztBQUFBLEVBQ2pCLFFBQVE7QUFBQSxJQUNOLE9BQU87QUFBQSxNQUNMLEtBQUssR0FBRyxhQUFhLEtBQUssUUFBUSxrQ0FBVyxlQUFlLENBQUM7QUFBQSxNQUM3RCxNQUFNLEdBQUcsYUFBYSxLQUFLLFFBQVEsa0NBQVcsZ0JBQWdCLENBQUM7QUFBQSxJQUNuRTtBQUFBLEVBQUM7QUFBQSxFQUNELFFBQVE7QUFBQSxJQUNOLFFBQVE7QUFBQTtBQUFBLEVBQ1Y7QUFDRixDQUFDOyIsCiAgIm5hbWVzIjogW10KfQo=

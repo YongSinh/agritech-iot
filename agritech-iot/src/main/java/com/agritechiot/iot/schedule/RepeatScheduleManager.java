@@ -1,8 +1,12 @@
 package com.agritechiot.iot.schedule;
 
+import com.agritechiot.iot.dto.request.DeviceCommandReq;
+import com.agritechiot.iot.exception.AppException;
+import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.model.RepeatSchedule;
+import com.agritechiot.iot.repository.IoTDeviceRepo;
 import com.agritechiot.iot.repository.RepeatScheduleRepo;
-import com.agritechiot.iot.service.RepeatScheduleService;
+import com.agritechiot.iot.service.ControlLogService;
 import com.agritechiot.iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +25,9 @@ import java.util.concurrent.ScheduledFuture;
 @Component
 public class RepeatScheduleManager {
     private final RepeatScheduleRepo repeatScheduleRepo;
-    private final RepeatScheduleService repeatScheduleService;
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
+    private final IoTDeviceRepo ioTDeviceRepo;
+    private final ControlLogService controlLogService;
     private final ConcurrentMap<String, ScheduledFuture<?>> scheduledFutures = new ConcurrentHashMap<>();
 
     public void refreshScheduledTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -93,8 +98,7 @@ public class RepeatScheduleManager {
         try {
             String taskKey = getTaskKey(schedule);
 
-            String cronExpression = GenUtil.buildWeeklyCronExpression(schedule.getDay(), schedule.getTime());
-
+            String cronExpression = GenUtil.generateCronEveryNMinutes(schedule.getDuration());
             log.info("✅ Scheduled task for device {} at {} {}", schedule.getDeviceId(), schedule.getDay(), schedule.getTime());
             log.info("Status: {}", schedule.getStatus());
 
@@ -118,11 +122,6 @@ public class RepeatScheduleManager {
         }
     }
 
-
-    private void executeScheduledActions(RepeatSchedule schedule) throws Exception {
-        log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
-        repeatScheduleService.startRepeatSchedule(schedule);
-    }
 
     private void cancelAllScheduledTasks() {
         scheduledFutures.values().forEach(future -> future.cancel(false));
@@ -155,5 +154,29 @@ public class RepeatScheduleManager {
         return "schedule|" + schedule.getId();
     }
 
+    public void executeScheduledActions(RepeatSchedule schedule) {
+        log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
 
+        IoTDevice device = ioTDeviceRepo.findById(schedule.getDeviceId()).block();
+        if (device == null) {
+            log.error("❌ Device not found with ID: {}", schedule.getDeviceId());
+            throw new AppException("Device not found with ID: " + schedule.getDeviceId());
+        }
+
+        DeviceCommandReq req = new DeviceCommandReq();
+        req.setDeviceId(device.getId());
+        req.setSensor(GenUtil.getFirstSensor(device.getSensors()));
+        req.setType(GenUtil.getWorkType(schedule.getTurnOnWater()));
+        req.setDuration(schedule.getDuration().toString());
+        req.setValveDuration(true);
+
+        log.info(GenUtil.getFirstSensor(device.getSensors()));
+
+        try {
+            controlLogService.scheduledTaskToDevice(req).block();
+        } catch (Exception e) {
+            log.error("❌ Failed to execute scheduled action for device {}: {}", device.getId(), e.getMessage(), e);
+            throw new AppException("Scheduled task execution failed");
+        }
+    }
 }

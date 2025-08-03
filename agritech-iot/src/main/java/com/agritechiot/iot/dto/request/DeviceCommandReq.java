@@ -10,6 +10,11 @@ import lombok.ToString;
 public class DeviceCommandReq {
     private Integer controlLogId;
     private String deviceId;
-    private String run;
+    private Boolean run;
     private String type;
+    private String state;
+    private String duration;
+    private Boolean valveDuration;
+    private String value;
+    private String sensor;
 }

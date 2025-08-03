@@ -124,7 +124,7 @@ public class IoTDeviceServiceImp implements IoTDeviceService {
                         Flux.fromArray(device.getSensors().split(",\\s*"))
                                 .index()
                                 .collectMap(
-                                        tuple -> "sensor" + (tuple.getT1() + 1),
+                                        tuple -> "value",
                                         tuple -> tuple.getT2().trim()
                                 )
                 );

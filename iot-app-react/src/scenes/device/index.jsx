@@ -61,10 +61,10 @@ const Device = () => {
   };
 
   // Add unique IDs to devices for DataGrid
-  const devicesWithIds = devices.map((row, index) => ({
-    id: row.deviceId, // Generate a unique ID
+  const devicesWithIds = devices?.map((row, index) => ({
+    id: row.deviceId,
     ...row,
-  }));
+  })) || [];
 
   // Handle form submission
   const handleSubmit = async (formData) => {

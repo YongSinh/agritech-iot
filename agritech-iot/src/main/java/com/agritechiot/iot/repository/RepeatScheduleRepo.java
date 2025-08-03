@@ -30,4 +30,4 @@ public interface RepeatScheduleRepo extends ReactiveCrudRepository<RepeatSchedul
 
     @Query("SELECT * FROM tbl_repeat_schedule as r where r.isRemoved = false or r.isRemoved IS NULL")
     Flux<RepeatSchedule> findByIsNotDeleted();
-}
+}   

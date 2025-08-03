@@ -1,6 +1,5 @@
 package com.agritechiot.iot.schedule;
 
-import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.model.Trigger;
 import com.agritechiot.iot.service.TriggerService;
 import com.agritechiot.iot.util.GenUtil;
@@ -102,9 +101,6 @@ public class TriggerScheduleManager {
         log.info("🚀 Executing scheduled actions for device {} and {}", trigger.getDeviceId(), topic);
 
         try {
-            // 1. Call your logic to send to device (or whatever your task is)
-            triggerService.sendTaskToDevice(trigger, GenConstant.STATUS_OFF, topic).subscribe();
-
             // 2. Cancel the scheduled task immediately after
             cancelTriggerTasks(trigger);
         } catch (Exception e) {

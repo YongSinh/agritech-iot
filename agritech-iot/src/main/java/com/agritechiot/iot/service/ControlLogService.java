@@ -17,7 +17,9 @@ public interface ControlLogService {
 
     Mono<Void> offAndOnControlLog(Integer id, boolean stats);
 
-    Mono<Void> sendTaskToDevice(Integer id, String sensor);
+    Mono<Void> sendTaskToDevice(DeviceCommandReq req);
+
+    Mono<Void> scheduledTaskToDevice(DeviceCommandReq req);
 
     Mono<Void> softDeleteById(Integer id);
 

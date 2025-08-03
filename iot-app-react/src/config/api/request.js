@@ -21,7 +21,8 @@ export function getLocalAccessToken() {
 }
 
 export const config = {
-  base_server: "https://159.65.131.28:8085",
+  // base_server: "https://159.65.131.28:8085",
+  base_server: "https://localhost:8085",
   image_path: "",
   version: 1,
 };

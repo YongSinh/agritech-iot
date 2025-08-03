@@ -1,7 +1,7 @@
 package com.agritechiot.iot.util;
 
 import com.agritechiot.iot.constant.GenConstant;
-import com.agritechiot.iot.dto.response.MqttMessageRes;
+import com.agritechiot.iot.dto.response.MqttMessageSlaveRes;
 import com.agritechiot.iot.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,6 +13,18 @@ import java.time.format.DateTimeParseException;
 @Slf4j
 public class GenUtil {
     private GenUtil() {
+    }
+
+    public static String getFirstSensor(String sensor) {
+        if (sensor == null || sensor.trim().isEmpty()) {
+            return "";
+        }
+        return sensor.split(",")[0].trim().toLowerCase();
+    }
+
+
+    public static String getWorkType(Boolean type) {
+        return Boolean.TRUE.equals(type) ? GenConstant.TYPE_VALVE : GenConstant.TYPE_WORK;
     }
 
 
@@ -27,8 +39,8 @@ public class GenUtil {
     }
 
 
-    public static void validateFields(MqttMessageRes req) {
-        if (req.getDeviceId() == null) {
+    public static void validateFields(MqttMessageSlaveRes req) {
+        if (req.getDevice() == null) {
             throw new AppException("Missing required field(s): device_id or value");
         }
     }

@@ -114,11 +114,11 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds = [], initialDat
                   label="Device ID"
                   fullWidth
                 >
-                  {deviceIds.map((device, index) => (
-                    <MenuItem key={index} value={device.deviceId}>
-                      {device.deviceId}
-                    </MenuItem>
-                  ))}
+                {(deviceIds || []).map((device) => (
+                  <MenuItem key={device.deviceId} value={device.deviceId}>
+                    {device.deviceId}
+                  </MenuItem>
+                ))}
                 </Select>
               </FormControl>
             </Grid>

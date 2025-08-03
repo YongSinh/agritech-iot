@@ -4,6 +4,7 @@ package com.agritechiot.iot.repository;
 import com.agritechiot.iot.dto.response.DeviceJoinDto;
 import com.agritechiot.iot.model.IoTDevice;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -42,5 +43,8 @@ public interface IoTDeviceRepo extends ReactiveCrudRepository<IoTDevice, String>
     @Query("SELECT * FROM tbl_iotdevice as i where i.isRemoved = false or i.isRemoved IS NULL")
     Flux<IoTDevice> findByIsNotDeleted();
 
-    Mono<IoTDevice> findByDeviceIdAndMasterDeviceName(String deviceId, String masterDeviceName);
+    @Query("SELECT * FROM view_device_ids_master_and_non_master v where v.is_master =:num ")
+    Flux<IoTDevice> findAllDevicesWithMasterFlag(@Param("num") String num);
+
 }
+

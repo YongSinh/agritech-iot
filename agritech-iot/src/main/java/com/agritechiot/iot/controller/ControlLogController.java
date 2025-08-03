@@ -35,7 +35,7 @@ public class ControlLogController {
         logService.logInfo("INIT_CREATE_CONTROL_LOG");
         return controlLogService.saveControlLog(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
-                .onErrorResume(Exception.class, ex ->
+                .onErrorResume(AppException.class, ex ->
                         Mono.just(new ApiResponse<>(
                                 ex.getMessage(),
                                 correlationId,
@@ -52,7 +52,7 @@ public class ControlLogController {
         logService.logInfo("INIT_UPDATE_CONTROL_LOG");
         return controlLogService.updateControlLog(req)// Collect the Flux into a List
                 .map(res -> new ApiResponse<>(res, correlationId))
-                .onErrorResume(Exception.class, ex ->
+                .onErrorResume(AppException.class, ex ->
                         Mono.just(new ApiResponse<>(
                                 ex.getMessage(),
                                 correlationId,
@@ -90,7 +90,7 @@ public class ControlLogController {
         logService.logInfo("INIT_DELETE_RECORD_CONTROL_LOGS");
         return controlLogService.softDeleteById(id)
                 .then(Mono.just(new ApiResponse<>())
-                        .onErrorResume(Exception.class, ex ->
+                        .onErrorResume(AppException.class, ex ->
                                 Mono.just(new ApiResponse<>(
                                         ex.getMessage(),
                                         correlationId,
@@ -99,38 +99,21 @@ public class ControlLogController {
                         ));
     }
 
-    @PostMapping("/v1/control-logs/send-task/{id}/{sensor}")  // Full path: `/api/device-control/send-task/{id}`
-    public Mono<Void> sendTaskToDevice(
-            @PathVariable Integer id,
-            @PathVariable String sensor,
-            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
-    ) {
-        logService.logInfo("INIT_SEND_TASK_CONTROL_LOGS");
-        return controlLogService.sendTaskToDevice(id, sensor)
-                .then(Mono.just(new ApiResponse<>())
-                        .onErrorResume(Exception.class, ex ->
-                                Mono.just(new ApiResponse<>(
-                                        ex.getMessage(),
-                                        correlationId,
-                                        GenConstant.ERR_CODE
-                                ))
-                        )).then();
-    }
-
-    @PostMapping("/v1/control-logs/send-commands")
-    public Mono<Void> sendDeviceCommand(
+    @PostMapping("/v1/control-logs/send-task")  // Full path: `/api/device-control/send-task/{id}`
+    public Mono<ApiResponse<Object>> sendTaskToDevice(
             @RequestBody DeviceCommandReq req,
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
     ) {
-        logService.logInfo("INIT_SEND_COMMAND_CONTROL_LOGS");
-        return controlLogService.sendDeviceCommand(req)
-                .then(Mono.just(new ApiResponse<>())
-                        .onErrorResume(AppException.class, ex ->
-                                Mono.just(new ApiResponse<>(
-                                        ex.getMessage(),
-                                        correlationId,
-                                        GenConstant.ERR_CODE
-                                ))
-                        )).then();
+        logService.logInfo("INIT_SEND_TASK_CONTROL_LOGS");
+        return controlLogService.sendTaskToDevice(req)
+                .thenReturn(new ApiResponse<>(null, correlationId))
+                .onErrorResume(AppException.class, ex -> Mono.just(
+                        new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        )
+                ));
     }
+
 }

@@ -74,7 +74,6 @@ const Trigger = () => {
     // You can now send the formData to your API or perform other actions
     let url = edit ? "/iot/v1/triggers/update" : "/iot/v1/triggers/multiple-create";
     let method = "post";
-    console.log(formData);
 
     const result = await request(url, method, formData);
     if (result.code === "SUC-000") {
@@ -112,7 +111,7 @@ const Trigger = () => {
   const getListTriggers = async () => {
     const result = await request("/iot/v1/triggers", "GET", null);
     if (result) {
-      setTriggers(result.data)
+      setTriggers(result?.data)
       setLoading(false)
     }
   };
@@ -120,7 +119,7 @@ const Trigger = () => {
   const getListSensors = async () => {
     const result = await request("/iot/v1/triggers/sensors", "GET", null);
     if (result) {
-      setSensors(result.data)
+      setSensors(result?.data)
       setLoading(false)
     }
   };
@@ -128,7 +127,7 @@ const Trigger = () => {
   const getAllDeviceIds = async () => {
     const result = await request("/iot/v1/devices", "GET", null);
     if (result) {
-      setDeviceIds(result.data)
+      setDeviceIds(result?.data)
       setLoading(false)
     }
   };

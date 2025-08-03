@@ -109,8 +109,8 @@ const ModelForm = ({ open, handleClose, handleSubmit, deviceIds = [], initialDat
                   onChange={handleChange}
                   fullWidth
                 >
-                  {deviceIds.map((device, index) => (
-                    <MenuItem key={index} value={device.deviceId}>
+                  {(deviceIds || []).map((device) => (
+                    <MenuItem key={device.deviceId} value={device.deviceId}>
                       {device.deviceId}
                     </MenuItem>
                   ))}

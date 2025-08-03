@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public interface DeviceCommand {
-    String deviceId();
+    String id();
 
     String getSet();
 }

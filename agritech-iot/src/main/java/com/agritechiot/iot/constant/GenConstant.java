@@ -20,7 +20,12 @@ public class GenConstant {
     public static final String STATUS_OFF = "off";
     public static final String TYPE_SLEEP = "sleep";
     public static final String TYPE_WORK = "work";
+    public static final String TYPE_WORK_SLEEP = "work-sleep";
+    public static final String TYPE_VALVE = "valve";
     public static final Integer DEFAULT_SLEEP_DURATION = 600;
+    public static final String TYPE_LORA_M_ADDRESS = "lora-m-address";
+    public static final String TYPE_LORA_M_CHANNEL = "lora-m-channel";
+    public static final String TYPE_LORA_S_ADDRESS = "lora-s-address";
 
     private GenConstant() {
 

@@ -12,8 +12,10 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class MqttMessageRes {
-    private String deviceId;
+public class MqttMessageSlaveRes {
+    private String device;
+    private String id;
+    private String set;
     private String status;
-    private String action;
+    private String state;
 }

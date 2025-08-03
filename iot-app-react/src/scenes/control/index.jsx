@@ -9,6 +9,7 @@ import { useRequest } from "../../config/api/request"
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
 import ModelForm from "./modelForm";
+import ControllForm from "./controllForm";
 
 const IntervalSchedule = () => {
   const theme = useTheme();
@@ -17,7 +18,9 @@ const IntervalSchedule = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deviceIds, setDeviceIds] = useState([]);
+  const [sensors, setSensors] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openControl, setOpenControl] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [edit, setEdit] = useState(false);
   // Open the form dialog
@@ -30,6 +33,23 @@ const IntervalSchedule = () => {
   const handleClose = () => {
     setOpen(false);
     setEdit(false)
+  };
+
+  const handleClickOpenControl = async (value) => {
+    const result = await request(`/iot/v1/devices/sensors/${value.deviceId}`, "GET", null);
+
+    if (!result || !result.data) {
+      throw new Error('No sensor data received');
+    }
+    const sensorObject = result.data;
+
+    setSensors([sensorObject]);
+    setInitialData(value);
+    setOpenControl(true);
+  };
+
+  const handleClicCloseControl = () => {
+    setOpenControl(false);
   };
 
   const handleUpdate = (value) => {
@@ -70,6 +90,34 @@ const IntervalSchedule = () => {
   };
 
 
+  const handleSubmit2 = async (formData) => {
+    const result = await request("/iot/v1/control-logs/send-task", "post", formData);
+    if (result) {
+      Swal.fire({
+        title: "Success!",
+        text: "Your has been send task",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      setLoading(false);
+      getListControlLog()
+      handleClicCloseControl(); // Close the dialog after submission
+    } else {
+      Swal.fire({
+        title: "Error!",
+        text: result.message,
+        icon: "error",
+        showConfirmButton: true,
+        timer: 3000,
+      });
+      handleClicCloseControl(); // Close the dialog after submission
+      setLoading(false);
+    }
+    // You can now send the formData to your API or perform other actions
+  };
+
+
   const handleOnDelete = async (value) => {
     const result = await Swal.fire({
       title: "Are you sure?",
@@ -101,139 +149,6 @@ const IntervalSchedule = () => {
   };
 
 
-  const handleOnSleep = async (value) => {
-    // Confirm action with user
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, sleep it!"
-    });
-
-    if (!result.isConfirmed) return;
-
-    // Prepare payload
-    const payload = {
-      controlLogId: value.id,
-      deviceId: value.deviceId,
-      type: "sleep"
-    };
-
-    try {
-      // Send command to server
-      await request(`/iot/v1/control-logs/send-commands`, "POST", payload);
-
-      // Refresh the list
-      await getListControlLog();
-
-      // Show success message
-      await Swal.fire({
-        title: "Success!",
-        text: `Your device (ID: ${value.deviceId}) has been put to sleep.`,
-        icon: "success"
-      });
-    } catch (error) {
-      console.error("Sleep command failed:", error);
-
-      // Show error message
-      await Swal.fire({
-        title: "Error!",
-        text: `Failed to put device (ID: ${value.deviceId}) to sleep. Please try again.`,
-        icon: "error"
-      });
-    }
-  };
-
-  const sendTaskToDevice = async (task) => {
-    try {
-      // First fetch the sensors for the device
-      const result = await request(`/iot/v1/devices/sensors/${task.deviceId}`, "GET", null);
-
-      if (!result || !result.data) {
-        throw new Error('No sensor data received');
-      }
-
-      // The data comes as an object like {"sensor1": "Humidity", "sensor2": "Temperature"}
-      const sensorObject = result.data;
-
-      // Convert the sensor object to the format Swal expects for select options
-      const sensorOptions = {};
-      Object.entries(sensorObject).forEach(([sensorId, sensorName]) => {
-        sensorOptions[sensorId] = sensorName;
-      });
-
-      // First dialog with select box
-      const { value: selectedSensorId } = await Swal.fire({
-        title: "Select Sensor",
-        input: 'select',
-        inputOptions: sensorOptions,
-        inputPlaceholder: 'Select a Sensor',
-        showCancelButton: true,
-        confirmButtonText: 'Next',
-        cancelButtonText: 'Cancel',
-        inputValidator: (value) => {
-          if (!value) {
-            return 'You need to select a sensor!';
-          }
-        }
-      });
-
-      // Exit if user cancels device selection
-      if (!selectedSensorId) return;
-
-      const selectedSensorName = sensorOptions[selectedSensorId];
-
-      // Confirmation dialog before proceeding
-      const confirmation = await Swal.fire({
-        title: "Are you sure?",
-        text: `You are about to send this task to ${selectedSensorName} . You won't be able to revert this!`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, send it!",
-        cancelButtonText: "Cancel",
-        reverseButtons: true,
-      });
-
-      // Exit if user cancels confirmation
-      if (!confirmation.isConfirmed) return;
-
-      // Send the task to the selected device
-      const result2 = await request(
-        `/iot/v1/control-logs/send-task/${task.id}/${selectedSensorName}`,
-        "POST",
-        null // Send the selected sensor ID
-      );
-
-      if (result2 === false) {
-        // Error notification
-        await Swal.fire({
-          title: "Error!",
-          text: `Failed to send the task: ${task.deviceId}`,
-          icon: "error",
-        });
-      } else {
-        // Success notification (empty result or other truthy value)
-        await Swal.fire({
-          title: "Task Sent!",
-          text: `Your task has been successfully sent to ${selectedSensorName}.`,
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-      // Refresh the task list
-      await getListControlLog();
-
-    } catch (error) {
-      console.error("Failed to send task:", error);
-    }
-  };
-
   useEffect(() => {
     getListControlLog()
     getAllDeviceIds()
@@ -243,7 +158,7 @@ const IntervalSchedule = () => {
   const getAllDeviceIds = async () => {
     const result = await request("/iot/v1/device/ids", "GET", null);
     if (result) {
-      setDeviceIds(result.data)
+      setDeviceIds(result?.data)
       setLoading(false)
     }
   };
@@ -252,7 +167,7 @@ const IntervalSchedule = () => {
   const getListControlLog = async () => {
     const result = await request("/iot/v1/control-logs", "GET", null);
     if (result) {
-      setData(result.data)
+      setData(result?.data)
       setLoading(false)
     }
   };
@@ -301,19 +216,14 @@ const IntervalSchedule = () => {
     {
       headerName: "Send",
       field: "Send",
-      flex: 1,
+      flex: 0.5,
       headerAlign: "center",
       align: "center",
       renderCell: ({ row }) => {
         return (
-          <Stack direction="row" spacing={0.5}>
-            <Button color="secondary" variant="contained" size="small" onClick={() => sendTaskToDevice(row)}>
-              send
-            </Button>
-            <Button color="secondary" variant="contained" size="small" onClick={() => handleOnSleep(row)}>
-              sleep device
-            </Button>
-          </Stack>
+          <Button color="secondary" variant="contained" size="small" onClick={() => handleClickOpenControl(row)}>
+            send
+          </Button>
         );
       },
     },
@@ -349,7 +259,7 @@ const IntervalSchedule = () => {
       },
     }
   ];
-  
+
   return (
     <Box m="20px">
       <Header title="CONTROL LOGS" subtitle="Managing the IOT Deivce" />
@@ -363,6 +273,14 @@ const IntervalSchedule = () => {
         colors={colors}
         deviceIds={deviceIds}
         initialData={initialData}
+      />
+      <ControllForm
+        open={openControl}
+        handleClose={handleClicCloseControl}
+        handleSubmit={handleSubmit2} // Pass the submit handler
+        colors={colors}
+        initialData={initialData}
+        sensors={sensors}
       />
       <Box
         mt="40px"

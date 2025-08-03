@@ -1,8 +1,12 @@
 package com.agritechiot.iot.schedule;
 
+import com.agritechiot.iot.dto.request.DeviceCommandReq;
+import com.agritechiot.iot.exception.AppException;
+import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.model.OnetimeSchedule;
+import com.agritechiot.iot.repository.IoTDeviceRepo;
 import com.agritechiot.iot.repository.OnetimeScheduleRepo;
-import com.agritechiot.iot.service.OnetimeScheduleService;
+import com.agritechiot.iot.service.ControlLogService;
 import com.agritechiot.iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +26,9 @@ import java.util.concurrent.ScheduledFuture;
 public class OnetimeScheduleManager {
     private final OnetimeScheduleRepo onetimeScheduleRepo;
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
-    private final OnetimeScheduleService onetimeScheduleService;
     private final SchedulingUtil schedulingUtil;
+    private final ControlLogService controlLogService;
+    private final IoTDeviceRepo ioTDeviceRepo;
     private final ConcurrentMap<String, ScheduledFuture<?>> oneTimeFutures = new ConcurrentHashMap<>();
 
     public void refreshOneTimeScheduledTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -140,12 +145,6 @@ public class OnetimeScheduleManager {
     }
 
 
-    private void executeScheduledActions(OnetimeSchedule schedule) throws Exception {
-        log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
-        onetimeScheduleService.startOneTimeSchedule(schedule);
-
-    }
-
     private String getTaskKey(OnetimeSchedule schedule) {
         return "oneTime_schedule|" + schedule.getId();
     }
@@ -155,4 +154,27 @@ public class OnetimeScheduleManager {
         oneTimeFutures.clear();
     }
 
+    public void executeScheduledActions(OnetimeSchedule schedule) {
+        log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
+
+        IoTDevice device = ioTDeviceRepo.findById(schedule.getDeviceId()).block();
+        if (device == null) {
+            log.error("❌ Device not found with ID: {}", schedule.getDeviceId());
+            throw new AppException("Device not found with ID: " + schedule.getDeviceId());
+        }
+
+        DeviceCommandReq req = new DeviceCommandReq();
+        req.setDeviceId(device.getId());
+        req.setSensor(GenUtil.getFirstSensor(device.getSensors()));
+        req.setType(GenUtil.getWorkType(schedule.getTurnOnWater()));
+        req.setDuration(schedule.getDuration().toString());
+        req.setValveDuration(true);
+
+        try {
+            controlLogService.scheduledTaskToDevice(req).block();
+        } catch (Exception e) {
+            log.error("❌ Failed to execute scheduled action for device {}: {}", device.getId(), e.getMessage(), e);
+            throw new AppException("Scheduled task execution failed");
+        }
+    }
 }
