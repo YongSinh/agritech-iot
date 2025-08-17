@@ -57,6 +57,7 @@ public class GenConstant {
     public static final String TYPE_LORA_M_ADDRESS = "lora-m-address";
     public static final String TYPE_LORA_M_CHANNEL = "lora-m-channel";
     public static final String TYPE_LORA_S_ADDRESS = "lora-s-address";
+
     private GenConstant() {
 
     }
