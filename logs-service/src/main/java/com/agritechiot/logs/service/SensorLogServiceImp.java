@@ -1,6 +1,7 @@
 package com.agritechiot.logs.service;
 
 
+import com.agritechiot.logs.dto.FilterReq;
 import com.agritechiot.logs.model.SensorLog;
 import com.agritechiot.logs.repository.SensorLogRepo;
 import lombok.RequiredArgsConstructor;
@@ -24,21 +25,27 @@ public class SensorLogServiceImp implements SensorLogService {
     }
 
     @Override
-    public Flux<SensorLog> getSensorLogByDeviceId(String deviceId) {
-        return sensorLogRepo.findByDeviceId(deviceId);
+    public Flux<SensorLog> getSensorLogFilter(FilterReq req) {
+        Flux<SensorLog> logs;
+        if (req.getDeviceId() != null) {
+            logs = sensorLogRepo.findByDeviceId(req.getDeviceId());
+        } else if (req.getStatus() != null) {
+            logs = sensorLogRepo.findByStatus(req.getStatus());
+        } else if (req.getTopic() != null) {
+            logs = sensorLogRepo.findByFromTopic(req.getTopic()).take(req.getLimit());
+        }
+        else {
+            logs = Flux.empty();
+        }
+        return logs;
     }
 
     @Override
-    public Flux<SensorLog> getSensorLogByStatus(String status) {
-        return sensorLogRepo.findByStatus(status);
-    }
-
-
-    @Override
-    public Mono<SensorLog> saveSensorLog(Object req) {
+    public Mono<SensorLog> saveSensorLog(Object req, String fromTopic) {
         SensorLog sensorLog = new SensorLog();
         sensorLog.setDateTime(LocalDateTime.now());
         sensorLog.setData(req);
+        sensorLog.setFromTopic(fromTopic);
         return sensorLogRepo.save(sensorLog);
     }
 

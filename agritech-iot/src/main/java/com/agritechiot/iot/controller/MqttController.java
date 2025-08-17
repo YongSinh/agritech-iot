@@ -6,7 +6,6 @@ import com.agritechiot.iot.dto.request.MqttTopicReq;
 import com.agritechiot.iot.model.MqttTopic;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.service.mqtt.MqttTopicService;
-import com.agritechiot.iot.service.mqtt.Publisher;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -19,17 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "MQTT")
 public class MqttController {
-    private final Publisher publisher;
     private final LogService logService;
     private final MqttTopicService mqttTopicService;
-
-    @GetMapping("/v1/mqtt/master-topic")
-    public Mono<ApiResponse<List<String>>> getSensors(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
-        logService.logInfo("GET_TOPIC_MASTER");
-        return publisher.getTopicMaster()
-                .collectList()  // Collect the Flux into a List
-                .map(res -> new ApiResponse<>(res, correlationId));
-    }
 
     @GetMapping("/v1/mqtt/topic")
     public Mono<ApiResponse<List<MqttTopic>>> getListTopic(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {

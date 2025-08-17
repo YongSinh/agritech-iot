@@ -15,8 +15,6 @@ public interface IntervalScheduleService {
 
     Flux<IntervalSchedule> getListIntervalRecordByDeviceId(String id);
 
-    Mono<IntervalSchedule> getIntervalRecordById(Integer id);
-
     Mono<Void> updateSingleStatus(Integer id, boolean newStatus);
 
     Mono<Void> updateListsStatus(List<Integer> ids, boolean newStatus, int batchSize);

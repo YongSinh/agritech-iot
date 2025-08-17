@@ -43,6 +43,8 @@ const MQTT = () => {
     setInitialData(null)
   };
 
+
+
   const handleOnDelete = async (value) => {
     const result = await Swal.fire({
       title: "Are you sure?",

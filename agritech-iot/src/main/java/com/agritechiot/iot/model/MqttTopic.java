@@ -17,6 +17,8 @@ public class MqttTopic {
     @Id
     private Integer id;
     private String topic;
+    @Column("topicOut")
+    private String topicOut;
     @Column("createdBy")
     private String createdBy;
     @Column("isRemoved")

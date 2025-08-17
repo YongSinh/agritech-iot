@@ -12,6 +12,6 @@ public class FallbackController {
     @RequestMapping("/fallback")
     public Mono<ResponseEntity<ApiResponse<String>>> fallback() {
         ApiResponse<String> response = new ApiResponse<>("Service is temporarily unavailable. Please try again later.");
-        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(response));
+        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
     }
 }

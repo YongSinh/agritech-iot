@@ -106,7 +106,24 @@ public class ControlLogController {
     ) {
         logService.logInfo("INIT_SEND_TASK_CONTROL_LOGS");
         return controlLogService.sendTaskToDevice(req)
-                .thenReturn(new ApiResponse<>(null, correlationId))
+                .thenReturn(new ApiResponse<>(GenConstant.SUC_MESSAGE, correlationId))
+                .onErrorResume(AppException.class, ex -> Mono.just(
+                        new ApiResponse<>(
+                                ex.getMessage(),
+                                correlationId,
+                                GenConstant.ERR_CODE
+                        )
+                ));
+    }
+
+    @PostMapping("/v1/control-logs/check-device")  // Full path: `/api/device-control/send-task/{id}`
+    public Mono<ApiResponse<Object>> checkDevice(
+            @RequestBody DeviceCommandReq req,
+            @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId
+    ) {
+        logService.logInfo("INIT_SEND_TASK_CONTROL_LOGS");
+        return controlLogService.sendDeviceCommandCheck(req)
+                .thenReturn(new ApiResponse<>(GenConstant.SUC_MESSAGE, correlationId))
                 .onErrorResume(AppException.class, ex -> Mono.just(
                         new ApiResponse<>(
                                 ex.getMessage(),

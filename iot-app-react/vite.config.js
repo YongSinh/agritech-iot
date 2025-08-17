@@ -11,7 +11,17 @@ export default defineConfig({
     https: {
       key: fs.readFileSync(path.resolve(__dirname, './ssl/key.pem')),
       cert: fs.readFileSync(path.resolve(__dirname, './ssl/cert.pem')),
-  }},
+  },
+  proxy: {
+      '/iot/ws': {
+        target: 'http://localhost:8083',
+        changeOrigin: true,
+        secure: false,
+        ws: true, // <-- IMPORTANT: proxy WebSocket
+      }
+  },
+},
+  
   define: {
     global: 'window', // 👈 define global for browser
   }

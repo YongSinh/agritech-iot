@@ -53,7 +53,7 @@ const Device = () => {
   };
 
   const getListMasterDeviceName = async () => {
-    const result = await request("/iot/v1/mqtt/master-topic", "GET", null);
+    const result = await request("/iot/v1/mqtt/topic", "GET", null);
     if (result) {
       setMasterDeviceName(result.data)
       setLoading(false)

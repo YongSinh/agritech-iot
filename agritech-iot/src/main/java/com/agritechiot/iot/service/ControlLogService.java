@@ -23,6 +23,8 @@ public interface ControlLogService {
 
     Mono<Void> softDeleteById(Integer id);
 
+    Mono<Void> sendDeviceCommandCheck(DeviceCommandReq req);
+
     Mono<Void> sendDeviceCommand(DeviceCommandReq req);
 
 }

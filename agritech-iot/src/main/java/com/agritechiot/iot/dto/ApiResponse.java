@@ -27,7 +27,7 @@ public class ApiResponse<T> {
     }
 
     public ApiResponse(String message, String correlationId) {
-        this(null, correlationId, message, GenConstant.ERR_CODE);
+        this(null, correlationId, message, GenConstant.SUC_CODE);
     }
 
     public ApiResponse(String message, String correlationId, String code) {

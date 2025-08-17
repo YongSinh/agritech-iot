@@ -10,4 +10,5 @@ import lombok.ToString;
 @ToString
 public class SensorLogReq {
     private Object data;
+    private String fromTopic;
 }

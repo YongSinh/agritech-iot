@@ -9,11 +9,23 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 public class GenUtil {
     private GenUtil() {
     }
+
+    public static String extractNumber(String input) {
+        Pattern pattern = Pattern.compile(".*_(\\d+)");
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.matches()) {
+            return matcher.group(1);  // Return the number as String
+        }
+        throw new IllegalArgumentException("Invalid format. Expected format 'prefix_number'");
+    }
+
 
     public static String getFirstSensor(String sensor) {
         if (sensor == null || sensor.trim().isEmpty()) {
@@ -125,5 +137,18 @@ public class GenUtil {
 
     private static void logCronExpression(String cronExpression) {
         log.info("CRON_EXPRESSION: {} ", cronExpression);
+    }
+
+    /**
+     * Converts a string by replacing all hyphens with underscores.
+     *
+     * @param input the original string
+     * @return the converted string
+     */
+    public static String convertDashToUnderscore(String input) {
+        if (input == null) {
+            return null;
+        }
+        return input.replace("-", "_");
     }
 }

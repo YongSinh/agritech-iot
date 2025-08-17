@@ -50,6 +50,14 @@ public class IoTDeviceController {
     }
 
 
+    @GetMapping("/v1/devices/get-status-type")
+    public Mono<ApiResponse<List<Map<String, String>>>> getStatusType(@RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId) {
+        return GenConstant.TYPE_STATUS_FLUX
+                .collectList()  // Collect the Flux into a List
+                .map(res -> new ApiResponse<>(res, correlationId));
+    }
+
+
     @GetMapping("/v1/devices/sensors/{deviceId}")
     public Mono<ApiResponse<Object>> getListSensors(
             @RequestHeader(value = GenConstant.CORRELATION_ID, required = false) String correlationId,

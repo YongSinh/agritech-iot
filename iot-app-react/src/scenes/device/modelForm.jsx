@@ -148,9 +148,9 @@ const ModelForm = ({ open, handleClose, handleSubmit, initialData, masterDeviceN
                   onChange={handleChange}
                   label="Sensor"
                 >
-                  {masterDeviceName.map((name) => (
-                    <MenuItem key={name} value={name}>
-                      {name}
+                  {(masterDeviceName || []).map((value) => (
+                    <MenuItem key={value.topic} value={value.topic}>
+                      {value.topic}
                     </MenuItem>
                   ))}
                 </Select>

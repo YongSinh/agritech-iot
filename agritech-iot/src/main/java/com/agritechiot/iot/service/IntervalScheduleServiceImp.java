@@ -56,12 +56,6 @@ public class IntervalScheduleServiceImp implements IntervalScheduleService {
     }
 
     @Override
-    public Mono<IntervalSchedule> getIntervalRecordById(Integer id) {
-        return intervalScheduleRepo.findById(id)
-                .switchIfEmpty(Mono.error(new Exception(GenConstant.INTERVAL_SCHEDULE_LOG_NOT_FOUND)));
-    }
-
-    @Override
     public Mono<Void> updateSingleStatus(Integer id, boolean newStatus) {
         return intervalScheduleRepo.updateStatusById(id, newStatus)
                 .then();

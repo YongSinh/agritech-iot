@@ -1,5 +1,9 @@
 package com.agritechiot.iot.constant;
 
+import reactor.core.publisher.Flux;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class GenConstant {
@@ -21,13 +25,45 @@ public class GenConstant {
     public static final String TYPE_SLEEP = "sleep";
     public static final String TYPE_WORK = "work";
     public static final String TYPE_WORK_SLEEP = "work-sleep";
+    public static final String TYPE_STATUS_CHECK = "check";
+    public static final String TYPE_STATUS_AMBIEN_TEMPERATURE = "ambien-temperature";
+    public static final String TYPE_STATUS_WATER_FLOW_RATE = "water-flow-rate";
+    public static final String TYPE_STATUS_WATER_FLOW_QUANTITY = "water-flow-quantity";
+    public static final String TYPE_STATUS_WATER_TOTAL = "water-total";
+    public static final String TYPE_STATUS_SOIL_TEMPERATURE = "soil-temperature";
+    public static final String TYPE_STATUS_WORK_RUN = "work-run";
+    public static final String TYPE_STATUS_WORK_SLEEP = "work-sleep";
+    public static final String TYPE_STATUS_LORA_M_ADDRESS = "lora-M-address";
+    public static final String TYPE_STATUS_LORA_M_CHANNEL = "lora-M-channel";
+    public static final String TYPE_STATUS_LORA_S_ADDRESS = "lora-S-address";
     public static final String TYPE_VALVE = "valve";
+
+    public static final Flux<Map<String, String>> TYPE_STATUS_FLUX = Flux.just(
+            createStatusMap(TYPE_STATUS_CHECK),
+            createStatusMap(TYPE_VALVE),
+            createStatusMap(TYPE_STATUS_AMBIEN_TEMPERATURE),
+            createStatusMap(TYPE_STATUS_WATER_FLOW_RATE),
+            createStatusMap(TYPE_STATUS_WATER_FLOW_QUANTITY),
+            createStatusMap(TYPE_STATUS_WATER_TOTAL),
+            createStatusMap(TYPE_STATUS_SOIL_TEMPERATURE),
+            createStatusMap(TYPE_STATUS_WORK_RUN),
+            createStatusMap(TYPE_STATUS_WORK_SLEEP),
+            createStatusMap(TYPE_STATUS_LORA_M_ADDRESS),
+            createStatusMap(TYPE_STATUS_LORA_M_CHANNEL),
+            createStatusMap(TYPE_STATUS_LORA_S_ADDRESS)
+    );
+
     public static final Integer DEFAULT_SLEEP_DURATION = 600;
     public static final String TYPE_LORA_M_ADDRESS = "lora-m-address";
     public static final String TYPE_LORA_M_CHANNEL = "lora-m-channel";
     public static final String TYPE_LORA_S_ADDRESS = "lora-s-address";
-
     private GenConstant() {
 
+    }
+
+    private static Map<String, String> createStatusMap(String status) {
+        Map<String, String> map = new HashMap<>();
+        map.put("status", status);
+        return map;
     }
 }

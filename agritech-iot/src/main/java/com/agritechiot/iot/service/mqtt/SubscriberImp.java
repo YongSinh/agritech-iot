@@ -67,26 +67,30 @@ public class SubscriberImp implements Subscriber {
         log.info("✅ Successfully subscribed to MQTT topic: test");
     }
 
-
+    /**
+     * Subscribes to all MQTT topics from the repository and handles incoming messages from devices.
+     * Note: This method only receives messages from devices; it does not publish messages.
+     */
     @Override
     public void updateStateDevice() throws MqttException {
         mqttTopicRepo.findByIsNotDeleted()
                 .flatMap(topic -> {
                     try {
-                        mqtt.getClient().subscribe(topic.getTopic(), (t, message) -> {
+                        mqtt.getClient().subscribe(topic.getTopicOut(), (t, message) -> {
                             String res = new String(message.getPayload());
                             MqttMessageSlaveRes dto = JsonUtil.fromJson(res, MqttMessageSlaveRes.class);
                             log.info("Res: {}", dto);
-                            GenUtil.validateFields(dto);
                             logMessage(res, topic.toString());
-                            if (dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ON) || dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ONLINE)) {
-                                updateStatus(dto.getDevice(), dto.getStatus())
-                                        .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
-                                        .doOnError(error -> log.error("❌ Failed to save", error))
-                                        .subscribe();
-                            }
-
+                            messagingTemplate.convertAndSend("/topic/public", res);
                             processMessage(res);
+//                            if (dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ON) || dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ONLINE)) {
+//                                updateStatus(dto.getDevice(), dto.getStatus())
+//                                        .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
+//                                        .doOnError(error -> log.error("❌ Failed to save", error))
+//                                        .subscribe();
+//                            }
+
+
                         });
                         log.info(GenConstant.SUBSCRIBE_MSG_LOG, topic);
                     } catch (MqttException e) {

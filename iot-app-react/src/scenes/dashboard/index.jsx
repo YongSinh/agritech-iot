@@ -27,34 +27,137 @@ import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
 import { useRequest } from "../../config/api/request";
 import { useState, useEffect } from "react";
+import SockJS from "sockjs-client";
+import Swal from "sweetalert2";
+import DeviceStatusDialog from './DeviceStatusDialog';
+import { Client } from "@stomp/stompjs";
+import ModelForm from "./modelForm";
 
 function Dashboard() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { request } = useRequest();
   const isXlDevices = useMediaQuery("(min-width: 1260px)");
   const isMdDevices = useMediaQuery("(min-width: 724px)");
   const isXsDevices = useMediaQuery("(max-width: 436px)");
   const [devices, setDevices] = useState([]);
-
- const { request } = useRequest();
+  const [stompClient, setStompClient] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [deviceIds, setDeviceIds] = useState([]);
+  const [statusType, setStatusType] = useState([]);
+  const [open, setOpen] = useState(false);
 
   const getListDevice = async () => {
     const result = await request("/iot/v1/device/total-status", "GET", null);
     if (result) {
       setDevices(result.data);
-      console.log(result.data)
     }
+  };
+
+
+  // Open the form dialog
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  // Close the form dialog
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const getListStatusType = async () => {
+    const result = await request("/iot/v1/devices/get-status-type", "GET", null);
+    if (result) {
+      setStatusType(result.data);
+    }
+  };
+
+    const getMqttMessage = async () => {
+    const result = await request("/log/v1/sensor-logs/filter?topic=", "GET", null);
+    if (result) {
+      setStatusType(result.data);
+    }
+  };
+
+
+
+  const getAllDeviceIds = async () => {
+    const result = await request("/iot/v1/device/ids", "GET", null);
+    if (result) {
+      setDeviceIds(result?.data)
+    }
+  };
+
+  // Example usage when you receive a message
+  const handleNewMessage = (message) => {
+    setMessage(message);
+    setDialogOpen(true);
   };
 
   useEffect(() => {
     getListDevice();
+    getAllDeviceIds();
+    getListStatusType();
   }, []);
+
+  useEffect(() => {
+    
+    const newClient = new Client({
+      webSocketFactory: () => new SockJS("/iot/ws"),
+      onConnect: () => {
+        newClient.subscribe("/topic/public", (message) => {
+          const newMessage = JSON.parse(message.body);
+          handleNewMessage(newMessage);
+          console.log(newMessage)
+        });
+      },
+      onStompError: (frame) => {
+        console.error("Broker error:", frame.headers["message"], frame.body);
+      },
+    });
+
+    newClient.activate();
+    setStompClient(newClient);
+
+    return () => {
+      newClient.deactivate();
+    };
+  }, []);
+
+
+    const handleSubmit = async (formData) => {
+      //console.log(formData)
+      const result = await request("/iot/v1/control-logs/check-device", "POST", formData);
+      handleClose();
+      if (result.code =! "SUC-000") {
+        Swal.fire({
+          title: "Error!",
+          text: result.message,
+          icon: "error",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    };
+  
   
   return (
     <Box m="20px">
+      <DeviceStatusDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        message={message}
+      />
+      <ModelForm
+        open={open}
+        deviceIds={deviceIds}
+        statusType={statusType}
+        handleClose={handleClose}
+        handleSubmit={handleSubmit}
+      />
       <Box display="flex" justifyContent="space-between">
         <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
-
         {!isXsDevices && (
           <Box>
             <Button
@@ -71,9 +174,10 @@ function Dashboard() {
                   bgcolor: colors.blueAccent[800],
                 },
               }}
+              onClick={handleClickOpen}
               startIcon={<DownloadOutlined />}
             >
-              DOWNLOAD REPORTS
+              GET REPORTS
             </Button>
           </Box>
         )}
@@ -112,7 +216,7 @@ function Dashboard() {
             }
           />
         </Box>
-         <Box
+        <Box
           gridColumn="span 3"
           bgcolor={colors.primary[400]}
           display="flex"
@@ -120,7 +224,7 @@ function Dashboard() {
           justifyContent="center"
         >
           <StatBox
-            title={devices.totalDevicesOnline ?? 'Default title'}
+            title={devices?.totalDevicesOnline ?? 'Default title'}
             subtitle="Device Online"
             progress="0.75"
             increase="+14%"
@@ -150,7 +254,7 @@ function Dashboard() {
             }
           />
         </Box>
-       
+
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}

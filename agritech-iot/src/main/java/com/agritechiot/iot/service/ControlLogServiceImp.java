@@ -6,10 +6,10 @@ import com.agritechiot.iot.dto.request.DeviceCommandReq;
 import com.agritechiot.iot.dto.request.DeviceCommandReq2;
 import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.ControlLog;
-import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.repository.ControlLogRepo;
 import com.agritechiot.iot.schedule.TriggerScheduleManager;
 import com.agritechiot.iot.service.mqtt.Publisher;
+import com.agritechiot.iot.util.GenUtil;
 import com.agritechiot.iot.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +94,7 @@ public class ControlLogServiceImp implements ControlLogService {
                 .flatMap(controlLog ->
                         ioTDeviceService.getDeviceById(controlLog.getDeviceId())
                                 .flatMap(device ->
-                                        buildAndSendDeviceCommand(req, device, controlLog.getDeviceId())
+                                        buildAndSendDeviceCommand(req, device.getDeviceId())
                                 )
                 );
     }
@@ -104,14 +104,14 @@ public class ControlLogServiceImp implements ControlLogService {
         return ioTDeviceService.getDeviceById(req.getDeviceId())
                 .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)))
                 .flatMap(device ->
-                        buildAndSendDeviceCommand(req, device, device.getDeviceId())
+                        buildAndSendDeviceCommand(req, device.getDeviceId())
                 );
     }
 
     /**
      * Shared method to get trigger, build DeviceCommandReq, and send command.
      */
-    private Mono<Void> buildAndSendDeviceCommand(DeviceCommandReq req, IoTDevice device, String deviceId) {
+    private Mono<Void> buildAndSendDeviceCommand(DeviceCommandReq req, String deviceId) {
         String sensor = Optional.ofNullable(req.getSensor()).orElse("").trim().toLowerCase();
 
         return triggerService.getTriggerBySensorAndDeviceId(sensor, deviceId)
@@ -147,6 +147,31 @@ public class ControlLogServiceImp implements ControlLogService {
                 .then();
     }
 
+    @Override
+    public Mono<Void> sendDeviceCommandCheck(DeviceCommandReq req) {
+        logService.logInfo("SEND_DEVICE_CHECK_COMMAND_REQ", JsonUtil.toJson(req));
+
+        return ioTDeviceService.getDeviceById(req.getDeviceId())
+                .flatMap(device -> {
+                    DeviceCommandReq2 req2 = new DeviceCommandReq2();
+                    req2.setDevice(device.getName());
+                    req2.setId(GenUtil.extractNumber(device.getDeviceId()));
+                    req2.setStatus(GenUtil.convertDashToUnderscore(req.getStatus()));
+
+                    String payload = JsonUtil.toJson(req2);
+                    log.info("Sending payload: {}", payload);
+
+                    return Mono.fromRunnable(() -> {
+                        try {
+                            publisher.publish(device.getMasterDeviceName(), payload, 1, true);
+                        } catch (MqttException e) {
+                            throw new AppException("Failed to publish MQTT message: " + e.getMessage());
+                        }
+                    });
+                })
+                .then();
+    }
+
 
     @Override
     public Mono<Void> sendDeviceCommand(DeviceCommandReq req) {
@@ -155,7 +180,7 @@ public class ControlLogServiceImp implements ControlLogService {
                 .flatMap(device -> {
                     DeviceCommandReq2 req2 = new DeviceCommandReq2();
                     req2.setDevice(device.getName());
-                    req2.setId(device.getId());
+                    req2.setId(GenUtil.extractNumber(device.getDeviceId()));
 
                     String payload;
                     boolean status;
