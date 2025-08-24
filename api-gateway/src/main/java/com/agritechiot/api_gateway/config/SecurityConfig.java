@@ -41,8 +41,9 @@ public class SecurityConfig {
     @Value("${file.path.cert}")
     private String pathCert;
 
-    private final String[] freeResourceUrls = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**","/ws/**",
-            "/swagger-resources/**", "/api-docs/**", "/aggregate/**", "/actuator/prometheus"};
+    private final String[] freeResourceUrls = {"/swagger-ui.html", "/v3/api-docs/**","/ws/**",
+            "/swagger-resources/**", "/api-docs/**", "/aggregate/**", "/actuator/prometheus",
+            "/webjars/swagger-ui/**"};
 
 
     @Bean
@@ -54,7 +55,7 @@ public class SecurityConfig {
                     exchanges
                             .pathMatchers(freeResourceUrls).permitAll()
                             .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                            .anyExchange().permitAll();
+                            .anyExchange().authenticated();
                 })
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
@@ -80,7 +81,7 @@ public class SecurityConfig {
                 "https://localhost:5173",
                 "http://localhost:80",
                 "https://159.65.131.28:5173",
-                "http://localhost:8083"  // Changed from ws:// to http://
+                "https://localhost:8085"  // Changed from ws:// to http://
         ));
 
         // Fixed typo in OPTIONS and added WebSocket specific headers
