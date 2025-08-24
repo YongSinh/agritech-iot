@@ -34,8 +34,6 @@ spring:
           uri: ws://localhost:8083
           predicates:
             - Path=/iot/ws/**
-          filters:
-            - RewritePath=/iot/ws/info/(?<segment>.*), /ws/info/${segment}
       default-filters:
         - name: Retry
           args:

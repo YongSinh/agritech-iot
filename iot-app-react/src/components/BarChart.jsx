@@ -7,10 +7,13 @@ import { useTheme } from "@mui/material";
 const BarChart = ({ isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  
 
   return (
     <ResponsiveBar
       data={data}
+      groupMode="grouped"
+      layout= "vertical"
       theme={{
         axis: {
           domain: {

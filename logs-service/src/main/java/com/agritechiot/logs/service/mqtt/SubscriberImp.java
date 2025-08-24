@@ -22,16 +22,16 @@ public class SubscriberImp implements Subscriber {
     private final SensorLogService service;
     private final IotService iotService;
 
-//    @PostConstruct
-//    public void init() {
-//        try {
-//            sub();
-//        } catch (MqttException e) {
-//            log.error("❌ Error subscribing to MQTT topic", e);
-//        } catch (SSLException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @PostConstruct
+    public void init() {
+        try {
+            sub();
+        } catch (MqttException e) {
+            log.error("❌ Error subscribing to MQTT topic", e);
+        } catch (SSLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private void logMessage(String message, String topic) {
         log.info("RES_MQTT {} - {}", message, topic);

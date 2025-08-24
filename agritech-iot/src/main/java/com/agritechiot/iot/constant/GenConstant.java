@@ -37,9 +37,11 @@ public class GenConstant {
     public static final String TYPE_STATUS_LORA_M_CHANNEL = "lora-M-channel";
     public static final String TYPE_STATUS_LORA_S_ADDRESS = "lora-S-address";
     public static final String TYPE_VALVE = "valve";
+    public static final String TYPE_STATUS_READ = "read";
 
     public static final Flux<Map<String, String>> TYPE_STATUS_FLUX = Flux.just(
             createStatusMap(TYPE_STATUS_CHECK),
+            createStatusMap(TYPE_STATUS_READ),
             createStatusMap(TYPE_VALVE),
             createStatusMap(TYPE_STATUS_AMBIEN_TEMPERATURE),
             createStatusMap(TYPE_STATUS_WATER_FLOW_RATE),

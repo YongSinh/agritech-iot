@@ -41,7 +41,7 @@ public class SecurityConfig {
     @Value("${file.path.cert}")
     private String pathCert;
 
-    private final String[] freeResourceUrls = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+    private final String[] freeResourceUrls = {"/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**","/ws/**",
             "/swagger-resources/**", "/api-docs/**", "/aggregate/**", "/actuator/prometheus"};
 
 
@@ -54,7 +54,7 @@ public class SecurityConfig {
                     exchanges
                             .pathMatchers(freeResourceUrls).permitAll()
                             .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                            .anyExchange().permitAll();
+                            .anyExchange().authenticated();
                 })
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));

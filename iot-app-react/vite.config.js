@@ -5,6 +5,8 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 
+const websocketUrl = "https://localhost:8085";
+
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -14,7 +16,7 @@ export default defineConfig({
   },
   proxy: {
       '/iot/ws': {
-        target: 'http://localhost:8083',
+        target: websocketUrl,
         changeOrigin: true,
         secure: false,
         ws: true, // <-- IMPORTANT: proxy WebSocket

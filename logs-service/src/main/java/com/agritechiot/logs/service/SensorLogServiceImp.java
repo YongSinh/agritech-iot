@@ -6,6 +6,8 @@ import com.agritechiot.logs.model.SensorLog;
 import com.agritechiot.logs.repository.SensorLogRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,7 +37,7 @@ public class SensorLogServiceImp implements SensorLogService {
             logs = sensorLogRepo.findByFromTopic(req.getTopic()).take(req.getLimit());
         }
         else {
-            logs = Flux.empty();
+            logs = sensorLogRepo.findAll().take(req.getLimit());
         }
         return logs;
     }

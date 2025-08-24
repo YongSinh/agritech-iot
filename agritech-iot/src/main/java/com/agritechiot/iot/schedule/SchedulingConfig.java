@@ -28,12 +28,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     public void refreshScheduledTasks() {
         if (this.taskRegistrar == null) {
-            log.warn("TaskRegistrar not initialized yet");
+            log.warn("TaskRegistrar not initialized yet"); 
         }
-        triggerScheduleManager.refreshScheduledTasks(taskRegistrar);
-        repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
-        onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
-        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
+//        triggerScheduleManager.refreshScheduledTasks(taskRegistrar);
+//        repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
+//        onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
+//        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
     }
 
     public void refreshRepeatScheduledTasksById(Integer id) {

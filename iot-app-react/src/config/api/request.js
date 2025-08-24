@@ -1,6 +1,5 @@
 import axios from "axios";
 import { toast, Bounce } from 'react-toastify';
-import { useContext } from "react";
 import useKeycloak from "../UserService/useKeycloak";
 // Constants for status codes and messages
 const STATUS_CODES = {
@@ -21,8 +20,7 @@ export function getLocalAccessToken() {
 }
 
 export const config = {
-  // base_server: "https://159.65.131.28:8085",
-  base_server: "https://localhost:8085",
+  base_server: import.meta.env.VITE_API_GATEWAY_URL,
   image_path: "",
   version: 1,
 };

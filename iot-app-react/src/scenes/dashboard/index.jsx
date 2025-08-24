@@ -5,6 +5,9 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Select,
+  MenuItem,
+  InputLabel,
 } from "@mui/material";
 import {
   Header,
@@ -16,15 +19,11 @@ import {
 } from "../../components";
 import {
   DownloadOutlined,
-  Email,
-  PersonAdd,
-  PointOfSale,
   Traffic,
   CalendarToday
 } from "@mui/icons-material";
 import DevicesIcon from '@mui/icons-material/Devices';
 import { tokens } from "../../theme";
-import { mockTransactions } from "../../data/mockData";
 import { useRequest } from "../../config/api/request";
 import { useState, useEffect } from "react";
 import SockJS from "sockjs-client";
@@ -32,6 +31,8 @@ import Swal from "sweetalert2";
 import DeviceStatusDialog from './DeviceStatusDialog';
 import { Client } from "@stomp/stompjs";
 import ModelForm from "./modelForm";
+import dayjs from "dayjs";
+import MyBarChart from "../../components/MyBarChart";
 
 function Dashboard() {
   const theme = useTheme();
@@ -46,7 +47,29 @@ function Dashboard() {
   const [message, setMessage] = useState(null);
   const [deviceIds, setDeviceIds] = useState([]);
   const [statusType, setStatusType] = useState([]);
+  const [mqttMesData, setMqttMesData] = useState([]);
   const [open, setOpen] = useState(false);
+
+  const [limit, setLimit] = useState('10');
+
+
+  const barData = [
+    {
+      "label": "Soil Temp",
+      "value": 28.52,
+      "id": "soil_temperature"
+    },
+    {
+      "label": "Ambient Temp",
+      "value": 28.50,
+      "id": "ambien_temperature"
+    },
+    {
+      "label": "Voltage",
+      "value": 33.44,
+      "id": "voltage"
+    }
+  ];
 
   const getListDevice = async () => {
     const result = await request("/iot/v1/device/total-status", "GET", null);
@@ -73,13 +96,23 @@ function Dashboard() {
     }
   };
 
-    const getMqttMessage = async () => {
-    const result = await request("/log/v1/sensor-logs/filter?topic=", "GET", null);
-    if (result) {
-      setStatusType(result.data);
-    }
+
+  const handleChange = (event) => {
+    const newLimit = event.target.value;
+    setLimit(newLimit);
+    getMqttMessage(newLimit);
   };
 
+  const getMqttMessage = async (currentLimit) => {
+    const payload = {
+      "topic": "mqtt_out",
+      "limit": currentLimit
+    };
+    const result = await request("/api/log/v1/sensor-logs/filter", "POST", payload);
+    if (result) {
+      setMqttMesData(result.data);
+    }
+  };
 
 
   const getAllDeviceIds = async () => {
@@ -99,17 +132,18 @@ function Dashboard() {
     getListDevice();
     getAllDeviceIds();
     getListStatusType();
+    getMqttMessage(limit);
   }, []);
 
   useEffect(() => {
-    
+
     const newClient = new Client({
       webSocketFactory: () => new SockJS("/iot/ws"),
       onConnect: () => {
         newClient.subscribe("/topic/public", (message) => {
           const newMessage = JSON.parse(message.body);
           handleNewMessage(newMessage);
-          console.log(newMessage)
+          getMqttMessage(limit)
         });
       },
       onStompError: (frame) => {
@@ -126,22 +160,29 @@ function Dashboard() {
   }, []);
 
 
-    const handleSubmit = async (formData) => {
-      //console.log(formData)
-      const result = await request("/iot/v1/control-logs/check-device", "POST", formData);
-      handleClose();
-      if (result.code =! "SUC-000") {
-        Swal.fire({
-          title: "Error!",
-          text: result.message,
-          icon: "error",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-    };
-  
-  
+  const handleSubmit = async (formData) => {
+    //console.log(formData)
+    const result = await request("/iot/v1/control-logs/check-device", "POST", formData);
+    handleClose();
+    if (result.code = ! "SUC-000") {
+      Swal.fire({
+        title: "Error!",
+        text: result.message,
+        icon: "error",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
+  };
+
+  const menuItems = [
+    { value: 10, label: "Ten" },
+    { value: 20, label: "Twenty" },
+    { value: 30, label: "Thirty" },
+    { value: 50, label: "Fifty" }
+  ];
+
+
   return (
     <Box m="20px">
       <DeviceStatusDialog
@@ -197,7 +238,7 @@ function Dashboard() {
         gap="20px"
       >
         {/* Statistic Items */}
-        <Box
+        {/* <Box
           gridColumn="span 3"
           bgcolor={colors.primary[400]}
           display="flex"
@@ -254,7 +295,6 @@ function Dashboard() {
             }
           />
         </Box>
-
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}
@@ -273,7 +313,7 @@ function Dashboard() {
               />
             }
           />
-        </Box>
+        </Box> */}
 
         {/* ---------------- Row 2 ---------------- */}
 
@@ -325,15 +365,34 @@ function Dashboard() {
           bgcolor={colors.primary[400]}
           overflow="auto"
         >
-          <Box borderBottom={`4px solid ${colors.primary[500]}`} p="15px">
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            borderBottom={`4px solid ${colors.primary[500]}`}
+            p="15px">
             <Typography color={colors.gray[100]} variant="h5" fontWeight="600">
               Recent MQTT Message
             </Typography>
+            <Select
+              labelId="limit-select-standard"
+              id="limit-select-standard"
+              value={limit}
+              onChange={handleChange}
+              defaultValue="10"
+              label="Limit Mesaage"
+            >
+              {menuItems.map((item) => (
+                <MenuItem key={item.value} value={item.value}>
+                  {item.label}
+                </MenuItem>
+              ))}
+            </Select>
           </Box>
 
-          {mockTransactions.map((transaction, index) => (
+          {mqttMesData.map((data, index) => (
             <Box
-              key={`${transaction.txId}-${index}`}
+              key={`${index}`}
               display="flex"
               alignItems="center"
               justifyContent="space-between"
@@ -346,21 +405,24 @@ function Dashboard() {
                   variant="h5"
                   fontWeight="600"
                 >
-                  {transaction.txId}
+                  {data.data?.device || 'N/A'}
                 </Typography>
                 <Typography color={colors.gray[100]}>
-                  {transaction.user}
+                  {data.data?.status || 'N/A'}
                 </Typography>
               </Box>
               <Typography color={colors.gray[100]}>
-                {transaction.date}
+                {data.data?.state || 'N/A'}
+              </Typography>
+              <Typography color={colors.gray[100]}>
+                {dayjs(data?.date_time).format('YYYY-MM-DD h:mm A') || 'N/A'}
               </Typography>
               <Box
                 bgcolor={colors.greenAccent[500]}
                 p="5px 10px"
                 borderRadius="4px"
               >
-                ${transaction.cost}
+                {data.data?.value || 'N/A'}
               </Box>
             </Box>
           ))}
@@ -417,12 +479,35 @@ function Dashboard() {
             height="250px"
             mt="-20px"
           >
-            <BarChart isDashboard={true} />
+            <MyBarChart data={message?.data || []} />
+              {/* <BarChart isDashboard={true} /> */}
+          </Box>
+        </Box>
+         <Box
+          gridColumn={isXlDevices ? "span 4" : "span 3"}
+          gridRow="span 2"
+          backgroundColor={colors.primary[400]}
+        >
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            sx={{ p: "30px 30px 0 30px" }}
+          >
+            Sales Quantity
+          </Typography>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            height="250px"
+            mt="-20px"
+          >
+              <BarChart isDashboard={true} />
           </Box>
         </Box>
 
         {/* Geography Chart */}
-        <Box
+        {/* <Box
           gridColumn={isXlDevices ? "span 4" : "span 3"}
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -439,7 +524,7 @@ function Dashboard() {
           >
             <GeographyChart isDashboard={true} />
           </Box>
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );

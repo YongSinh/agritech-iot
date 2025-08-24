@@ -2,6 +2,8 @@ package com.agritechiot.iot.controller;
 
 import com.agritechiot.iot.dto.ApiResponse;
 import com.agritechiot.iot.dto.request.MqttPublishReq;
+import com.agritechiot.iot.dto.response.SensorResponseWrapper;
+import com.agritechiot.iot.dto.response.SensorTransformer;
 import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.model.Trigger;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
@@ -41,6 +43,12 @@ public class SampleController {
         publisher.publish(req.getTopic(), JsonUtil.toJsonSnakeCase(res), req.getQos(), req.getRetained());
         return ResponseEntity.ok(new ApiResponse<>(req));
     }
+
+    @PostMapping("/transform")
+    public SensorResponseWrapper transform(@RequestBody SensorTransformer sensorData) {
+        return new SensorResponseWrapper(sensorData);
+    }
+
 
     @GetMapping("/sample2/{id}")
     public ResponseEntity<List<IoTDevice>> sample2(

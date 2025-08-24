@@ -3,12 +3,15 @@ package com.agritechiot.iot.service.mqtt;
 import com.agritechiot.iot.config.Mqtt;
 import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.response.MqttMessageSlaveRes;
+import com.agritechiot.iot.dto.response.SensorResponseWrapper;
+import com.agritechiot.iot.dto.response.SensorTransformer;
 import com.agritechiot.iot.repository.MqttTopicRepo;
 import com.agritechiot.iot.service.ControlLogService;
 import com.agritechiot.iot.service.IoTDeviceService;
 import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.util.GenUtil;
 import com.agritechiot.iot.util.JsonUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -78,10 +83,27 @@ public class SubscriberImp implements Subscriber {
                     try {
                         mqtt.getClient().subscribe(topic.getTopicOut(), (t, message) -> {
                             String res = new String(message.getPayload());
-                            MqttMessageSlaveRes dto = JsonUtil.fromJson(res, MqttMessageSlaveRes.class);
-                            log.info("Res: {}", dto);
                             logMessage(res, topic.toString());
-                            messagingTemplate.convertAndSend("/topic/public", res);
+
+                            try {
+                                JsonNode node = JsonUtil.parseJson(res);
+                                String status = node.get("status").asText();
+
+                                if ("read".equalsIgnoreCase(status)) {
+                                    // ✅ Case 1: Sensor response
+                                    SensorTransformer sensor = JsonUtil.fromJson(res, SensorTransformer.class);
+                                    SensorResponseWrapper transformed = new SensorResponseWrapper(sensor);
+                                    log.info("Sensor Res: {}", transformed);
+                                    messagingTemplate.convertAndSend("/topic/public", transformed);
+                                } else {
+                                    // ✅ Case 2: Normal response
+                                    MqttMessageSlaveRes dto = JsonUtil.fromJson(res, MqttMessageSlaveRes.class);
+                                    log.info("Normal Res: {}", dto);
+                                    messagingTemplate.convertAndSend("/topic/public", dto);
+                                }
+                            } catch (Exception e) {
+                                log.error("❌ Failed to parse MQTT message: {}", res, e);
+                            }
                             processMessage(res);
 //                            if (dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ON) || dto.getStatus().equalsIgnoreCase(GenConstant.STATUS_ONLINE)) {
 //                                updateStatus(dto.getDevice(), dto.getStatus())
