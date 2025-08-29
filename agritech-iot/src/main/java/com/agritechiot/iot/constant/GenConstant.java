@@ -19,6 +19,12 @@ public class GenConstant {
     public static final String NOT_FOUND = "DATA NOT FOUND";
     public static final String INTERVAL_SCHEDULE_LOG_NOT_FOUND = "INTERVAL SCHEDULE LOG NOT FOUND";
 
+    public static final String LOG_TYPE_CANCEL = "cancel";
+    public static final String LOG_TYPE_REGISTER = "register";
+    public static final String LOG_TYPE_NONE = "none";
+    public static final String LOG_TYPE_DONE = "done";
+    public static final String LOG_TYPE_EXECUTE = "execute";
+
     public static final String STATUS_ON = "on";
     public static final String STATUS_ONLINE = "online";
     public static final String STATUS_OFF = "off";
@@ -38,6 +44,10 @@ public class GenConstant {
     public static final String TYPE_STATUS_LORA_S_ADDRESS = "lora-S-address";
     public static final String TYPE_VALVE = "valve";
     public static final String TYPE_STATUS_READ = "read";
+
+    public static final String INTERVAL_SCHEDULE = "interval";
+    public static final String ONETIME_SCHEDULE = "one-time";
+    public static final String REPEAT_SCHEDULE = "repeat";
 
     public static final Flux<Map<String, String>> TYPE_STATUS_FLUX = Flux.just(
             createStatusMap(TYPE_STATUS_CHECK),

@@ -21,8 +21,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -87,7 +85,7 @@ public class SubscriberImp implements Subscriber {
 
                             try {
                                 JsonNode node = JsonUtil.parseJson(res);
-                                String status = node.get("status").asText();
+                                String status = node.path("status").asText("UNKNOWN");
 
                                 if ("read".equalsIgnoreCase(status)) {
                                     // ✅ Case 1: Sensor response

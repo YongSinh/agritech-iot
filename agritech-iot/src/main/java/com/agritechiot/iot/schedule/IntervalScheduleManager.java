@@ -1,5 +1,6 @@
 package com.agritechiot.iot.schedule;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.DeviceCommandReq;
 import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.IntervalSchedule;
@@ -7,6 +8,7 @@ import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.repository.IntervalScheduleRepo;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
 import com.agritechiot.iot.service.ControlLogService;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
@@ -25,6 +28,7 @@ import java.util.concurrent.ScheduledFuture;
 @Slf4j
 public class IntervalScheduleManager {
     private final IntervalScheduleRepo intervalScheduleRepo;
+    private final LogService logService;
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
     private final SchedulingUtil schedulingUtil;
     private final ConcurrentMap<String, ScheduledFuture<?>> intervalSchedule = new ConcurrentHashMap<>();
@@ -39,7 +43,6 @@ public class IntervalScheduleManager {
             log.info("🧹 Cancelling all existing interval schedule tasks...");
             cancelAllScheduledTasks();
 
-            log.info("🔁 Re-registering tasks...");
             // Re-schedule default task
             intervalScheduleRepo.findByIsNotDeleted()
                     .flatMap(schedule -> {
@@ -89,28 +92,59 @@ public class IntervalScheduleManager {
             log.warn("TaskRegistrar not initialized yet: {}", id);
             return;
         }
-        log.info("🧹 Interval Cancelling tasks for device {}...", id);
+        logService.scheduleLog(GenConstant.LOG_TYPE_CANCEL, id, GenConstant.INTERVAL_SCHEDULE);
         cancelDeviceTasks(id);
 
-        log.info("🔁 Re-registering tasks for device {}...", id);
+        logService.scheduleLog(GenConstant.LOG_TYPE_REGISTER, id, GenConstant.INTERVAL_SCHEDULE);
         intervalScheduleRepo.findById(id)
                 .flatMap(schedule -> {
                     if (Boolean.FALSE.equals(schedule.getStatus())) {
-                        cancelDeviceTasks(id);
                         return Mono.empty();  // Skip if we're canceling
                     }
                     return Mono.just(schedule);  // Continue with processing
                 })
                 // .doOnNext(this::scheduleRepeatTask)
                 .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("⚠️ No schedules found for device {}", id);
+                    logService.scheduleLog(GenConstant.LOG_TYPE_NONE, id, GenConstant.INTERVAL_SCHEDULE);
                     return Mono.empty();
                 }))
                 .subscribe(
                         this::scheduleRepeatTask,
                         error -> log.error("Failed to schedule tasks for device {}", id, error),
-                        () -> log.info("Completed scheduling tasks for device {}", id)
+                        () -> logService.scheduleLog(GenConstant.LOG_TYPE_DONE, id, GenConstant.INTERVAL_SCHEDULE)
                 );
+    }
+
+    public void refreshIntervalScheduledTasksByIds(List<Integer> ids, ScheduledTaskRegistrar taskRegistrar) {
+        if (taskRegistrar == null) {
+            log.warn("TaskRegistrar not initialized yet for IDs: {}", ids);
+            return;
+        }
+
+        for (Integer id : ids) {
+            logService.scheduleLog(GenConstant.LOG_TYPE_CANCEL, id, GenConstant.INTERVAL_SCHEDULE);
+            cancelDeviceTasks(id);
+
+            logService.scheduleLog(GenConstant.LOG_TYPE_REGISTER, id, GenConstant.INTERVAL_SCHEDULE);
+            intervalScheduleRepo.findById(id)
+                    .flatMap(schedule -> {
+                        if (Boolean.FALSE.equals(schedule.getStatus())) {
+                            logService.scheduleLog(GenConstant.LOG_TYPE_CANCEL, id, GenConstant.INTERVAL_SCHEDULE);
+                            cancelDeviceTasks(id);
+                            return Mono.empty();  // Skip if we're canceling
+                        }
+                        return Mono.just(schedule);
+                    })
+                    .switchIfEmpty(Mono.defer(() -> {
+                        logService.scheduleLog(GenConstant.LOG_TYPE_NONE, id, GenConstant.INTERVAL_SCHEDULE);
+                        return Mono.empty();
+                    }))
+                    .subscribe(
+                            this::scheduleRepeatTask,
+                            error -> log.error("Failed to schedule tasks for device {}", id, error),
+                            () -> logService.scheduleLog(GenConstant.LOG_TYPE_DONE, id, GenConstant.INTERVAL_SCHEDULE)
+                    );
+        }
     }
 
 
@@ -147,7 +181,7 @@ public class IntervalScheduleManager {
     private void executeIntervalActions(IntervalSchedule schedule) {
         String deviceId = schedule.getDeviceId();
         boolean currentStatus = deviceStatusMap.getOrDefault(deviceId, false);
-
+        logService.scheduleLog(GenConstant.LOG_TYPE_REGISTER, schedule.getId(), GenConstant.INTERVAL_SCHEDULE);
         if (!currentStatus) {
             if (schedule.getStatus() == Boolean.TRUE) {
                 executeScheduledActions(schedule);
@@ -179,7 +213,7 @@ public class IntervalScheduleManager {
     }
 
     public void executeScheduledActions(IntervalSchedule schedule) {
-        log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
+        logService.scheduleLog(GenConstant.LOG_TYPE_EXECUTE, schedule.getId(), GenConstant.INTERVAL_SCHEDULE);
 
         IoTDevice device = ioTDeviceRepo.findById(schedule.getDeviceId()).block();
         if (device == null) {

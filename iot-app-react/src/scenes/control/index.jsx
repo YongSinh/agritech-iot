@@ -91,6 +91,8 @@ const IntervalSchedule = () => {
 
 
   const handleSubmit2 = async (formData) => {
+
+    console.log(formData)
     const result = await request("/iot/v1/control-logs/send-task", "post", formData);
     if (result) {
       Swal.fire({

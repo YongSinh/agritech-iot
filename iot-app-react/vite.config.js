@@ -19,11 +19,10 @@ export default defineConfig({
         target: websocketUrl,
         changeOrigin: true,
         secure: false,
-        ws: true, // <-- IMPORTANT: proxy WebSocket
+        ws: true,
       }
+    },
   },
-},
-  
   define: {
     global: 'window', // 👈 define global for browser
   }

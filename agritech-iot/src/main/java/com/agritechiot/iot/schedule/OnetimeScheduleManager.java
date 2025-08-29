@@ -1,5 +1,6 @@
 package com.agritechiot.iot.schedule;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.DeviceCommandReq;
 import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.IoTDevice;
@@ -7,6 +8,7 @@ import com.agritechiot.iot.model.OnetimeSchedule;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
 import com.agritechiot.iot.repository.OnetimeScheduleRepo;
 import com.agritechiot.iot.service.ControlLogService;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
@@ -25,6 +28,7 @@ import java.util.concurrent.ScheduledFuture;
 @Slf4j
 public class OnetimeScheduleManager {
     private final OnetimeScheduleRepo onetimeScheduleRepo;
+    private final LogService logService;
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
     private final SchedulingUtil schedulingUtil;
     private final ControlLogService controlLogService;
@@ -96,30 +100,57 @@ public class OnetimeScheduleManager {
 
     public void refreshOneTimeScheduledTasksById(Integer id, ScheduledTaskRegistrar taskRegistrar) {
         schedulingUtil.withTaskRegistrar(taskRegistrar, registrar -> {
-            log.info("🧹 One time Cancelling tasks for device {}...", id);
-            cancelDeviceTasks(id);
 
-            log.info("🔁 Re-registering tasks for device {}...", id);
+            logService.scheduleLog(GenConstant.LOG_TYPE_CANCEL, id, GenConstant.ONETIME_SCHEDULE);
+            cancelDeviceTasks(id);
             onetimeScheduleRepo.findById(id)
                     .flatMap(schedule -> {
                         if (Boolean.FALSE.equals(schedule.getStatus())) {
-                            cancelDeviceTasks(id);
                             return Mono.empty();  // Skip if we're canceling
                         }
+                        executeScheduledActions(schedule);
                         return Mono.just(schedule);  // Continue with processing
                     })
                     // .doOnNext(this::scheduleRepeatTask)
                     .switchIfEmpty(Mono.defer(() -> {
-                        log.warn("⚠️ No schedules found for device {}", id);
+                        logService.scheduleLog(GenConstant.LOG_TYPE_NONE, id, GenConstant.ONETIME_SCHEDULE);
                         return Mono.empty();
                     }))
                     .subscribe(
                             this::scheduleRepeatTask,
                             error -> log.error("Failed to schedule tasks for device {}", id, error),
-                            () -> log.info("Completed scheduling tasks for device {}", id)
+                            () -> logService.scheduleLog(GenConstant.LOG_TYPE_DONE, id, GenConstant.ONETIME_SCHEDULE)
                     );
         });
 
+    }
+
+    public void refreshOneTimeScheduledTasksByIds(List<Integer> ids, ScheduledTaskRegistrar taskRegistrar) {
+        schedulingUtil.withTaskRegistrar(taskRegistrar, registrar -> {
+            for (Integer id : ids) {
+                logService.scheduleLog(GenConstant.LOG_TYPE_CANCEL, id, GenConstant.ONETIME_SCHEDULE);
+                cancelDeviceTasks(id);
+
+                logService.scheduleLog(GenConstant.LOG_TYPE_REGISTER, id, GenConstant.ONETIME_SCHEDULE);
+                onetimeScheduleRepo.findById(id)
+                        .flatMap(schedule -> {
+                            if (Boolean.FALSE.equals(schedule.getStatus())) {
+                                return Mono.empty();  // Skip if we're canceling
+                            }
+                            executeScheduledActions(schedule);
+                            return Mono.just(schedule);
+                        })
+                        .switchIfEmpty(Mono.defer(() -> {
+                            logService.scheduleLog(GenConstant.LOG_TYPE_NONE, id, GenConstant.ONETIME_SCHEDULE);
+                            return Mono.empty();
+                        }))
+                        .subscribe(
+                                this::scheduleRepeatTask,
+                                error -> log.error("Failed to schedule tasks for device {}", id, error),
+                                () -> logService.scheduleLog(GenConstant.LOG_TYPE_DONE, id, GenConstant.ONETIME_SCHEDULE)
+                        );
+            }
+        });
     }
 
 
@@ -155,7 +186,7 @@ public class OnetimeScheduleManager {
     }
 
     public void executeScheduledActions(OnetimeSchedule schedule) {
-        log.info("🚀 Executing scheduled actions for device {}", schedule.getDeviceId());
+        logService.scheduleLog(GenConstant.LOG_TYPE_EXECUTE, schedule.getId(), GenConstant.ONETIME_SCHEDULE);
 
         IoTDevice device = ioTDeviceRepo.findById(schedule.getDeviceId()).block();
         if (device == null) {

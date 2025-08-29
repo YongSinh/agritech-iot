@@ -8,4 +8,7 @@ public interface LogService {
     void logInfo(String step);
 
     void logMqtt(String step, String message, String topic);
+
+    void scheduleLog(String action, Integer id, String type);
+
 }

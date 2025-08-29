@@ -98,6 +98,8 @@ public class OnetimeScheduleController {
         logService.logInfo("INIT_ONETIME_SCHEDULE_UPDATE_MULTIPLE_STATUS", JsonUtil.toJson(req));
         return onetimeScheduleService.updateListsStatus(req.getIds(), req.getStatus(), req.getBatchSize())
                 .then(Mono.fromCallable(ApiResponse::new))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshOnetimeScheduledTasksByIds(req.getIds()))
                 .onErrorResume(Exception.class, ex ->
                         Mono.just(new ApiResponse<>(
                                 ex.getMessage(),
@@ -115,6 +117,8 @@ public class OnetimeScheduleController {
         logService.logInfo("INIT_ONETIME_SCHEDULE_UPDATE_SINGLE_STATUS", JsonUtil.toJson(req));
         return onetimeScheduleService.updateSingleStatus(req.getId(), req.getStatus())
                 .then(Mono.fromCallable(ApiResponse::new))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshOnetimeIntervalTasksById(req.getId()))
                 .onErrorResume(e -> {
                     log.error("Error updating schedules: {}", e.getCause().getMessage(), e);
                     return Mono.just(new ApiResponse<>(List.of(), correlationId)); // Return empty list or custom error response

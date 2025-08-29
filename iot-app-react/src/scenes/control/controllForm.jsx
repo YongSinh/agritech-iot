@@ -22,7 +22,7 @@ const ControllForm = ({ open, handleClose, handleSubmit, sensors = [], initialDa
   const getInitialPayload = () => ({
     controlLogId: initialData?.id || "",
     valveDuration: "",
-    action: "",
+    state: "",
     sensor: "",
     type: ""
   });
@@ -113,16 +113,16 @@ const ControllForm = ({ open, handleClose, handleSubmit, sensors = [], initialDa
             </Grid> 
             <Grid item xs={6}>
               <FormControl variant="outlined" fullWidth margin="dense">
-                <InputLabel id="action-label">Action</InputLabel>
+                <InputLabel id="action-label">State</InputLabel>
                 <Select
                   labelId="action-label"
-                  id="action"
+                  id="state"
                   fullWidth
-                  name="action"
+                  name="state"
                   onChange={handleChange}
-                  value={formData.action}
+                  value={formData.state}
                  // disabled={status}
-                  label="Action"
+                  label="State"
                 >
                   {
                     booleans.map((value, index) => (

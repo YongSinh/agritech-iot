@@ -97,6 +97,8 @@ public class IntervalScheduleController {
         logService.logInfo("INIT_UPDATE_MULTIPLE_STATUS", JsonUtil.toJson(req));
         return intervalScheduleService.updateListsStatus(req.getIds(), req.getStatus(), req.getBatchSize())
                 .then(Mono.fromCallable(ApiResponse::new))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshOnetimeIntervalTasksByIds(req.getIds()))
                 .onErrorResume(Exception.class, ex ->
                         Mono.just(new ApiResponse<>(
                                 ex.getMessage(),

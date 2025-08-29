@@ -61,7 +61,7 @@ export const useRequest = () => {
       "Content-Type": param instanceof FormData ? "multipart/form-data" : "application/json",
       accept: param instanceof FormData ? "application/json" : "*/*",
       "correlation_id": self.crypto.randomUUID(),
-   //   Authorization: `Bearer ${keycloak.token}`,
+      Authorization: `Bearer ${keycloak.token}`,
     };
 
     try {

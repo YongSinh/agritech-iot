@@ -43,6 +43,7 @@ const KeycloakProvider = ({ children }) => {
         .then((authenticated) => {
           setAuthenticated(authenticated);
           setRefreshToken(keycloakInstance.refreshToken);
+          localStorage.setItem("access_token", keycloakInstance.token);
           setToken(keycloakInstance.token)
         })
         .catch((error) => {

@@ -18,11 +18,11 @@ spring:
         - id: logs-service
           uri: http://log-service:8082
           predicates:
-            - Path=/api/log/**, /logs-service/v3/api-docs
+            - Path=/api/log/**, /v3/api-docs/logs-service
         - id: iot-service
           uri: http://iot-service:8083
           predicates:
-            - Path=/iot/**, /iot-service/v3/api-docs
+            - Path=/iot/**, /v3/api-docs/iot-service
         - id: websocket-route
           uri: ws://localhost:8083
           predicates:
@@ -56,11 +56,12 @@ springdoc:
         url: /v3/api-docs
         display-name: api-gateway
       - name: logs-service
-        url: /logs-service/v3/api-docs
+        url: /v3/api-docs/logs-service
         display-name: logs-service
       - name: iot-service
-        url: /iot-service/v3/api-docs
+        url: /v3/api-docs/iot-service
         display-name: iot-service
+
 
 
 logging:

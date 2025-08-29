@@ -105,6 +105,8 @@ public class RepeatScheduleController {
         logService.logInfo("INIT_UPDATE_MULTIPLE_STATUS", JsonUtil.toJson(req));
         return repeatScheduleService.updateListsStatus(req.getIds(), req.getStatus(), req.getBatchSize())
                 .then(Mono.fromCallable(ApiResponse::new))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshRepeatScheduledTasksByIds(req.getIds()))
                 .onErrorResume(Exception.class, ex ->
                         Mono.just(new ApiResponse<>(
                                 ex.getMessage(),
@@ -122,6 +124,8 @@ public class RepeatScheduleController {
         logService.logInfo("INIT_UPDATE_SINGLE_STATUS", JsonUtil.toJson(req));
         return repeatScheduleService.updateSingleStatus(req.getId(), req.getStatus())
                 .then(Mono.fromCallable(ApiResponse::new))
+                .publishOn(Schedulers.boundedElastic())
+                .doOnSuccess(updateRepeatSchedule -> config.refreshRepeatScheduledTasksById(req.getId()))
                 .onErrorResume(Exception.class, ex ->
                         Mono.just(new ApiResponse<>(
                                 ex.getMessage(),

@@ -29,4 +29,18 @@ public class LogServiceImp implements LogService {
     public void logMqtt(String step, String message, String topic) {
         log.info("📥 Received message on topic {}: {} - {}", step, topic, message);
     }
+
+    @Override
+    public void scheduleLog(String action, Integer id, String type) {
+        switch (action) {
+            case "cancel" -> log.info("🧹 {} Cancelling tasks for device {}...", type, id);
+            case "register" -> log.info("🔁 {} Re-registering tasks for device {}...", type, id);
+            case "execute" -> log.info("🚀 {} Executing scheduled actions for device {}...", type, id);
+            case "none" -> log.warn("⚠️ No schedules found for device {}", id);
+            case "done" -> log.info("✅ Completed scheduling tasks for device {}", id);
+            default -> log.debug("[{}] Unknown action for device {}", type, id);
+        }
+    }
+
+
 }

@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
+import java.util.List;
+
 
 @Configuration
 @Slf4j
@@ -28,12 +30,12 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     public void refreshScheduledTasks() {
         if (this.taskRegistrar == null) {
-            log.warn("TaskRegistrar not initialized yet"); 
+            log.warn("TaskRegistrar not initialized yet");
         }
-//        triggerScheduleManager.refreshScheduledTasks(taskRegistrar);
-//        repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
-//        onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
-//        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
+        triggerScheduleManager.refreshScheduledTasks(taskRegistrar);
+        repeatScheduleManager.refreshScheduledTasks(taskRegistrar);
+        onetimeScheduleManager.refreshOneTimeScheduledTasks(taskRegistrar);
+        intervalScheduleManager.refreshIntervalScheduledTasks(taskRegistrar);
     }
 
     public void refreshRepeatScheduledTasksById(Integer id) {
@@ -46,6 +48,18 @@ public class SchedulingConfig implements SchedulingConfigurer {
 
     public void refreshOnetimeIntervalTasksById(Integer id) {
         intervalScheduleManager.refreshIntervalScheduledTasksById(id, taskRegistrar);
+    }
+
+    public void refreshRepeatScheduledTasksByIds(List<Integer> ids) {
+        repeatScheduleManager.refreshScheduledTasksByIds(ids, taskRegistrar);
+    }
+
+    public void refreshOnetimeScheduledTasksByIds(List<Integer> ids) {
+        onetimeScheduleManager.refreshOneTimeScheduledTasksByIds(ids, taskRegistrar);
+    }
+
+    public void refreshOnetimeIntervalTasksByIds(List<Integer> ids) {
+        intervalScheduleManager.refreshIntervalScheduledTasksByIds(ids, taskRegistrar);
     }
 
 

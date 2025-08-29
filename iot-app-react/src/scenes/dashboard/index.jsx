@@ -49,7 +49,7 @@ function Dashboard() {
   const [statusType, setStatusType] = useState([]);
   const [mqttMesData, setMqttMesData] = useState([]);
   const [open, setOpen] = useState(false);
-
+  const token = localStorage.getItem("access_token");
   const [limit, setLimit] = useState('10');
 
 
@@ -139,6 +139,9 @@ function Dashboard() {
 
     const newClient = new Client({
       webSocketFactory: () => new SockJS("/iot/ws"),
+      // connectHeaders: {
+      //   Authorization: `Bearer ${token}`, // 👈 Pass token here
+      // },
       onConnect: () => {
         newClient.subscribe("/topic/public", (message) => {
           const newMessage = JSON.parse(message.body);
@@ -470,7 +473,7 @@ function Dashboard() {
             fontWeight="600"
             sx={{ p: "30px 30px 0 30px" }}
           >
-            Sales Quantity
+           Sensor Quantity
           </Typography>
           <Box
             display="flex"
@@ -480,10 +483,10 @@ function Dashboard() {
             mt="-20px"
           >
             <MyBarChart data={message?.data || []} />
-              {/* <BarChart isDashboard={true} /> */}
+            {/* <BarChart isDashboard={true} /> */}
           </Box>
         </Box>
-         <Box
+        <Box
           gridColumn={isXlDevices ? "span 4" : "span 3"}
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -493,7 +496,7 @@ function Dashboard() {
             fontWeight="600"
             sx={{ p: "30px 30px 0 30px" }}
           >
-            Sales Quantity
+            Sensor Quantity
           </Typography>
           <Box
             display="flex"
@@ -502,7 +505,7 @@ function Dashboard() {
             height="250px"
             mt="-20px"
           >
-              <BarChart isDashboard={true} />
+            <BarChart isDashboard={true} />
           </Box>
         </Box>
 

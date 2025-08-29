@@ -50,7 +50,7 @@ public class ControlLogServiceImp implements ControlLogService {
     @Override
     public Mono<ControlLog> updateControlLog(ControlLogReq req) {
         logService.logInfo("REQ_UPDATE_CONTROL_LOG_REQ", JsonUtil.toJson(req));
-        return repo.findById(req.getId()).switchIfEmpty(Mono.error(new Exception("CONTROL_LOG_NOT_FOUND"))).
+        return repo.findById(req.getId()).switchIfEmpty(Mono.error(new Exception(GenConstant.NOT_FOUND))).
                 map(controlLog -> {
                     controlLog.setId(req.getId());
                     controlLog.setDeviceId(req.getDeviceId());
@@ -71,14 +71,14 @@ public class ControlLogServiceImp implements ControlLogService {
     @Override
     public Mono<Void> offAndOnControlLogDeviceId(String deviceId, boolean status) {
         return controlLogRepo.updateStatusByDeviceId(deviceId, status)
-                .switchIfEmpty(Mono.error(new AppException("CONTROL_LOG_NOT_FOUND")))
+                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)))
                 .then();
     }
 
     @Override
     public Mono<Void> offAndOnControlLog(Integer id, boolean status) {
         log.info("REQ_OFF_ON_CONTROL_LOG : {}", id);
-        return repo.findById(id).switchIfEmpty(Mono.error(new AppException("CONTROL_LOG_NOT_FOUND"))).
+        return repo.findById(id).switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND))).
                 map(controlLog -> {
                     controlLog.setId(id);
                     controlLog.setStatus(status);
@@ -121,6 +121,7 @@ public class ControlLogServiceImp implements ControlLogService {
                     DeviceCommandReq commandReq = new DeviceCommandReq();
                     commandReq.setDeviceId(deviceId);
                     commandReq.setType(req.getType());
+                    commandReq.setState(req.getState());
                     if (req.getDuration() != null) {
                         commandReq.setDuration(req.getDuration());
                     } else {
@@ -231,7 +232,6 @@ public class ControlLogServiceImp implements ControlLogService {
                             return Mono.error(new AppException("Invalid command type: " + req.getType()));
                         }
                     }
-
                     String topic = device.getMasterDeviceName();
 
                     log.info("Sending payload: {}", payload);

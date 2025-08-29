@@ -1,5 +1,6 @@
 package com.agritechiot.iot.schedule;
 
+import com.agritechiot.iot.constant.GenConstant;
 import com.agritechiot.iot.dto.request.DeviceCommandReq;
 import com.agritechiot.iot.exception.AppException;
 import com.agritechiot.iot.model.IoTDevice;
@@ -7,6 +8,7 @@ import com.agritechiot.iot.model.RepeatSchedule;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
 import com.agritechiot.iot.repository.RepeatScheduleRepo;
 import com.agritechiot.iot.service.ControlLogService;
+import com.agritechiot.iot.service.LogService;
 import com.agritechiot.iot.util.GenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledFuture;
@@ -28,6 +31,7 @@ public class RepeatScheduleManager {
     private final ThreadPoolTaskSchedulerConfig threadPoolTaskSchedulerConfig;
     private final IoTDeviceRepo ioTDeviceRepo;
     private final ControlLogService controlLogService;
+    private final LogService logService;
     private final ConcurrentMap<String, ScheduledFuture<?>> scheduledFutures = new ConcurrentHashMap<>();
 
     public void refreshScheduledTasks(ScheduledTaskRegistrar taskRegistrar) {
@@ -68,29 +72,58 @@ public class RepeatScheduleManager {
             log.warn("TaskRegistrar not initialized yet: {}", id);
             return;
         }
-
-        log.info("🧹 Cancelling tasks for device {}...", id);
+        logService.scheduleLog(GenConstant.LOG_TYPE_CANCEL, id, GenConstant.REPEAT_SCHEDULE);
         cancelDeviceTasks(id);
 
-        log.info("🔁 Re-registering tasks for device {}...", id);
+        logService.scheduleLog(GenConstant.LOG_TYPE_REGISTER, id, GenConstant.REPEAT_SCHEDULE);
         repeatScheduleRepo.findById(id)
                 .flatMap(schedule -> {
                     if (Boolean.FALSE.equals(schedule.getStatus())) {
-                        cancelDeviceTasks(id);
                         return Mono.empty();  // Skip if we're canceling
                     }
                     return Mono.just(schedule);  // Continue with processing
                 })
                 // .doOnNext(this::scheduleRepeatTask)
                 .switchIfEmpty(Mono.defer(() -> {
-                    log.warn("⚠️ No schedules found for device {}", id);
+                    logService.scheduleLog(GenConstant.LOG_TYPE_NONE, id, GenConstant.REPEAT_SCHEDULE);
                     return Mono.empty();
                 }))
                 .subscribe(
                         this::scheduleRepeatTask,
                         error -> log.error("Failed to schedule tasks for device {}", id, error),
-                        () -> log.info("Completed scheduling tasks for device {}", id)
+                        () -> logService.scheduleLog(GenConstant.LOG_TYPE_DONE, id, GenConstant.REPEAT_SCHEDULE)
                 );
+    }
+
+
+    public void refreshScheduledTasksByIds(List<Integer> ids, ScheduledTaskRegistrar taskRegistrar) {
+        if (taskRegistrar == null) {
+            log.warn("TaskRegistrar not initialized yet for IDs: {}", ids);
+            return;
+        }
+
+        for (Integer id : ids) {
+            logService.scheduleLog(GenConstant.LOG_TYPE_CANCEL, id, GenConstant.REPEAT_SCHEDULE);
+            cancelDeviceTasks(id);
+
+            logService.scheduleLog(GenConstant.LOG_TYPE_REGISTER, id, GenConstant.REPEAT_SCHEDULE);
+            repeatScheduleRepo.findById(id)
+                    .flatMap(schedule -> {
+                        if (Boolean.FALSE.equals(schedule.getStatus())) {
+                            return Mono.empty();  // Skip if we're canceling
+                        }
+                        return Mono.just(schedule);
+                    })
+                    .switchIfEmpty(Mono.defer(() -> {
+                        logService.scheduleLog(GenConstant.LOG_TYPE_NONE, id, GenConstant.REPEAT_SCHEDULE);
+                        return Mono.empty();
+                    }))
+                    .subscribe(
+                            this::scheduleRepeatTask,
+                            error -> log.error("Failed to schedule tasks for device {}", id, error),
+                            () -> logService.scheduleLog(GenConstant.LOG_TYPE_DONE, id, GenConstant.REPEAT_SCHEDULE)
+                    );
+        }
     }
 
 
