@@ -8,7 +8,6 @@ import com.agritechiot.iot.model.IoTDevice;
 import com.agritechiot.iot.model.Trigger;
 import com.agritechiot.iot.repository.IoTDeviceRepo;
 import com.agritechiot.iot.repository.TriggerRepo;
-import com.agritechiot.iot.service.integration.LogClient;
 import com.agritechiot.iot.service.mqtt.Publisher;
 import com.agritechiot.iot.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ public class SampleController {
     private final SimpMessagingTemplate messagingTemplate;
     private final TriggerRepo triggerRepo;
     private final Publisher publisher;
-    private final LogClient logClient;
     private final IoTDeviceRepo ioTDeviceRepo;
     @Value("${spring.profiles.active}")
     private String activeProfile;

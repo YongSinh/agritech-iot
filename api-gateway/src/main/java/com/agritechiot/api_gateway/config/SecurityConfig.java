@@ -41,7 +41,7 @@ public class SecurityConfig {
     @Value("${file.path.cert}")
     private String pathCert;
 
-    private final String[] freeResourceUrls = {"/swagger-ui.html", "/v3/api-docs/**", "/iot/ws/**",
+    private final String[] freeResourceUrls = {"/swagger-ui.html", "/v3/api-docs/**", "/iot/ws/**","/fallback",
             "/swagger-resources/**", "/api-docs/**", "/aggregate/**", "/actuator/prometheus",
             "/webjars/swagger-ui/**"};
 
