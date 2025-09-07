@@ -20,6 +20,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
 
   # IoT Service shouldn't depend on API Gateway
   iot-service:
@@ -35,6 +38,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
 
   # Log Service should be independent
   log-service:
@@ -50,7 +56,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
 
 networks:
   spring-net:
+    external: true
     driver: bridge

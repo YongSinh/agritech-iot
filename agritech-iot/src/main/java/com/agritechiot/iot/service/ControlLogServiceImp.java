@@ -71,7 +71,6 @@ public class ControlLogServiceImp implements ControlLogService {
     @Override
     public Mono<Void> offAndOnControlLogDeviceId(String deviceId, boolean status) {
         return controlLogRepo.updateStatusByDeviceId(deviceId, status)
-                .switchIfEmpty(Mono.error(new AppException(GenConstant.NOT_FOUND)))
                 .then();
     }
 

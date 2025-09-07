@@ -91,7 +91,8 @@ export const useRequest = () => {
             notifyError(err.message);
             break;
           case STATUS_CODES.UNAUTHORIZED:
-            notifyError(MESSAGES.UNAUTHORIZED);
+            keycloak?.login();
+            notifyWarning(MESSAGES.UNAUTHORIZED);
             break;
           case STATUS_CODES.FORBIDDEN:
             notifyWarning(MESSAGES.FORBIDDEN);

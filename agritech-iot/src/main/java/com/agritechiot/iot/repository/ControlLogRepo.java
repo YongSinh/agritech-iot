@@ -17,9 +17,9 @@ public interface ControlLogRepo extends ReactiveCrudRepository<ControlLog, Integ
     @Query("SELECT * FROM control_log as cl where cl.isRemoved =false or cl.isRemoved IS NULL")
     Flux<ControlLog> findByIsNotDeleted();
 
-    @Modifying
-    @Query("UPDATE control_log SET status = :status WHERE deviceId = :id")
-    Mono<Integer> updateStatusByDeviceId(String deviceId, boolean status);
+    @Query("UPDATE control_log SET status = :status WHERE deviceId = :deviceId")
+    Mono<Void> updateStatusByDeviceId(@Param("deviceId") String deviceId,
+                                         @Param("status") boolean status);
 
     @Query("""
                 SELECT * FROM control_log

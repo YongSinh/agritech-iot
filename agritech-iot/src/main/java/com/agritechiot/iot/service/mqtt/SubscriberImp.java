@@ -98,18 +98,17 @@ public class SubscriberImp implements Subscriber {
                                     MqttMessageSlaveRes dto = JsonUtil.fromJson(res, MqttMessageSlaveRes.class);
                                     log.info("Normal Res: {}", dto);
                                     messagingTemplate.convertAndSend("/topic/public", dto);
-                                    updateStatus(dto.getDevice(), dto.getStatus())
-                                            .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
-                                            .doOnError(error -> log.error("❌ Failed to save", error))
-                                            .subscribe();
+                                    if (dto.getStatus().equalsIgnoreCase(GenConstant.TYPE_STATUS_CHECK)){
+                                        updateStatus(dto.getState(), "master1_1")
+                                                .doOnSuccess(saveDevice -> log.info("✅ saved successfully: {}", saveDevice))
+                                                .doOnError(error -> log.error("❌ Failed to save", error))
+                                                .subscribe();
+                                    }
                                 }
                             } catch (Exception e) {
                                 log.error("❌ Failed to parse MQTT message: {}", res, e);
                             }
                             processMessage(res);
-
-
-
 
                         });
                         log.info(GenConstant.SUBSCRIBE_MSG_LOG, topic);

@@ -80,27 +80,47 @@ logging:
     org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping: DEBUG
     org.springframework.cloud.gateway.filter: DEBUG
 
-    # Netty & WebFlux details (if needed)
+    # Netty & WebFlux details
     reactor.netty.http.client: DEBUG
     reactor.netty: INFO
 
-    # Spring Security for OAuth2/JWT
+    # Spring Security
     org.springframework.security: INFO
     org.springframework.security.oauth2: DEBUG
     org.springframework.security.oauth2.server.resource: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG
+    org.springframework.security.oauth2.server.resource.web.access.server: DEBUG
 
-    # Retry & CircuitBreaker (Resilience4j)
+    # Retry & CircuitBreaker
     org.springframework.cloud.gateway.filter.factory.RetryGatewayFilterFactory: DEBUG
     org.springframework.cloud.gateway.filter.factory.CircuitBreakerGatewayFilterFactory: DEBUG
     io.github.resilience4j: DEBUG
 
-    # Token and Authorization (if using Keycloak or JWT introspection)
-    org.springframework.security.oauth2.jwt: DEBUG
-    org.springframework.security.oauth2.server.resource.web.access.server: DEBUG
-
     # Swagger / Springdoc
     org.springdoc: INFO
+
+  pattern:
+    correlation: "[${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 
 file:
   path:
     cert: D:\Work and School\Project\IoT\keycloak.crt
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show:
+        details: "always"
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+  tracing:
+    sampling:
+      probability: 1.0

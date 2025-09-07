@@ -22,7 +22,7 @@ import {
   Traffic,
   CalendarToday
 } from "@mui/icons-material";
-import DevicesIcon from '@mui/icons-material/Devices';
+
 import { tokens } from "../../theme";
 import { useRequest } from "../../config/api/request";
 import { useState, useEffect } from "react";
@@ -321,7 +321,7 @@ function Dashboard() {
         {/* ---------------- Row 2 ---------------- */}
 
         {/* Line Chart */}
-        <Box
+        {/* <Box
           gridColumn={
             isXlDevices ? "span 8" : isMdDevices ? "span 6" : "span 3"
           }
@@ -359,11 +359,13 @@ function Dashboard() {
           <Box height="250px" mt="-20px">
             <LineChart isDashboard={true} />
           </Box>
-        </Box>
+        </Box> */}
 
-        {/* Transaction Data */}
+        {/* MQTT Message Data */}
         <Box
-          gridColumn={isXlDevices ? "span 4" : "span 3"}
+          gridColumn={
+            isXlDevices ? "span 8" : isMdDevices ? "span 6" : "span 3"
+          }
           gridRow="span 2"
           bgcolor={colors.primary[400]}
           overflow="auto"
@@ -432,7 +434,7 @@ function Dashboard() {
         </Box>
 
         {/* Revenue Details */}
-        <Box
+        {/* <Box
           gridColumn={isXlDevices ? "span 4" : "span 3"}
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -460,7 +462,7 @@ function Dashboard() {
               Includes extra misc expenditures and costs
             </Typography>
           </Box>
-        </Box>
+        </Box> */}
 
         {/* Bar Chart */}
         <Box
@@ -486,7 +488,7 @@ function Dashboard() {
             {/* <BarChart isDashboard={true} /> */}
           </Box>
         </Box>
-        <Box
+        {/* <Box
           gridColumn={isXlDevices ? "span 4" : "span 3"}
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
@@ -507,7 +509,7 @@ function Dashboard() {
           >
             <BarChart isDashboard={true} />
           </Box>
-        </Box>
+        </Box> */}
 
         {/* Geography Chart */}
         {/* <Box
