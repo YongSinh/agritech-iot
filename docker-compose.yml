@@ -63,4 +63,3 @@ services:
 networks:
   spring-net:
     external: true
-    driver: bridge
