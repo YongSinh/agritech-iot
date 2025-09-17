@@ -10,7 +10,7 @@ import Bar from "./bar";
 import Line from "./line";
 import Pie from "./pie";
 import Stream from "./stream";
-import FAQ from "./faq";
+import Faq from "./faq";
 import Geography from "./geography";
 import Device from "./device";
 import RepeatSchedule from "./repeat-schedule";
@@ -18,7 +18,7 @@ import IntervalSchedule from "./interval-schedule";
 import OnetimeSchedule from "./onetime-schedule";
 import Trigger from "./trigger";
 import Control from "./control"
-import MQTT from "./mqtt"
+import Mqtt from "./mqtt"
 export {
   Navbar,
   SideBar,
@@ -32,7 +32,7 @@ export {
   Line,
   Pie,
   Stream,
-  FAQ,
+  Faq,
   Geography,
   Device,
   RepeatSchedule,
@@ -40,5 +40,5 @@ export {
   OnetimeSchedule,
   Trigger,
   Control,
-  MQTT
+  Mqtt
 };

@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-  TextField,
   Grid,
   Button,
   Select,
@@ -18,7 +17,6 @@ const ControllForm = ({ open, handleClose, handleSubmit, sensors = [], initialDa
   const actions = ["sleep", "work", "valve", "lora-m-address", "lora-m-channel", "lora-s-address"];
   const valveDuration = [true, false];
 
-  const [status, setStatus] = useState(false);
   const getInitialPayload = () => ({
     controlLogId: initialData?.id || "",
     valveDuration: "",
@@ -31,7 +29,6 @@ const ControllForm = ({ open, handleClose, handleSubmit, sensors = [], initialDa
   // Handle form field changes
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setStatus(value === "valve")
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -121,7 +118,6 @@ const ControllForm = ({ open, handleClose, handleSubmit, sensors = [], initialDa
                   name="state"
                   onChange={handleChange}
                   value={formData.state}
-                 // disabled={status}
                   label="State"
                 >
                   {

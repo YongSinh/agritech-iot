@@ -54,7 +54,7 @@ const notifyWarning = (message) => {
 };
 // Wrap the request function in a hook to use notifications
 export const useRequest = () => {
-  const { keycloak, authenticated } = useKeycloak();
+  const { keycloak } = useKeycloak();
 
   const request = async (url, method, param) => {
     const headers = {

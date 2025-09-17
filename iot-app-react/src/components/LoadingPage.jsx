@@ -1,4 +1,3 @@
-import * as legoData from "../assets/legoloading.json";
 import * as fly from "../assets/Animation - 1750490164126.json";
 import Lottie from "react-lottie";
 import "animate.css";
@@ -14,7 +13,6 @@ const LoadingPage = () => {
   };
 
   return (
-    <>
       <div style={{
         height: '100%',
         margin: 0,
@@ -26,7 +24,6 @@ const LoadingPage = () => {
       }}>
         <Lottie options={defaultOptions} height={400} width={400} />
       </div>
-    </>
   );
 };
 

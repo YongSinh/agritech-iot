@@ -32,12 +32,12 @@ const StateChip = styled(Chip)(({ state }) => ({
     color: '#fff',
 }));
 
-const DeviceStatusDialog = ({ open, onClose, message }) => {
+const DeviceStatusDialog = ({   open, onClose, message }) => {
     // Safely parse the message
     const parseMessage = () => {
         try {
-            if (!message || !message) return null;
-            return message
+            if (!message) return null;
+            return message;
         } catch (error) {
             console.error('Error parsing message:', error);
             return null;

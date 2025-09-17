@@ -10,7 +10,7 @@ import {
   Bar,
   Line,
   Pie,
-  FAQ,
+  Faq,
   Geography,
   Calendar,
   Stream,
@@ -20,7 +20,7 @@ import {
   IntervalSchedule,
   Trigger,
   Control, 
-  MQTT
+  Mqtt
 } from "./scenes";
 
 import LoadingPage from "./components/LoadingPage";
@@ -40,7 +40,7 @@ const AppRouter = () => {
           <Route path="/pie" element={<Pie />} />
           <Route path="/stream" element={<Stream />} />
           <Route path="/line" element={<Line />} />
-          <Route path="/faq" element={<FAQ />} />
+          <Route path="/faq" element={<Faq />} />
           <Route path="/geography" element={<Geography />} />
           <Route path="/device" element={<Device />} />
           <Route path="/repeat-schedule" element={<RepeatSchedule />} />
@@ -48,7 +48,7 @@ const AppRouter = () => {
           <Route path="/onetime-schedule" element={<OnetimeSchedule />} />
           <Route path="/trigger" element={<Trigger />} />
           <Route path="/control" element={<Control />} />
-          <Route path="/mqtt-topic" element={<MQTT />} />
+          <Route path="/mqtt-topic" element={<Mqtt/>} />
           <Route path="/loading" element={<LoadingPage />} />
         </Route>
       </Routes>
