@@ -71,13 +71,6 @@ function Dashboard() {
     }
   ];
 
-  const getListDevice = async () => {
-    const result = await request("/iot/v1/device/total-status", "GET", null);
-    if (result) {
-      setDevices(result.data);
-    }
-  };
-
 
   // Open the form dialog
   const handleClickOpen = () => {
@@ -129,7 +122,6 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    getListDevice();
     getAllDeviceIds();
     getListStatusType();
     getMqttMessage(limit);

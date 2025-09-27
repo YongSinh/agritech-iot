@@ -137,6 +137,11 @@ const Calendar = () => {
                 title: "Timed event",
                 date: "2024-02-29",
               },
+              {
+                id: "51232",
+                title: "Timed event",
+                date: "2025-09-26",
+              },
             ]}
           />
         </Box>
