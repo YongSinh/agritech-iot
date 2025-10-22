@@ -55,7 +55,7 @@ public class SecurityConfig {
                     exchanges
                             .pathMatchers(freeResourceUrls).permitAll()
                             .pathMatchers(HttpMethod.OPTIONS).permitAll()
-                            .anyExchange().authenticated();
+                            .anyExchange().permitAll();
                 })
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));

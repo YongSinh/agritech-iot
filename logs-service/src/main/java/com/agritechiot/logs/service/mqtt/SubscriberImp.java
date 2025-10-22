@@ -59,6 +59,7 @@ public class SubscriberImp implements Subscriber {
                         log.info("📌 Subscribing to IN topic: {}", topicIn);
                         log.info("📌 Subscribing to OUT topic: {}", topicOut);
 
+                        saveSensorLog("#");
                         saveSensorLog(topicIn);
                         saveSensorLog(topicOut);
 
