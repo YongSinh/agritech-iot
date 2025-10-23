@@ -48,29 +48,29 @@ public class SubscriberImp implements Subscriber {
             mqtt.getClient().connect();
             log.info("🔄 MQTT Client reconnected successfully.");
         }
-
-        iotService.getTopic()
-                .flatMapMany(Flux::fromIterable) // convert List<TopicRes> -> Flux<TopicRes>
-                .doOnSubscribe(sub -> log.info("📡 Fetching topics from IoT service..."))
-                .flatMap(res -> Mono.fromRunnable(() -> {
-                    try {
-                        String topicOut = res.getTopicOut();
-                        String topicIn = res.getTopic();
-                        log.info("📌 Subscribing to IN topic: {}", topicIn);
-                        log.info("📌 Subscribing to OUT topic: {}", topicOut);
-
-                        saveSensorLog("#");
-                        saveSensorLog(topicIn);
-                        saveSensorLog(topicOut);
-
-                        log.info("✅ Successfully subscribed to IN/OUT topics [{} , {}]", topicIn, topicOut);
-                    } catch (Exception e) {
-                        log.error("❌ Failed to subscribe to topic: {}", res.getTopic(), e);
-                    }
-                }))
-                .doOnComplete(() -> log.info("🎉 All topics subscribed successfully."))
-                .doOnError(e -> log.error("🔥 Error while subscribing to topics", e))
-                .subscribe();
+        saveSensorLog("#");
+//        iotService.getTopic()
+//                .flatMapMany(Flux::fromIterable) // convert List<TopicRes> -> Flux<TopicRes>
+//                .doOnSubscribe(sub -> log.info("📡 Fetching topics from IoT service..."))
+//                .flatMap(res -> Mono.fromRunnable(() -> {
+//                    try {
+//                        String topicOut = res.getTopicOut();
+//                        String topicIn = res.getTopic();
+//                        log.info("📌 Subscribing to IN topic: {}", topicIn);
+//                        log.info("📌 Subscribing to OUT topic: {}", topicOut);
+//
+//                        saveSensorLog("#");
+//                        saveSensorLog(topicIn);
+//                        saveSensorLog(topicOut);
+//
+//                        log.info("✅ Successfully subscribed to IN/OUT topics [{} , {}]", topicIn, topicOut);
+//                    } catch (Exception e) {
+//                        log.error("❌ Failed to subscribe to topic: {}", res.getTopic(), e);
+//                    }
+//                }))
+//                .doOnComplete(() -> log.info("🎉 All topics subscribed successfully."))
+//                .doOnError(e -> log.error("🔥 Error while subscribing to topics", e))
+//                .subscribe();
     }
 
 
